@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to tame your LLM — Pranav Dhoolia</title>
+  <meta name="description" content="LLMs are intelligent beasts. Think of them as unicorns. Channel their powers">
+  <meta name="author" content="Pranav Dhoolia">
+  <meta property="og:title" content="How to tame your LLM">
+  <meta property="og:description" content="LLMs are intelligent beasts. Think of them as unicorns. Channel their powers">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://pranav.com.au/posts/operant/">
+  <link rel="canonical" href="https://pranav.com.au/posts/operant/">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../about.html">About</a>
+    </nav>
+  </header>
+  <main>
+    <article>
+      <h1>How to tame your LLM</h1>
+      <time datetime="2026-05-16">May 16, 2026</time>
+
+      <p>After the full <em>intents + SDLC spec</em> back and forth with the LLM, we arrive at a final <em>EIS</em></p>
+
+      <p>But the major challenge is that doesn&#39;t guarantee that the LLM is going to reliably follow that spec and deliver solutions</p>
+
+      <p>So the LLM is practically <em>REQUIRED</em> to do the following (a <em>Stop</em> hook detects if it checked all the below, if not, LLM is not allowed to exit the loop):</p>
+
+      <ul>
+        <li><p>Generate test spec (including finite state machines, schema specs, and e2e specs) using <em>sequential thinking</em> type tools that <em>REQUIRE</em> it to think of some key params + reject the tests if they don&#39;t heuristically and semantically match our catalog (of around 100+ best practice examples and growing)</p></li>
+        <li><p>The LLM is then <em>REQUIRED</em> to launch a <em>maintainer</em> subagent (to spawn dockers, servers and setup dev environment), N x <em>builder</em> subagents (responsible for delivering on the EIS)</p></li>
+        <li><p>After they&#39;re done, they are <em>REQUIRED</em> to submit <em>screenshots</em> and other proof of work, which are verified <em>DETERMINISTICALLY</em>, <em>HEURISTICALLY</em>, and <em>STOCHASTICALLY</em> by <em>police</em> subagents (which are <em>REQUIRED</em> to submit reason if they pass/fail the builder)</p></li>
+        <li><p>A report is submitted to the <em>orchestrator</em> (also called the CEO) agent, which spawns new <em>builder</em> subagents if tests fail</p></li>
+        <li><p>After the <em>orchestrator</em> gets everything fixed, it is <em>REQUIRED</em> to <em>commit, push and deploy</em> (using MCP tools ONLY), which <em>DETERMINISTICALLY</em> and <em>HEURISTICALLY</em> verify working.</p></li>
+        <li><p>ONLY IF the last tool call is a successful <em>deploy</em> MCP call does the LLM get to exit, else it receives the relevant error, and has to keep trying until it succeeds</p></li>
+      </ul>
+    </article>
+  </main>
+  <footer>
+    <p>&copy; 2026 Pranav Dhoolia</p>
+  </footer>
+</body>
+</html>

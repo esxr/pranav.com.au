@@ -1,0 +1,5 @@
+title: "Making a ChatGPT-like UI for your application in 15 minutes"
+date: "2024-06-24"
+description: "Creating a Generic Chat UI that we can use with ANY LLM solution we create in future"
+tags: ["ai", "genai", "langchain", "open-webui", "ollama"]
+draft: false

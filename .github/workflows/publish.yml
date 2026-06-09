@@ -1,0 +1,260 @@
+name: Publish
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  build-index:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Rebuild index
+        run: ./scripts/build-index.sh
+
+      - name: Check for index changes
+        id: diff
+        run: |
+          git diff --quiet index.html && echo "changed=false" >> "$GITHUB_OUTPUT" || echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push updated index
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "chore: rebuild index"
+          git push
+
+  cross-post:
+    runs-on: ubuntu-latest
+    needs: build-index
+    steps:
+      - name: Checkout repo (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect new posts
+        id: detect
+        run: |
+          # Handle edge case: first commit has no HEAD~1
+          if ! git rev-parse HEAD~1 >/dev/null 2>&1; then
+            echo "First commit detected -- skipping cross-post detection"
+            echo "posts=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          NEW_POSTS=$(git diff HEAD~1 --name-only --diff-filter=A -- 'posts/*/index.html' | xargs -I{} dirname {} | xargs -I{} basename {} || true)
+          echo "posts=${NEW_POSTS}" >> "$GITHUB_OUTPUT"
+
+      - name: Cross-post new articles
+        if: steps.detect.outputs.posts != ''
+        env:
+          # Medium (https://github.com/Medium/medium-api-docs)
+          MEDIUM_TOKEN: ${{ secrets.MEDIUM_TOKEN }}
+          # Reddit OAuth app credentials
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+          REDDIT_USERNAME: ${{ secrets.REDDIT_USERNAME }}
+          REDDIT_PASSWORD: ${{ secrets.REDDIT_PASSWORD }}
+          # LinkedIn OAuth2 access token and person URN
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
+        run: |
+          for SLUG in ${{ steps.detect.outputs.posts }}; do
+            echo "========================================="
+            echo "Processing post: ${SLUG}"
+            echo "========================================="
+
+            META_FILE="posts/${SLUG}/meta.yaml"
+            if [ ! -f "${META_FILE}" ]; then
+              echo "WARNING: No meta.yaml found for ${SLUG} -- skipping"
+              continue
+            fi
+
+            # Read metadata via python3
+            TITLE=$(python3 -c "
+          import yaml, sys
+          with open('${META_FILE}') as f:
+              m = yaml.safe_load(f)
+          print(m.get('title', ''))
+          ")
+            DESCRIPTION=$(python3 -c "
+          import yaml, sys
+          with open('${META_FILE}') as f:
+              m = yaml.safe_load(f)
+          print(m.get('description', ''))
+          ")
+
+            # Platform flags (default: all enabled)
+            MEDIUM_ENABLED=$(python3 -c "
+          import yaml
+          with open('${META_FILE}') as f:
+              m = yaml.safe_load(f)
+          p = m.get('platforms', {})
+          print(str(p.get('medium', True)).lower())
+          ")
+            REDDIT_ENABLED=$(python3 -c "
+          import yaml
+          with open('${META_FILE}') as f:
+              m = yaml.safe_load(f)
+          p = m.get('platforms', {})
+          print(str(p.get('reddit', True)).lower())
+          ")
+            LINKEDIN_ENABLED=$(python3 -c "
+          import yaml
+          with open('${META_FILE}') as f:
+              m = yaml.safe_load(f)
+          p = m.get('platforms', {})
+          print(str(p.get('linkedin', True)).lower())
+          ")
+
+            echo "Title: ${TITLE}"
+            echo "Medium enabled: ${MEDIUM_ENABLED}"
+            echo "Reddit enabled: ${REDDIT_ENABLED}"
+            echo "LinkedIn enabled: ${LINKEDIN_ENABLED}"
+
+            # ── Medium ──────────────────────────────────────────────
+            if [ "${MEDIUM_ENABLED}" = "true" ] && [ -n "${MEDIUM_TOKEN}" ]; then
+              echo "--- Cross-posting to Medium ---"
+
+              MEDIUM_TAGS=$(python3 -c "
+          import yaml, json
+          with open('${META_FILE}') as f:
+              m = yaml.safe_load(f)
+          print(json.dumps(m.get('tags', [])))
+          ")
+
+              USER_ID=$(curl -s -H "Authorization: Bearer ${MEDIUM_TOKEN}" \
+                https://api.medium.com/v1/me \
+                | python3 -c "import sys,json; print(json.load(sys.stdin)['data']['id'])")
+
+              RESPONSE=$(curl -s -o /dev/stderr -w "%{http_code}" -X POST \
+                "https://api.medium.com/v1/users/${USER_ID}/posts" \
+                -H "Authorization: Bearer ${MEDIUM_TOKEN}" \
+                -H "Content-Type: application/json" \
+                -d "{
+                  \"title\": $(python3 -c "import json; print(json.dumps('${TITLE}'))"),
+                  \"contentFormat\": \"html\",
+                  \"content\": $(cat "posts/${SLUG}/index.html" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))'),
+                  \"tags\": ${MEDIUM_TAGS},
+                  \"canonicalUrl\": \"https://pranav.com.au/posts/${SLUG}/\",
+                  \"publishStatus\": \"public\"
+                }" 2>&1) || true
+
+              if echo "${RESPONSE}" | grep -q "^2"; then
+                echo "SUCCESS: Published to Medium"
+              else
+                echo "FAILED: Medium cross-post returned: ${RESPONSE}"
+              fi
+            elif [ "${MEDIUM_ENABLED}" = "true" ]; then
+              echo "SKIPPED: Medium -- MEDIUM_TOKEN secret not configured"
+            else
+              echo "SKIPPED: Medium -- disabled in meta.yaml"
+            fi
+
+            # ── Reddit ──────────────────────────────────────────────
+            if [ "${REDDIT_ENABLED}" = "true" ] && [ -n "${REDDIT_CLIENT_ID}" ] && [ -n "${REDDIT_CLIENT_SECRET}" ]; then
+              echo "--- Cross-posting to Reddit ---"
+
+              SUBREDDITS=$(python3 -c "
+          import yaml
+          with open('${META_FILE}') as f:
+              m = yaml.safe_load(f)
+          subs = m.get('reddit', {}).get('subreddits', [])
+          print(' '.join(subs))
+          ")
+
+              if [ -z "${SUBREDDITS}" ]; then
+                echo "SKIPPED: Reddit -- no subreddits listed in meta.yaml"
+              else
+                TOKEN=$(curl -s -X POST "https://www.reddit.com/api/v1/access_token" \
+                  -u "${REDDIT_CLIENT_ID}:${REDDIT_CLIENT_SECRET}" \
+                  -d "grant_type=password&username=${REDDIT_USERNAME}&password=${REDDIT_PASSWORD}" \
+                  | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
+
+                for SUB in ${SUBREDDITS}; do
+                  RESPONSE=$(curl -s -o /dev/stderr -w "%{http_code}" -X POST \
+                    "https://oauth.reddit.com/api/submit" \
+                    -H "Authorization: bearer ${TOKEN}" \
+                    -H "User-Agent: pranav-blog-bot/1.0" \
+                    -d "sr=${SUB}&kind=link&title=${TITLE}&url=https://pranav.com.au/posts/${SLUG}/&resubmit=true" 2>&1) || true
+
+                  if echo "${RESPONSE}" | grep -q "^2"; then
+                    echo "SUCCESS: Submitted to r/${SUB}"
+                  else
+                    echo "FAILED: Reddit r/${SUB} returned: ${RESPONSE}"
+                  fi
+                done
+              fi
+            elif [ "${REDDIT_ENABLED}" = "true" ]; then
+              echo "SKIPPED: Reddit -- REDDIT_CLIENT_ID/REDDIT_CLIENT_SECRET secrets not configured"
+            else
+              echo "SKIPPED: Reddit -- disabled in meta.yaml"
+            fi
+
+            # ── LinkedIn ────────────────────────────────────────────
+            if [ "${LINKEDIN_ENABLED}" = "true" ] && [ -n "${LINKEDIN_ACCESS_TOKEN}" ] && [ -n "${LINKEDIN_PERSON_URN}" ]; then
+              echo "--- Cross-posting to LinkedIn ---"
+
+              HASHTAGS=$(python3 -c "
+          import yaml
+          with open('${META_FILE}') as f:
+              m = yaml.safe_load(f)
+          tags = m.get('tags', [])
+          print(' '.join('#' + t.replace(' ', '') for t in tags))
+          ")
+
+              SHARE_TEXT=$(python3 -c "
+          import json
+          title = '''${TITLE}'''
+          desc = '''${DESCRIPTION}'''
+          tags = '''${HASHTAGS}'''
+          print(json.dumps(title + '\n\n' + desc + '\n\n' + tags))
+          ")
+
+              RESPONSE=$(curl -s -o /dev/stderr -w "%{http_code}" -X POST \
+                "https://api.linkedin.com/v2/ugcPosts" \
+                -H "Authorization: Bearer ${LINKEDIN_ACCESS_TOKEN}" \
+                -H "Content-Type: application/json" \
+                -d "{
+                  \"author\": \"urn:li:person:${LINKEDIN_PERSON_URN}\",
+                  \"lifecycleState\": \"PUBLISHED\",
+                  \"specificContent\": {
+                    \"com.linkedin.ugc.ShareContent\": {
+                      \"shareCommentary\": {
+                        \"text\": ${SHARE_TEXT}
+                      },
+                      \"shareMediaCategory\": \"ARTICLE\",
+                      \"media\": [{
+                        \"status\": \"READY\",
+                        \"originalUrl\": \"https://pranav.com.au/posts/${SLUG}/\"
+                      }]
+                    }
+                  },
+                  \"visibility\": {
+                    \"com.linkedin.ugc.MemberNetworkVisibility\": \"PUBLIC\"
+                  }
+                }" 2>&1) || true
+
+              if echo "${RESPONSE}" | grep -q "^2"; then
+                echo "SUCCESS: Published to LinkedIn"
+              else
+                echo "FAILED: LinkedIn cross-post returned: ${RESPONSE}"
+              fi
+            elif [ "${LINKEDIN_ENABLED}" = "true" ]; then
+              echo "SKIPPED: LinkedIn -- LINKEDIN_ACCESS_TOKEN/LINKEDIN_PERSON_URN secrets not configured"
+            else
+              echo "SKIPPED: LinkedIn -- disabled in meta.yaml"
+            fi
+
+            echo ""
+          done

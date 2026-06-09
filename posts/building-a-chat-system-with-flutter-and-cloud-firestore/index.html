@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building a chat system with Flutter and Cloud Firestore — Pranav Dhoolia</title>
+  <meta name="description" content="How to build a chat system in flutter under 20 minutes">
+  <meta name="author" content="Pranav Dhoolia">
+  <meta property="og:title" content="Building a chat system with Flutter and Cloud Firestore">
+  <meta property="og:description" content="How to build a chat system in flutter under 20 minutes">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://pranav.com.au/posts/building-a-chat-system-with-flutter-and-cloud-firestore/">
+  <link rel="canonical" href="https://pranav.com.au/posts/building-a-chat-system-with-flutter-and-cloud-firestore/">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../about.html">About</a>
+    </nav>
+  </header>
+  <main>
+    <article>
+      <h1>Building a chat system with Flutter and Cloud Firestore</h1>
+      <time datetime="2020-01-31">Jan 31, 2020</time>
+
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/1*XEi_70b2tph6vyZ_XQLc9w.png" alt=""></p>
+
+      <p>Flutter is one of the most trending platforms for mobile development in 2020. It is one of the easiest ways to code complex applications with good UI.</p>
+
+      <p>To gain experience in <strong>Flutter</strong>, we decided to do recreate our former app, <em>Pivot</em>, in flutter, with an added feature, the <em>global chatroom,</em> where users could hang out and talk about different topics.</p>
+
+      <p>We decided to use a simple <strong>Cloud Firestore</strong> backend. The full project can be accessed using the link below:</p>
+
+      <p><a href="https://github.com/pd-escher/pivot_2"><strong>pd-escher/pivot_2</strong></a></p>
+
+      <p>A mobile student portal for ICAS made with Flutter Place where students can view their timetable and major updates and...</p>
+
+      <h3>Setup</h3>
+
+      <p>Before using Firebase, it has to be configured. First, it has to be <a href="https://firebase.google.com/docs/flutter/setup?platform=android">added to the flutter project</a>.</p>
+
+      <blockquote><p>A file named &quot;google-services.json&quot; will be downloaded and added to the project folder.</p></blockquote>
+
+      <p>After that, the <a href="https://github.com/pd-escher/pivot_2/blob/master/pubspec.yaml"><em>pubspec.yaml</em></a> file has to be changed to add <em>Firebase</em> and <em>Cloud Firestore</em> plugins.</p>
+
+      <blockquote><p>NOTE: The latest version of dependencies might have to be changed in the future.</p></blockquote>
+
+      <p>The details of <a href="https://github.com/pd-escher/pivot_2/blob/master/lib/root_page.dart"><em>firebase authentication</em></a> are discussed in a separate blog, but they can be found in the Github repo as well.</p>
+
+      <h2>Chat Backend</h2>
+
+      <p>The backend is pretty simple. It consists of a <a href="https://firebase.google.com/docs/firestore/data-model"><strong>Collection</strong></a> of <strong>Chats.</strong></p>
+
+      <h3>Schema</h3>
+
+      <p>Each chat entry contains:</p>
+
+      <p><em>content:</em> The contents in the chat</p>
+
+      <p><em>idFrom:</em> Id of the user who submitted the chat</p>
+
+      <p><em>timestamp:</em> Time at which the message was sent</p>
+
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/1*X00hzcVmQiuuSioY-PSVmw.png" alt="Collection of Chats Firebase"></p>
+
+      <p>Whenever a new <strong>chat</strong> is sent, it will be added to the <strong>Chats</strong> collection.</p>
+
+      <h2>Frontend</h2>
+
+      <p>Now that the backend is established. It is time to map each <a href="https://firebase.google.com/docs/firestore/data-model"><strong>document</strong></a> in the chat collection with its <strong>frontend counterpart</strong>.</p>
+
+      <p>Its basic structure is given below.</p>
+
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/1*ViEK6Ev047jOcCIUh2zpZA.png" alt="Frontend Components"></p>
+
+      <blockquote><p><strong>NOTE:</strong> Click on the subheadings to directly go to the code.</p></blockquote>
+
+      <h3><a href="https://github.com/pd-escher/pivot_2/blob/master/lib/Chat/chat.dart">Chat</a></h3>
+
+      <p>This component is responsible for managing the entire state of the chat. It has two sub-components:</p>
+
+      <ul>
+        <li>ChatScreen.dart</li>
+        <li>ChatSender.dart</li>
+      </ul>
+
+      <h3><a href="https://github.com/pd-escher/pivot_2/blob/master/lib/Chat/ChatScreen.dart">ChatScreen</a></h3>
+
+      <p>This sub-component is responsible for loading the chat from the firebase backend and displaying a list of <strong>ChatItem</strong> s.</p>
+
+      <p>A <a href="https://api.flutter.dev/flutter/widgets/StreamBuilder-class.html"><strong>StreamBuilder</strong></a> has been used for the process so that the chat screen is instantly updated when an entry is <em>added, changed</em> or <em>deleted</em> in the backend.</p>
+
+      <h3><a href="https://github.com/pd-escher/pivot_2/blob/master/lib/Chat/ChatItem.dart">ChatItem</a></h3>
+
+      <p>This is the GUI counterpart of every <strong>Chat</strong>( <strong>document</strong>) in the <strong>Chats</strong> collection.</p>
+
+      <p>Defining the <strong>ChatItem</strong> separately increases the modularity of the code. We can change the appearance of each <strong>ChatItem</strong> with ease.</p>
+
+      <h3><a href="https://github.com/pd-escher/pivot_2/blob/master/lib/Chat/ChatSender.dart">ChatSender</a></h3>
+
+      <p>This component allows the user to send their chat.</p>
+
+      <p>It consists of a <a href="https://api.flutter.dev/flutter/material/TextField-class.html">TextField</a> and an <a href="https://api.flutter.dev/flutter/material/IconButton-class.html">IconButton</a>. The TextField is assigned a TextEditingController to manage its UI state and update it with user input.</p>
+
+      <h3>Sending Message to Firebase Collection</h3>
+
+      <p>When the button is clicked, the <em>sendMessage()</em> method is called, which in turn takes the current value of the <em>TextEditingController</em> and calls the <em>onSendMessage()</em> method.</p>
+
+      <pre><code class="language-dart">void sendMessage() {
+    onSendMessage(textEditingController.text);
+}</code></pre>
+
+      <p>The <em>onSendMessage()</em> method accepts a <strong>String</strong> as a parameter and adds it to the &#39; <strong>Chat</strong>&#39; collection in Cloud Firestore.</p>
+
+      <h2>Conclusion</h2>
+
+      <p>This concludes a simple and easy implementation of a <em>global chatroom</em> using <strong>Cloud Firestore</strong> and <strong>Flutter.</strong></p>
+    </article>
+  </main>
+  <footer>
+    <p>&copy; 2026 Pranav Dhoolia</p>
+  </footer>
+</body>
+</html>

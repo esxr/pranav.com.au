@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kizy AI - An opinionated framework for diffusion based workflows — Pranav Dhoolia</title>
+  <meta name="description" content="A rough draft of the initial problem space is here: https://blog.kizy.cloud/hypothesis">
+  <meta name="author" content="Pranav Dhoolia">
+  <meta property="og:title" content="Kizy AI - An opinionated framework for diffusion based workflows">
+  <meta property="og:description" content="A rough draft of the initial problem space is here: https://blog.kizy.cloud/hypothesis">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://pranav.com.au/posts/kizy-ai/">
+  <link rel="canonical" href="https://pranav.com.au/posts/kizy-ai/">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../about.html">About</a>
+    </nav>
+  </header>
+  <main>
+    <article>
+      <h1>Kizy AI - An opinionated framework for diffusion based workflows</h1>
+      <time datetime="2025-12-15">Dec 15, 2025</time>
+      <p>In this article, I present an opinionated open-source framework for diffusion based workflows, which includes running cloud inference, fine-tuning, and self-hosting - all through a simple and intuitive user interface.</p>
+<p><strong>What is the problem we're solving?</strong></p>
+<p>There's an interesting gap in the current AI image generation landscape. On one end, you have powerful but complex tools like ComfyUI that demand technical fluency. On the other, hosted APIs that abstract everything away, but at the cost of flexibility and control. Artists without engineering backgrounds are often left choosing between a steep learning curve or a walled garden. This framework is an attempt to explore what a middle open-source self-hosted path might look like.</p>
+<p>We have consumer/prosumer grade products like ComfyUI, A111, Fooocus, etc that offer good control, but trade off on hardware or time. One the other, we have fully hosted cloud solutions like Replicate, Fal.AI. Then we have opinionated guides for deploying ComfyUI and similar WebUI's on runpod for better GPU provisioning. But it is to be noted that ComfyUI itself is not optimized for multi-gpu clusters.</p>
+<p>Fine-tuning is a separate space, with famous open-source players like kohya ss and kohys sd scripts (built for stable diffusion), as well as hosted services like Civitai trainer.</p>
+<p>We currently have the systems in place for these activities, and a professional (or a technically competent enthusiast/hobbyist) can easily generate high quality images. However, same cannot be said for pure artists, which severely limits the scope for these tools. To put is simply, we need an easily hostable open-source counterpart of fal.ai or replicate.</p>
+<h2>Exploring the Problem Space</h2>
+<h3>Self-exploration</h3>
+<h4>Inference</h4>
+<p><strong>Local Inference Tools (Open Source)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Use Case</th>
+<th>Key Features</th>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ComfyUI</strong></td>
+<td>Prosumer/Enterprise</td>
+<td>Node-based workflows, SD 1.5/SDXL/SD3.5/Flux support, extensive custom nodes</td>
+<td>Most flexible, future-proof</td>
+<td>Steep learning curve</td>
+</tr>
+<tr>
+<td><strong>Automatic1111</strong></td>
+<td>Consumer/Prosumer</td>
+<td>Traditional UI, 20+ samplers, rich extension ecosystem, Forge fork available</td>
+<td>Most mature, largest community</td>
+<td>Less flexible than ComfyUI</td>
+</tr>
+<tr>
+<td><strong>Fooocus</strong></td>
+<td>Consumer</td>
+<td>Simplified interface, 4GB VRAM minimum, one-click install</td>
+<td>Best for beginners</td>
+<td>Less customization</td>
+</tr>
+<tr>
+<td><strong>InvokeAI</strong></td>
+<td>Prosumer</td>
+<td>Professional UI, Unified Canvas, advanced inpainting/outpainting</td>
+<td>Most polished UI</td>
+<td>Heavier resource requirements</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Cloud API Providers</strong></p>
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Use Case</th>
+<th>Pricing</th>
+<th>Key Differentiator</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Fal.AI</strong></td>
+<td>Enterprise</td>
+<td>Pay-per-use</td>
+<td>Fastest inference (10x faster), 600+ models, $95M ARR</td>
+</tr>
+<tr>
+<td><strong>Replicate</strong></td>
+<td>Prosumer/Enterprise</td>
+<td>Pay-per-second</td>
+<td>Largest model library, one-line API</td>
+</tr>
+<tr>
+<td><strong>Together.AI</strong></td>
+<td>Enterprise</td>
+<td>Usage-based</td>
+<td>OpenAI-compatible API, $1.25B valuation</td>
+</tr>
+<tr>
+<td><strong>Stability AI API</strong></td>
+<td>Enterprise</td>
+<td>Credit-based</td>
+<td>Official SD source, early access to new releases</td>
+</tr>
+<tr>
+<td><strong>Black Forest Labs</strong></td>
+<td>Enterprise</td>
+<td>$0.04/image</td>
+<td>Highest quality (Flux 1.1 Pro, ELO 1153)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Hosted WebUI Platforms</strong></p>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Use Case</th>
+<th>Pricing</th>
+<th>Strengths</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Midjourney</strong></td>
+<td>All</td>
+<td>$10-120/mo</td>
+<td>Best photorealistic quality, v6.1 released</td>
+</tr>
+<tr>
+<td><strong>Leonardo.AI</strong></td>
+<td>Prosumer</td>
+<td>Freemium</td>
+<td>16M+ users, Phoenix model, acquired by Canva</td>
+</tr>
+<tr>
+<td><strong>DALL-E 3</strong></td>
+<td>Consumer</td>
+<td>$20/mo (ChatGPT+)</td>
+<td>Best prompt adherence, ChatGPT integration</td>
+</tr>
+<tr>
+<td><strong>Freepik Mystic</strong></td>
+<td>Prosumer</td>
+<td>Premium req.</td>
+<td>Native 1K-4K resolution, Flux 1.1 + Magnific</td>
+</tr>
+<tr>
+<td><strong>Ideogram AI</strong></td>
+<td>Prosumer</td>
+<td>Freemium</td>
+<td>Best-in-class text rendering in images</td>
+</tr>
+<tr>
+<td><strong>NightCafe</strong></td>
+<td>Consumer</td>
+<td>Freemium</td>
+<td>Multi-model access (SDXL, DALL-E 3)</td>
+</tr>
+<tr>
+<td><strong>Playground AI</strong></td>
+<td>Consumer</td>
+<td>Free (1000/day)</td>
+<td><strong>Most generous free tier</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Serverless GPU Platforms</strong></p>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>GPU Options</th>
+<th>Pricing</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RunPod</strong></td>
+<td>RTX 3090/4090, A100, H100</td>
+<td>Pay-per-minute</td>
+<td>GPU flexibility, pre-built templates</td>
+</tr>
+<tr>
+<td><strong>Modal</strong></td>
+<td>Auto-scaled</td>
+<td>Serverless</td>
+<td>Python devs, batch processing</td>
+</tr>
+<tr>
+<td><strong>Baseten</strong></td>
+<td>T4 to H100</td>
+<td>Freemium</td>
+<td>Easy deployment with Truss framework</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Community/Hybrid</strong></p>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Features</th>
+<th>Pricing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Civitai</strong></td>
+<td>16K+ models, onsite generation, video</td>
+<td>100 free Buzz, $10/mo membership</td>
+</tr>
+<tr>
+<td><strong>ThinkDiffusion</strong></td>
+<td>Managed ComfyUI/A1111/Kohya in cloud</td>
+<td>Subscription</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Inference Summary (32 Solutions)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Recommended Solutions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Speed</td>
+<td>Fal.AI, SDXL Turbo, TensorRT</td>
+</tr>
+<tr>
+<td>Quality</td>
+<td>Flux 1.1 Pro (BFL), Midjourney v6.1</td>
+</tr>
+<tr>
+<td>Cost</td>
+<td>Local tools (free), Playground AI</td>
+</tr>
+<tr>
+<td>Privacy</td>
+<td>Draw Things, Mochi Diffusion (offline)</td>
+</tr>
+<tr>
+<td>Beginners</td>
+<td>Fooocus, NightCafe</td>
+</tr>
+<tr>
+<td>Professionals</td>
+<td>ComfyUI, InvokeAI</td>
+</tr>
+<tr>
+<td>Enterprise</td>
+<td>Fal.AI, Amazon Bedrock, Stability AI</td>
+</tr>
+</tbody>
+</table>
+<h4>Fine-tuning</h4>
+<p><strong>Local Training Tools (Open Source)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Use Case</th>
+<th>Key Features</th>
+<th>VRAM</th>
+<th>Strengths</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Kohya_ss</strong></td>
+<td>Consumer/Prosumer</td>
+<td>LoRA, DreamBooth, SDXL, FLUX.1, SD3.5, GUI + CLI</td>
+<td>Configurable</td>
+<td>Most popular, best docs</td>
+</tr>
+<tr>
+<td><strong>SimpleTuner</strong></td>
+<td>Prosumer/Enterprise</td>
+<td>Multi-modal (image/video/audio), DeepSpeed, FLUX.2</td>
+<td>16-24GB</td>
+<td>Best for FLUX.2</td>
+</tr>
+<tr>
+<td><strong>OneTrainer</strong></td>
+<td>Consumer/Prosumer</td>
+<td>FLUX.1, SD3.5, auto-backup, image augmentation</td>
+<td>7-10.3GB</td>
+<td>Lowest VRAM requirements</td>
+</tr>
+<tr>
+<td><strong>AI-Toolkit</strong></td>
+<td>Prosumer</td>
+<td>FLUX.1-dev specialized, WebUI option</td>
+<td>12-24GB</td>
+<td>Fast FLUX LoRA training</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Cloud Training Platforms</strong></p>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Use Case</th>
+<th>Pricing</th>
+<th>Key Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Civitai Trainer</strong></td>
+<td>Consumer/Prosumer</td>
+<td>500-2000 Buzz</td>
+<td>Zero setup, web-based, SD/SDXL/Flux</td>
+</tr>
+<tr>
+<td><strong>Replicate</strong></td>
+<td>Prosumer/Enterprise</td>
+<td>Pay-per-second</td>
+<td>FLUX.1 fine-tuning, one-line API</td>
+</tr>
+<tr>
+<td><strong>RunPod</strong></td>
+<td>All</td>
+<td>$0.50-2.79/hr</td>
+<td>Pre-built Kohya template, 77-84% cheaper than AWS</td>
+</tr>
+<tr>
+<td><strong>SaladCloud</strong></td>
+<td>All</td>
+<td>$0.08-0.14/job</td>
+<td>Cheapest option, 60K+ GPUs, checkpoint recovery</td>
+</tr>
+<tr>
+<td><strong>Modal</strong></td>
+<td>Prosumer/Enterprise</td>
+<td>Serverless</td>
+<td>DreamBooth + LoRA for FLUX.1-dev</td>
+</tr>
+<tr>
+<td><strong>Vast.ai</strong></td>
+<td>Consumer/Prosumer</td>
+<td>Marketplace</td>
+<td>GPU marketplace, variable pricing</td>
+</tr>
+<tr>
+<td><strong>Lambda Labs</strong></td>
+<td>Enterprise</td>
+<td>Hourly/weekly</td>
+<td>1-Click Clusters (16-512 H100s)</td>
+</tr>
+<tr>
+<td><strong>fal.ai</strong></td>
+<td>Prosumer/Enterprise</td>
+<td>$0.008/step</td>
+<td>FLUX.2 trainer, auto-captioning</td>
+</tr>
+<tr>
+<td><strong>Astria AI</strong></td>
+<td>All</td>
+<td>$20 free credits</td>
+<td>Multi-model, CivitAI import, FaceID adapter</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Fine-tuning Summary (26 Solutions)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Recommended Solutions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Beginners</td>
+<td>Civitai Trainer, Brev.dev (1-click), Textual Inversion</td>
+</tr>
+<tr>
+<td>Budget</td>
+<td>SaladCloud ($0.08/job), Brev.dev ($0.04/hr), Local OSS</td>
+</tr>
+<tr>
+<td>FLUX Models</td>
+<td>AI-Toolkit, SimpleTuner, fal.ai</td>
+</tr>
+<tr>
+<td>Enterprise</td>
+<td>Stability AI, Vertex AI, Lambda Clusters</td>
+</tr>
+<tr>
+<td>Quick Iteration</td>
+<td>InstantID (zero-shot), PhotoMaker (seconds)</td>
+</tr>
+<tr>
+<td>Advanced</td>
+<td>SimpleTuner (DeepSpeed), HF Diffusers, Kohya_ss</td>
+</tr>
+</tbody>
+</table>
+<h3>Interviews</h3>
+<p>I conducted around 10-15 interviews with people from the CivitAI, Stable Diffusion, and Midjourney discord which involved non-technical artists, technical artists (those who understand the diffusion space intuitively), and AI engineers working in this space. Here are my findings:</p>
+<p><strong>Non-technical artists (5 interviews):</strong></p>
+<ul>
+<li>Most had tried Midjourney or DALL-E but felt "stuck" when results didn't match their vision</li>
+<li>4/5 had attempted ComfyUI or A1111 but abandoned it within a week due to setup complexity</li>
+<li>Common sentiment: "I know exactly what I want, but I don't know how to tell the machine"</li>
+<li>Fine-tuning was seen as "something for developers, not for me"</li>
+</ul>
+<p><strong>Technical artists (6 interviews):</strong></p>
+<ul>
+<li>All had working local setups (mostly ComfyUI or A1111 with custom workflows)</li>
+<li>Average time to get comfortable: 2-3 months of tinkering</li>
+<li>Main frustration: context-switching between inference, upscaling, and fine-tuning tools</li>
+<li>One interviewee: "I spend more time debugging Python environments than actually creating art"</li>
+</ul>
+<p><strong>AI engineers (4 interviews):</strong></p>
+<ul>
+<li>Preferred API-based solutions (Replicate, fal.ai) for production work</li>
+<li>Acknowledged that current tools assume too much technical knowledge</li>
+<li>Expressed interest in self-hosted alternatives but cited "operational overhead" as a blocker</li>
+<li>One noted: "People need something nuanced but simple, and that is a hard problem to solve"</li>
+</ul>
+<p>The interviews confirmed some of my assumptions. Those who are well established in this space (i.e. have been doing this for a while and are also technically competent) often find it much easier to product high-quality AI art. But newcomers, and pure artists often find it difficult to get started. Also, the focus shifts from WHAT to HOW, with many of the artistic details getting lost in the technicalities. A slight proof towards that is the fact that almost every person I interviewed agreed that it takes multiple tries and generations to get their vision right, and luck often plays its part (as is expected from stochastic models).</p>
+<h2>Proposed Solution</h2>
+<p>The solution lies in the User Experience.</p>
+<p>This brings us to a semi-formal system definition</p>
+<h2>System Definition</h2>
+<p>Develop a system and pipeline(s) for AI based image/video generation. Key aspects:</p>
+<ol>
+<li>Select from a bunch of available open models</li>
+<li>Select / ask for auto-selection from all or sub-set of pre-existing LORA adapters that are:
+a. Linked to some of these models
+b. Linked to popular generation intents</li>
+<li>Select from set of available effects / detailers (e.g., size, resolution)</li>
+</ol>
+<h3>Generation experience</h3>
+<ol>
+<li>Natural language specification of the image / video the user desires</li>
+<li>Optionally, a starting / guiding image / video to theme the generation on</li>
+<li>Optionally, specific selections of the aspects above (of course there are default settings)</li>
+</ol>
+<p>In addition the system also offers a fine-tuning experience.</p>
+<h3>Fine-tuning experience</h3>
+<ol>
+<li>Upload images / videos, or a zip thereof</li>
+<li>Goal name, and description - for what the images and videos semantically imply</li>
+</ol>
+<p>As a result of the fine-tuning a LORA adapter is learnt, and is made available for selection in the generation experience.</p>
+<h2>Architecture</h2>
+<p>Kizy AI is built on a <strong>three-tier layered architecture</strong> with a <strong>plugin-based node system</strong>:</p>
+<ol>
+<li><strong>Interface Layer</strong>: API, CLI, SDK for external access</li>
+<li><strong>Orchestration Layer</strong>: Workflow DAG execution, node registry, validation</li>
+<li><strong>Compute Layer</strong>: GPU inference (Modal serverless), model loading, node implementations</li>
+</ol>
+<h3>System Context</h3>
+<pre><code class="language-mermaid">flowchart TB
+    subgraph Clients[&quot;Clients&quot;]
+        SDK[&quot;Python SDK&quot;]
+        CLI[&quot;CLI Tool&quot;]
+        WebApp[&quot;Web Application&quot;]
+    end
+
+    subgraph KizyAI[&quot;Kizy AI Platform&quot;]
+        API[&quot;FastAPI Server&quot;]
+        Modal[&quot;Modal GPU (Serverless)&quot;]
+    end
+
+    subgraph Storage[&quot;Storage&quot;]
+        R2[&quot;Cloudflare R2&quot;]
+    end
+
+    subgraph External[&quot;External&quot;]
+        CivitAI[&quot;CivitAI&quot;]
+        HuggingFace[&quot;Hugging Face&quot;]
+    end
+
+    SDK --&gt; API
+    CLI --&gt; API
+    WebApp --&gt; API
+    API --&gt; Modal
+    Modal --&gt; R2
+    Modal --&gt; CivitAI
+    Modal --&gt; HuggingFace
+</code></pre>
+<h3>Node-Based Workflows</h3>
+<p>The core abstraction is a DAG of nodes. Each node is a discrete processing unit with typed inputs/outputs, discovered via Python entry points:</p>
+<pre><code class="language-mermaid">graph TB
+    subgraph Inputs[&quot;Input Nodes&quot;]
+        Prompt[&quot;StringInput&quot;]
+        RefImage[&quot;ImageInput&quot;]
+    end
+
+    subgraph Inference[&quot;Inference&quot;]
+        Flux[&quot;FluxInferenceNode&quot;]
+    end
+
+    subgraph Controls[&quot;Controls&quot;]
+        ControlNet[&quot;ControlNetNode&quot;]
+        LoRA[&quot;LoRALoaderNode&quot;]
+    end
+
+    subgraph PostProcess[&quot;Post-Processing&quot;]
+        ADetailer[&quot;ADetailerNode&quot;]
+        Upscale[&quot;UpscaleESRGANNode&quot;]
+    end
+
+    subgraph Outputs[&quot;Output&quot;]
+        Output[&quot;ImageOutputNode&quot;]
+    end
+
+    Prompt --&gt; Flux
+    RefImage --&gt; ControlNet
+    ControlNet --&gt; Flux
+    LoRA --&gt; Flux
+    Flux --&gt; ADetailer
+    ADetailer --&gt; Upscale
+    Upscale --&gt; Output
+</code></pre>
+<h3>Why This Design</h3>
+<ul>
+<li><strong>Reference-based data flow</strong>: Control plane passes R2 URL references only - compute nodes fetch/upload directly. This reduces memory overhead by ~90%.</li>
+<li><strong>Per-node checkpointing</strong>: Each node execution is checkpointed to R2, enabling automatic retry on failure without losing progress.</li>
+<li><strong>Plugin extensibility</strong>: Third-party nodes can be registered via <code>pyproject.toml</code> entry points, similar to how pytest plugins work.</li>
+</ul>
+<h2>Execution</h2>
+<h2>Conclusion</h2>
+<p>The first prototype of <a href="https://kizy.cloud/docs/">Kizy API v1</a> has been deployed.</p>
+<p>Note that v0 is a bit different from the proposed architecture because we want a quick version for testing against real users. Right now, our framework is imperatively defined (i.e. no controls for using custom detailers, models etc.), and the exact workflow (prompt -&gt; model -&gt; detailers) is also hardcoded.</p>
+<h2>Future Directions</h2>
+<p>Currently, we have a deployed API to abstract out the individual processes of fine-tuning, inference and other things, and expose an easy to use interface to help generate images/videos using any model, and be able to apply multiple before/after detailers (ESRGan based etc). However, there is a lot of scope for improvement right now (which I will be possibly covering in future blogs):</p>
+<p>Phase 1: Implement v1 according to the described architecture (with a node based DAG graph orchestration plus a robust plugin system for BYO detailers, models etc.)</p>
+<p>Phase 2: Package our server as an MCP. This is a low-hanging fruit, but I believe this might add a lot of value to artists who are looking to define their creations or workflows in natural language, and then we can use the power of LLMs to formulate the best possible combination of models and effects to act on these definitions. This could theoretically make it simpler for users to consume our software (by simply adding a few MCP configs to their current desktop assistants).</p>
+    </article>
+  </main>
+  <footer>
+    <p>&copy; 2026 Pranav Dhoolia</p>
+  </footer>
+</body>
+</html>

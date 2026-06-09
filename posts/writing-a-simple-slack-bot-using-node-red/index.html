@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Writing a simple Slack bot using Node-RED — Pranav Dhoolia</title>
+  <meta name="description" content="Creating a Slack bot using Node-RED, a higher level visual programming tool">
+  <meta name="author" content="Pranav Dhoolia">
+  <meta property="og:title" content="Writing a simple Slack bot using Node-RED">
+  <meta property="og:description" content="Creating a Slack bot using Node-RED, a higher level visual programming tool">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://pranav.com.au/posts/writing-a-simple-slack-bot-using-node-red/">
+  <link rel="canonical" href="https://pranav.com.au/posts/writing-a-simple-slack-bot-using-node-red/">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../about.html">About</a>
+    </nav>
+  </header>
+  <main>
+    <article>
+      <h1>Writing a simple Slack bot using Node-RED</h1>
+      <time datetime="2019-07-10">Jul 10, 2019</time>
+
+      <p><strong>Slack</strong> is probably the one of the best messaging apps used worldwide by small and large developer teams alike for <em>general communication, conferencing, sharing code etc</em>. But it brings something else to the table.</p>
+
+      <p><em>Slack apps and bots</em> are a super useful concept. These apps can range from small integrations such as <em>reminders, notes and storage</em> to full <em>chat-ops support</em> for large organisations.</p>
+
+      <p>Unfortunately, slack apps are infamously difficult to make. They require full dev-tools setup and hours invested in just reading up on the material to get acquainted with the slack development atmosphere. But it needn&#39;t be like this.</p>
+
+      <p>While there is no shortcut to full dev environments, the initial hustle can somewhat be eased up with the use of a <em>higher level visual programming tool like node-red</em>.</p>
+
+      <p>We&#39;ll start by gaining some background on the technology we&#39;re using and then straight away get started on making the bot.</p>
+
+      <h2>What is Node-Red ?</h2>
+
+      <blockquote>
+        <p>Node-RED is a programming tool for wiring together hardware devices, APIs and online services in new and interesting ways.</p>
+        <p>It provides a browser-based editor that makes it easy to wire together flows using the wide range of nodes in the palette that can be deployed to its runtime in a single-click.</p>
+      </blockquote>
+
+      <p>Note that the most important part is that we are &#39; <em>wiring</em>&#39; things together and making them work. This isn&#39;t just in the metaphorical sense, but in quite a literal way. We&#39;ll be &#39; <em>wiring</em>&#39; our components together, which makes the process of programming a little easier.</p>
+
+      <h2>Slack Apps</h2>
+
+      <p>I&#39;m assuming that if you&#39;re developing for slack then you know a bit about it. Now, to make a bot for our workspace in slack, we have to follow a couple of (boring) steps to set up our bot:</p>
+
+      <ol>
+        <li>Go to <a href="https://api.slack.com/">https://api.slack.com/</a></li>
+        <li>Click on <strong>Your Apps</strong></li>
+        <li>Click on <strong>Create New App</strong></li>
+        <li>Enter the <em>app name</em> and choose the <em>workspace</em> for which you&#39;ll develop. ( <strong>NOTE</strong>: Initially we will only be able to develop for our own workspace )</li>
+      </ol>
+
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/1*w0MCZuc0zxIGfnZtc3nLqA.png" alt=""></p>
+
+      <ol start="5">
+        <li><p>Click on <strong>Create App</strong> to conclude the process</p></li>
+        <li><p>You&#39;ll come across something like this:</p></li>
+      </ol>
+
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/1*NRFLnGb7SrKlwxOubCsJnw.png" alt=""></p>
+
+      <ol start="7">
+        <li>Now click on the <strong>Bots</strong> box.</li>
+      </ol>
+
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/1*1iVNUDIRAPH79No7K7Driw.png" alt=""></p>
+
+      <ol start="8">
+        <li><p>Click on <strong>Add a Bot User.</strong> Set its name.</p></li>
+        <li><p>Now that the bot is set, we need to get its <strong>token</strong> in order to gain access to it. Go to <strong>OAuth &amp; Permissions</strong>.</p></li>
+      </ol>
+
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/1*KO7keZunjlSCT-tBLLSV2Q.png" alt=""></p>
+
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/1*kFwV0Pe6yx3wxFVkYbvNoQ.png" alt=""></p>
+
+      <ol start="10">
+        <li>Click on <strong>Install App to Workspace.</strong> You&#39;ll come across something like this</li>
+      </ol>
+
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/1*ZKv-CQltsN3OPoelsktioA.png" alt=""></p>
+
+      <ol start="11">
+        <li>Copy the <strong>Bot User OAuth Access Token</strong> and save it somewhere.</li>
+      </ol>
+
+      <h3>That&#39;s half of the tedious work done. We have successfully set up our app with our very own bot user. We will now use Node-RED to control the behaviour of this bot.</h3>
+
+      <h2>Setting up Node-RED</h2>
+
+      <p>To setup <strong>Node-RED</strong> on our system, we must have <strong>Nodejs</strong> and <strong>Node Package Manager (NPM)</strong> already set up on our system.</p>
+
+      <blockquote>
+        <p><a href="https://nodejs.org/en/download/"><em>Follow this link to set up Nodejs</em></a></p>
+        <p><a href="https://www.npmjs.com/get-npm"><em>Follow this link to set up NPM</em></a></p>
+        <p><a href="https://nodered.org/docs/getting-started/"><em>Follow this link to set up Node-RED</em></a></p>
+      </blockquote>
+
+      <ol>
+        <li>Open your terminal and <em>start the node-red localhost serve</em> r. The <code>node-red</code> command runs the server on <strong>localhost:1880</strong> by default.</li>
+      </ol>
+
+      <ol start="2">
+        <li>Open <strong>localhost:1880</strong> in your browser. You might see something like this:</li>
+      </ol>
+
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/1*k-m3qevJZnwt6_KWbfsdGw.png" alt=""></p>
+
+      <p>To integrate <strong>Node-RED</strong> with <strong>Slack API</strong>, we have to install a package which helps connect it to slack using the <strong>Bot User OAuth Access Token</strong> mentioned previously.</p>
+
+      <p>Click on the hamburger icon in the top-right corner and select <strong>Manage Palette.</strong></p>
+
+      <p><img src="https://miro.medium.com/v2/resize:fit:516/1*JaGJIMhS1EWdR9W2RMnYgg.png" alt=""></p>
+
+      <p>Search for the keyword &quot; <em>slack</em>&quot; in the <strong>Install</strong> tab. Install the package named <strong>node-red-contrib-slack.</strong></p>
+
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/1*7W4AqlmNmrsBS2v7N1O6uw.png" alt=""></p>
+
+      <p>Close the menu.</p>
+
+      <p>Now that the package is installed, we can begin making our bot.</p>
+
+      <p>The first thing you&#39;ll notice is that some new blocks got added to the <strong>social</strong> tab in our Node-RED palette.</p>
+
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/1*bfu2CCOD6lVjIuN63LTsgg.png" alt=""></p>
+
+      <p>We only need to be concerned about two of the tabs here. The <strong>slack-rtm-in</strong> and <strong>slack-web-out.</strong></p>
+
+      <p>The <strong>slack-rtm-in</strong> block gets activated whenever a message is sent on the workspace the bot has subscribed to. The <strong>slack-web-out</strong> block is responsible for sending messages on slack on the bot&#39;s behalf.</p>
+
+      <p>Go ahead and drag them into the workspace. Then double click on one of them to edit the properties.</p>
+
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/1*z0PuAHkaayqO8NTwmU944g.png" alt=""></p>
+
+      <p>Add a new slack config. Now copy and paste the <strong>Bot User OAuth Access Token</strong> you had saved earlier.</p>
+
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/1*Wcx71h1cCH6DKa2msDLJ6A.png" alt=""></p>
+
+      <p>Congrats ! Our bot has been successfully connected to node-red. Now we only have to design its behaviour.</p>
+
+      <h2>Defining Bot behaviour</h2>
+
+      <p>Let&#39;s make our bot <em>echo</em> back whatever we message it.</p>
+
+      <ol>
+        <li>Drag a <strong>function</strong> block from the palette and connect it to <strong>slack-rtm-in.</strong> You can name it <strong>filter-input.</strong></li>
+      </ol>
+
+      <p><img src="https://miro.medium.com/v2/resize:fit:530/1*AG-_nJ1MKqak2RNS1b_ZVQ.png" alt=""></p>
+
+      <ol start="2">
+        <li>Paste the following code in it.</li>
+      </ol>
+
+      <pre><code class="language-javascript">// ignore anything but messages
+if (msg.payload.type != &quot;message&quot;) {
+    return null;
+}// ignore deleted messages
+if (msg.payload.subtype == &quot;message_deleted&quot;) {
+    return null;
+}// ignore me_message
+if (msg.payload.subtype == &quot;me_message&quot;) {
+    return null;
+}// ignore bot_message
+if (msg.payload.subtype == &quot;bot_message&quot;) {
+    return null;
+}msg.user = {
+    id: msg.payload.user,
+    name: msg.payload.userObject.name
+}msg.text = msg.payload.text
+msg.channel = msg.payload.channel
+return msg;</code></pre>
+
+      <p>The code is pretty self-explanatory. All it does is filter the input received (input is in the form of events which are listened to by our bot) so that we only receive the message another user has sent to us either in our DM or a channel to which our bot is added.</p>
+
+      <p>The line <strong>msg.channel = msg.payload.channel</strong> finds out whether the message has been sent to DM (personal) or to a channel.</p>
+
+      <ol start="3">
+        <li>Drag another <strong>function</strong> block from the palette and connect it to the previous block. Paste the following code in it.</li>
+      </ol>
+
+      <pre><code class="language-javascript">msg.topic = &quot;chat.postMessage&quot;
+msg.payload = {
+    channel: msg.channel,
+    text: msg.text
+}
+return msg;</code></pre>
+
+      <ol start="4">
+        <li>Connect the <strong>function</strong> block with the <strong>slack-web-out</strong> block.</li>
+      </ol>
+
+      <ol start="5">
+        <li>Click on the <strong>Deploy</strong> button on the top-right.</li>
+      </ol>
+
+      <p>(NOTE: The <strong>slack-rtm-in</strong> and <strong>slack-web-out</strong> will show &quot; <em>connected</em>&quot; on deployment if everything is good)</p>
+
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/1*9lYpL-4Nkrl86DA4D0qJKw.png" alt=""></p>
+
+      <h3>Hurray ! Our first bot is ready.</h3>
+
+      <p>Open slack and DM your bot.</p>
+
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/1*rzQXyFyBoevVllweYPxjCg.png" alt=""></p>
+
+      <p>You can also add your bot to a channel in your workspace and message it there. It will message you back on the channel.</p>
+
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/1*vVmZkNIuLszDYB2l1wjPfQ.png" alt=""></p>
+
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/1*Xij8dcyaNAJqZfjcFY2lXA.png" alt=""></p>
+
+      <h2>Conclusion</h2>
+
+      <p>Hopefully you found Node-RED as interesting and easy to use as I did. The possibilities with this thing are endless if used properly.</p>
+
+      <p>Do let me know if you faced any kind of problem or doubts while setting this up.</p>
+
+      <p>Thanks for reading !</p>
+    </article>
+  </main>
+  <footer>
+    <p>&copy; 2026 Pranav Dhoolia</p>
+  </footer>
+</body>
+</html>

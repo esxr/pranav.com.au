@@ -1,0 +1,5 @@
+title: "Writing a simple Slack bot using Node-RED"
+date: "2019-07-10"
+description: "Creating a Slack bot using Node-RED, a higher level visual programming tool"
+tags: ["slack", "node-red", "nodejs", "bots", "escher"]
+draft: false

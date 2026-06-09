@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building our own Universal Assistant with LangGraph and MCP — Pranav Dhoolia</title>
+  <meta name="description" content="Combining LangGraph with MCP to build a Universal Assistant that can interface with different services">
+  <meta name="author" content="Pranav Dhoolia">
+  <meta property="og:title" content="Building our own Universal Assistant with LangGraph and MCP">
+  <meta property="og:description" content="Combining LangGraph with MCP to build a Universal Assistant that can interface with different services">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://pranav.com.au/posts/building-our-own-universal-assistant-with-langgraph-and-mcp/">
+  <link rel="canonical" href="https://pranav.com.au/posts/building-our-own-universal-assistant-with-langgraph-and-mcp/">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../about.html">About</a>
+    </nav>
+  </header>
+  <main>
+    <article>
+      <h1>Building our own Universal Assistant with LangGraph and MCP</h1>
+      <time datetime="2025-01-20">Jan 20, 2025</time>
+      <p><img alt="" src="https://miro.medium.com/v2/resize:fit:1000/1*LzdeOcwF_lE4KIscsqo3wg.png"></p>
+<p><a href="https://modelcontextprotocol.io/introduction"><strong>Model Context Protocol (MCP)</strong></a> is an open protocol that enables seamless integration between LLM applications and external data sources and tools. Whether you're building an AI-powered IDE, enhancing a chat interface, or creating custom AI workflows, MCP provides a standardized way to connect LLMs with the context they need.</p>
+<p>Think of MCP like a USB-C port for AI applications. Just as USB-C provides a standardized way to connect your devices to various peripherals and accessories, MCP provides a standardized way to connect AI models to different data sources and tools.</p>
+<p><a href="https://langchain-ai.github.io/langgraph/"><strong>LangGraph</strong></a> is a framework designed to enable seamless integration of language models into complex workflows and applications. It emphasizes modularity and flexibility. Workflows are represented as graphs. Nodes correspond to actions, tools, or model queries. Edges define the flow of information between them.</p>
+<p>LangGraph provides a structured yet dynamic way to execute tasks, making it ideal for writing AI applications involving natural language understanding, automation, and decision-making.</p>
+<p>In <a href="https://medium.com/@pranavdhoolia/building-and-deploying-a-virtual-assistant-with-langgraph-5c68dabd82db">this earlier article</a> we enhanced LangGraph's retrieval agent template to develop and deploy an AI solution.</p>
+<p>In this work, we combine LangGraph with MCP to build our own Universal Assistant. You can access the code <a href="https://github.com/esxr/langgraph-mcp">here</a>.</p>
+<p>Before we get into it, let's experience what we built in this demo:</p>
+<blockquote>
+<p>Note: In the <a href="https://medium.com/@pranavdhoolia/building-a-universal-assistant-to-connect-with-any-api-89d7c353e524">next blog</a>, we explore how to enhance the capabilities of this assistant even further, so that we can plug any OpenAPI spec for an API and connect it!</p>
+</blockquote>
+<h2>Implementation</h2>
+<p>For our universal assistant we implement a multi-agent pattern as follows:</p>
+<p><img alt="Assistant Flow" src="https://miro.medium.com/v2/resize:fit:500/1*LC60UdkVcymgurdLHTGjTg.png"></p>
+<p>Assistant receives the user message and decides the agent to use. The agent node decides the right tool to use, and calls the tool on the MCP server. Since all our agents are based on MCP, a single MCP-Agent node is sufficient for LLM based orchestration, and another single node is sufficient to work with MCP servers to invoke their tools.</p>
+<h2>Our Implementation Walk-thru</h2>
+<p>There are 3 main parts to our implementation:</p>
+<ol>
+<li>Building the Router</li>
+<li>The Assistant</li>
+<li>A generic MCP wrapper</li>
+</ol>
+<h3>Building the Router</h3>
+<p><img alt="Sequence Diagram for build_router_graph" src="https://miro.medium.com/v2/resize:fit:700/1*gJhlNLpF1JcKcfPJiJ_R7g.png"></p>
+<p>Our graph to build the router is implemented in <code>build_router_graph.py</code>. It collects routing information based on tools, prompts, and resources offered by each MCP server using our <code>mcp_wrapper.py</code>. It indexes this routing information for each server in a vector database.</p>
+<h3>The Assistant</h3>
+<p>The assistant graph is implemented in <code>assistant_graph.py</code>. The following animation describes the role of various nodes and the flow of control thru it, with the help of an example</p>
+<p><img alt="" src="https://miro.medium.com/v2/resize:fit:700/1*l2hl5yqygMgj2Nfdr0iVGw.gif"></p>
+<h3>A Generic MCP Wrapper</h3>
+<p><code>mcp_wrapper.py</code> employs a Strategy Pattern using an abstract base class (<code>MCPSessionFunction</code>) to define a common interface for executing various operations on MCP servers. The pattern includes:</p>
+<ol>
+<li><strong>Abstract Interface</strong></li>
+</ol>
+<ul>
+<li><code>MCPSessionFunction</code> defines an async <code>__call__</code> method as a contract for all session functions.</li>
+</ul>
+<ol start="2">
+<li><strong>Concrete Implementations</strong></li>
+</ol>
+<ul>
+<li><code>RoutingDescription</code> class implements fetching routing information based on tools, prompts, and resources.</li>
+<li><code>GetTools</code> class implements fetching tools for the MCP server and transforming them to the format consumable by LangGraph.</li>
+<li><code>RunTool</code> class implements invoking a tool on MCP server and returning its output.</li>
+</ul>
+<ol start="3">
+<li><strong>Processor Function</strong></li>
+</ol>
+<ul>
+<li><code>apply</code> serves as a unified executor. It:</li>
+<li>Initialises a session using <code>stdio_client</code> from <code>mcp</code> library.</li>
+<li>Delegates the actual operation to the provided <code>MCPSessionFunction</code> instance via <code>await fn(server_name, session)</code>.</li>
+</ul>
+<ol start="4">
+<li><strong>Extensibility</strong></li>
+</ol>
+<ul>
+<li>New operations can be added by subclassing <code>MCPSessionFunction</code> without modifying the core processor logic. for e.g. we should be able to add support for getting tools and executing tools using this pattern.</li>
+</ul>
+<h2>Setting it up</h2>
+<p>Create and activate a virtual environment</p>
+<pre><code class="language-bash">git clone https://github.com/esxr/langgraph-mcp.git
+cd langgraph-mcp python3 -m venv .venv
+source .venv/bin/activate
+</code></pre>
+<p>Install Langgraph CLI</p>
+<pre><code class="language-bash">pip install -U &quot;langgraph-cli[inmem]&quot;
+</code></pre>
+<blockquote>
+<p><strong>Note:</strong> "inmem" extra(s) are needed to run LangGraph API server in development mode (without requiring Docker installation)</p>
+</blockquote>
+<p>Install the dependencies</p>
+<pre><code class="language-bash">pip install -e .
+</code></pre>
+<p>Configure environment variables</p>
+<pre><code class="language-bash">cp env.example .env
+</code></pre>
+<p>Add your <code>OPENAI_API_KEY</code>, <code>GITHUB_PERSONAL_ACCESS_TOKEN</code> etc. to the <code>.env</code></p>
+<blockquote>
+<p><strong>Note</strong>: We have added support for <em>Milvus Lite Retriever</em> (support file based URI). Milvus Lite won't work on Windows. For Windows you may need to use Milvus Server (Easy to start using Docker), and change the <code>MILVUS_DB</code> config to the server based URI. You may also enhance the <a href="https://github.com/esxr/langgraph-mcp/blob/main/src/langgraph_mcp/retriever.py">retriever.py</a> to add retrievers for your choice of vector databases!</p>
+</blockquote>
+<h2>Conclusion</h2>
+<p>We can now try to connect it to services we use daily (e.g. JIRA, Slack, other channels etc) to help make our daily tasks more efficient!</p>
+<p>We tackle that in the following blog:</p>
+<p><a href="https://medium.com/@pranavdhoolia/building-a-universal-assistant-to-connect-with-any-api-89d7c353e524"><strong>Building a Universal Assistant to connect with any API</strong></a></p>
+    </article>
+  </main>
+  <footer>
+    <p>&copy; 2026 Pranav Dhoolia</p>
+  </footer>
+</body>
+</html>

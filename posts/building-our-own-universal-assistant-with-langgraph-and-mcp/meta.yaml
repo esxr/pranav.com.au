@@ -1,0 +1,5 @@
+title: "Building our own Universal Assistant with LangGraph and MCP"
+date: "2025-01-20"
+description: "Combining LangGraph with MCP to build a Universal Assistant that can interface with different services"
+tags: ["model-context-protocol", "langgraph", "anthropic-claude", "ai-assistant", "machine-learning-ai"]
+draft: false

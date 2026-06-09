@@ -1,0 +1,5 @@
+title: "Host GPT Locally with Ollama"
+date: "2024-01-23"
+description: "Hosting LLMs locally with Ollama and adding a UI using Ollama WebUI"
+tags: ["ollama", "gpt", "llm", "local-llm"]
+draft: false

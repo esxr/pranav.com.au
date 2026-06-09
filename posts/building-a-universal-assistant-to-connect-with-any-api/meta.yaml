@@ -1,0 +1,5 @@
+title: "Building a Universal Assistant to connect with any API"
+date: "2025-02-07"
+description: "Extending our Universal Assistant to connect to almost any API using OpenAPI specs and MCP"
+tags: ["langgraph", "model-context-protocol", "anthropic-claude", "ai-assistant", "ai-integration"]
+draft: false

@@ -1,0 +1,383 @@
+/* ==============================
+   Color Palette
+   ============================== */
+
+:root {
+  --bg:          #FAF9F6;
+  --bg-alt:      #F0EDE8;
+  --ink:         #1a1a1a;
+  --muted:       #6b6b6b;
+  --accent:      #D97706;
+  --accent-hover:#B45309;
+  --border:      #E5E2DC;
+  --code-bg:     #F5F2ED;
+  --code-text:   #1a1a1a;
+}
+
+/* ==============================
+   Reset & Base
+   ============================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+code,
+pre {
+  font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
+  font-size: 0.875em;
+}
+
+/* ==============================
+   Layout — shared max-width
+   ============================== */
+
+header,
+main,
+footer {
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+/* ==============================
+   Header & Navigation
+   ============================== */
+
+header {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+nav {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.15s ease;
+}
+
+nav a:hover {
+  color: var(--ink);
+}
+
+nav a.active {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 2px;
+}
+
+/* ==============================
+   Index — Hero
+   ============================== */
+
+.hero {
+  padding: 3rem 0 2.5rem;
+}
+
+.hero h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+
+.hero p {
+  color: var(--muted);
+  font-size: 1.1rem;
+}
+
+/* ==============================
+   Index — Post List
+   ============================== */
+
+.post-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.post-card {
+  display: block;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s ease;
+}
+
+.post-card:hover {
+  background: var(--bg-alt);
+}
+
+.post-card time {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 0.25rem;
+}
+
+.post-card h2 {
+  font-size: 1.25em;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.25rem;
+  transition: color 0.15s ease;
+}
+
+.post-card:hover h2 {
+  color: var(--accent);
+}
+
+.post-card p {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ==============================
+   Tags
+   ============================== */
+
+.tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.tag {
+  font-size: 0.8rem;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 0.15em 0.6em;
+  border-radius: 999px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* ==============================
+   Article — Blog Post
+   ============================== */
+
+article {
+  padding-bottom: 3rem;
+}
+
+article h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 0.25rem;
+}
+
+article time {
+  display: block;
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+}
+
+article h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+article h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+article h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+article p {
+  margin-bottom: 1.25rem;
+}
+
+article a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: text-decoration 0.15s ease;
+}
+
+article a:hover {
+  text-decoration: underline;
+}
+
+article pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  overflow-x: auto;
+  margin-bottom: 1.25rem;
+}
+
+article code {
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: 0.15em 0.4em;
+  border-radius: 0.25rem;
+}
+
+article pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+article blockquote {
+  border-left: 3px solid var(--accent);
+  padding-left: 1rem;
+  color: var(--muted);
+  font-style: italic;
+  margin-bottom: 1.25rem;
+}
+
+article img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+
+article ul,
+article ol {
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+}
+
+article li {
+  margin-bottom: 0.35rem;
+}
+
+article table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--border);
+  margin-bottom: 1.25rem;
+}
+
+article th {
+  background: var(--bg-alt);
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  border: 1px solid var(--border);
+  font-weight: 600;
+}
+
+article td {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+}
+
+article tr:nth-child(even) {
+  background: var(--bg-alt);
+}
+
+article hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+
+/* ==============================
+   About Page
+   ============================== */
+
+.about-summary {
+  margin-bottom: 2rem;
+}
+
+.social-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.social-links a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: text-decoration 0.15s ease;
+}
+
+.social-links a:hover {
+  text-decoration: underline;
+}
+
+.experience,
+.education,
+.certificates {
+  margin-bottom: 2rem;
+}
+
+.entry {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.entry h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+}
+
+.entry time {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.entry p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* ==============================
+   Footer
+   ============================== */
+
+footer {
+  color: var(--muted);
+  text-align: center;
+  border-top: 1px solid var(--border);
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  margin-top: 3rem;
+  font-size: 0.875rem;
+}

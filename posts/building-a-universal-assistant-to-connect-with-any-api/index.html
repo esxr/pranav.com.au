@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building a Universal Assistant to connect with any API — Pranav Dhoolia</title>
+  <meta name="description" content="Extending our Universal Assistant to connect to almost any API using OpenAPI specs and MCP">
+  <meta name="author" content="Pranav Dhoolia">
+  <meta property="og:title" content="Building a Universal Assistant to connect with any API">
+  <meta property="og:description" content="Extending our Universal Assistant to connect to almost any API using OpenAPI specs and MCP">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://pranav.com.au/posts/building-a-universal-assistant-to-connect-with-any-api/">
+  <link rel="canonical" href="https://pranav.com.au/posts/building-a-universal-assistant-to-connect-with-any-api/">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../about.html">About</a>
+    </nav>
+  </header>
+  <main>
+    <article>
+      <h1>Building a Universal Assistant to connect with any API</h1>
+      <time datetime="2025-02-07">Feb 7, 2025</time>
+      <p><img alt="Universal Assistant connected to multiple APIs" src="https://miro.medium.com/v2/resize:fit:1000/1*LzdeOcwF_lE4KIscsqo3wg.png"></p>
+<p>In our previous blog, we built a <a href="https://github.com/esxr/langgraph-mcp">universal assistant</a> that could use <strong>Claude's Model Context Protocol (MCP)</strong> to interface with different services (such as our filesystem, a sqlite database, etc.), and help make our daily tasks more efficient.</p>
+<p>In this blog, we'll extend our <a href="https://github.com/esxr/langgraph-mcp"><strong>Universal Assistant</strong></a> to be able to connect to almost any API and automatically call its endpoints!</p>
+<p><img alt="" src="https://miro.medium.com/v2/resize:fit:700/1*mSgJmL2lP-FeOiHaQlqZ4w.gif"></p>
+<p>You can access the code for this blog <a href="https://github.com/esxr/langgraph-mcp/tree/ed8d6d5f2fcaa5a94d0a4236068199c7f473a3ea">here</a>.</p>
+<h2>Steps</h2>
+<blockquote>
+<p>Note: I've included links for all the relevant changes for greater clarity.</p>
+</blockquote>
+<h3>Initial Setup</h3>
+<p>In a regular MCP server setup, we're limited by the number of MCP servers out there, or have to build our own. So adding support for each service we use with our assistant would mean creating a robust MCP implementation of the same. This approach might <em>currently</em> not be scalable.</p>
+<p>Fortunately, there is an easier way of doing the same. Most of the popular APIs can be specified in a standard OpenAPI format. We just need a generic MCP server that can convert an OpenAPI spec into MCP tools.</p>
+<p>After some research, I found <a href="https://github.com/snaggle-ai/openapi-mcp-server">this mcp server</a>, which takes an OpenAPI Spec and dynamically exposes its endpoints as tools. All we have to do is add a config to our <a href="https://github.com/esxr/langgraph-mcp/blob/ed8d6d5f2fcaa5a94d0a4236068199c7f473a3ea/mcp-servers-config.sample.json">mcp-servers-config.json</a> for our desired spec!</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    ...
+    &quot;jira&quot;: {
+        &quot;description&quot;: &quot;Project management and issue tracking, e.g., get, modify, or search projects, issues, bugs, etc.&quot;,
+        &quot;command&quot;: &quot;npx&quot;,
+        &quot;args&quot;: [
+            &quot;-y&quot;,
+            &quot;openapi-mcp-server@1.1.0&quot;,
+            &quot;/path/to/openapi-specs/jira-openapi.json&quot;
+        ],
+        &quot;env&quot;: {
+            &quot;OPENAPI_MCP_HEADERS&quot;: &quot;{\&quot;Authorization\&quot;: \&quot;Basic [base64 encoded version of: &lt;YOUR.JIRA.EMAIL@YOUR.JIRA.TOKEN&gt;]\&quot;}&quot;,
+            &quot;JIRA_HOST&quot;: &quot;your_workspace.atlassian.net&quot;,
+            &quot;JIRA_EMAIL&quot;: &quot;you_email@example.com&quot;,
+            &quot;JIRA_API_TOKEN&quot;: &quot;YOUR.JIRA.TOKEN&quot;
+        }
+    }
+  }
+}
+</code></pre>
+<p>We've connected our JIRA workspace to our assistant using a simple config. Now, let's tell our assistant to create a JIRA ticket for us.</p>
+<p><img alt="" src="https://miro.medium.com/v2/resize:fit:640/1*ZLJQXgCxbd7kzudPfWQAKw.gif"></p>
+<p>It's able to select the right tool (from a list of 500 or so tools!) most of the time. However, it cannot correctly map the information from the conversation context to tool arguments.</p>
+<p>Tracing this with the help of LangSmith reveals the problem. The tool definitions returned by the MCP server has <code>refs</code> to the information schema (instead of the actual schema). Therefore, the target schema of tool input arguments is effectively not available to our tool orchestrator.</p>
+<p><img alt="" src="https://miro.medium.com/v2/resize:fit:640/1*snHD1O30cPPf1Xez0VSsQg.gif"></p>
+<p>To address the problem, we need to make sure that the tool definition has resolved schema references.</p>
+<h3>Improving the openapi-mcp-server integration</h3>
+<p><strong>Openapi-mcp-server</strong> by itself doesn't check for the presence of <code>refs</code> and resolve them. This is what I needed to correct. After going through LangChain <a href="https://python.langchain.com/api_reference/langchain/chains/langchain.chains.openai_functions.openapi.openapi_spec_to_openai_fn.html">docs</a>, I found a utility called <a href="https://github.com/esxr/langgraph-mcp/blob/ed8d6d5f2fcaa5a94d0a4236068199c7f473a3ea/src/langgraph_mcp/utils/openapi_utils.py">openapi_spec_to_openai_fn</a>, which automatically resolves the <code>refs</code> during the transformation.</p>
+<p>So let's extend <code>GetTools</code> of the <code>mcp_wrapper.py</code> with <a href="https://github.com/esxr/langgraph-mcp/blob/ed8d6d5f2fcaa5a94d0a4236068199c7f473a3ea/src/langgraph_mcp/mcp_wrapper.py#L91"><strong>GetOpenAPITools</strong></a>.</p>
+<pre><code class="language-python">class GetOpenAPITools(GetTools):
+    def __init__(self, openapi_spec: dict, **kwargs):
+        self.openapi_spec_dict = openapi_spec
+        self.openapi_spec = OpenAPISpec.from_spec_dict(self.openapi_spec_dict)
+
+    async def __call__(
+        self, server_name: str, session: ClientSession
+    ) -&gt; list[dict[str, Any]]:
+        tools = await session.list_tools()
+        openai_fns = openapi_spec_to_openai_fn(self.openapi_spec)[0]
+
+        # Making the JSON schema given by openapi_spec_to_openai_fn
+        # compatible to Runtool function (MCP)
+        for fn, tool in zip(openai_fns, tools.tools):
+            op_id = &quot;&quot;.join(tool.name.split(&quot;-&quot;)[1:])
+            # This will be useful later
+            fn[&quot;metadata&quot;] = {}
+            fn[&quot;metadata&quot;][&quot;tool_info&quot;] = extract_inlined_operation_data(
+                self.openapi_spec_dict, op_id
+            )
+
+            fn[&quot;parameters&quot;][&quot;properties&quot;] = merge_json_structure(
+                fn[&quot;parameters&quot;][&quot;properties&quot;]
+            )
+            fn[&quot;name&quot;] = tool.name
+            # truncate all openai_fn descriptions to 1024 characters
+            if len(fn[&quot;description&quot;]) &gt; 1024:
+                fn[&quot;description&quot;] = fn[&quot;description&quot;][:1021] + &quot;...&quot;
+
+        return openai_fns
+</code></pre>
+<p>The graph may now use <code>GetOpenAPITools</code> instead of the usual <code>GetTools</code> while asking for tools from an <strong>openapi-mcp-server.</strong></p>
+<pre><code class="language-python">async def mcp_orchestrator(
+    state: State, *, config: RunnableConfig
+) -&gt; dict[str, list[BaseMessage]]:
+    &quot;&quot;&quot;Orchestrates MCP server processing.&quot;&quot;&quot;
+
+    ...
+
+    # Fetch tools from the MCP server conditionally
+    tools = []
+    args = (
+        server_config[&quot;args&quot;][1:]
+        if server_config[&quot;args&quot;][0] == &quot;-y&quot;
+        else server_config[&quot;args&quot;]
+    )
+
+    # Separate integration for openapi-mcp-server@1.1.0
+    # TODO: refactor this into an adapter pattern later
+    # You can also contribute to &quot;Github: esxr/langgraph-mcp&quot; for this!
+    if args[0] == &quot;openapi-mcp-server@1.1.0&quot;:
+        openapi_path = args[1]
+
+        # Get the openapi file as a json
+        with open(openapi_path, &quot;r&quot;) as file:
+            openapi_spec = json.load(file)  # Converts JSON to a Python dictionary
+
+        # convert the spec to openai tools
+        tools = await mcp.apply(
+            server_name,
+            server_config,
+            mcp.GetOpenAPITools(openapi_spec),
+        )
+    else:
+        tools = await mcp.apply(server_name, server_config, mcp.GetTools())
+
+    ...
+</code></pre>
+<p>This yields much better results!</p>
+<p>However, though <a href="https://github.com/esxr/langgraph-mcp/blob/ed8d6d5f2fcaa5a94d0a4236068199c7f473a3ea/src/langgraph_mcp/utils/openapi_utils.py">openapi_spec_to_openai_fn</a> resolves the <code>refs</code>, it ignores some of the <code>operation</code> details available in the spec. E.g., it ignores <em>examples</em>, and any additional <em>annotations</em> that API spec providers may have added.</p>
+<p>My first intuition was to enhance <code>openapi_spec_to_openai_fn</code> to include these, but for APIs like JIRA (with 500+ operations) that significantly increases the number of tokens with the bind tools. After some experimentation, the approach I chose was to selectively refine the schema details after the tool selection by the orchestrator.</p>
+<p>The graph structure for that looks somewhat like this:</p>
+<p><img alt="" src="https://miro.medium.com/v2/resize:fit:700/1*NSge-LWUz_Lg7MwqlsV2aw.png"></p>
+<p>The <strong>refine_tool_call</strong> binds that single selected tool with the additional schema details and re-attempts the <a href="https://github.com/esxr/langgraph-mcp/blob/ed8d6d5f2fcaa5a94d0a4236068199c7f473a3ea/src/langgraph_mcp/prompts.py#L58">tool orchestration prompt</a>.</p>
+<pre><code class="language-python">TOOL_REFINER_PROMPT = &quot;&quot;&quot;You are an intelligent assistant with access to various specialized tools.
+
+Objectives:
+1. Analyze the conversation to understand the user's intent and context.
+2. Select the most appropriate info from the conversation for the tool_call
+3. Combine tool outputs logically to provide a clear and concise response.
+
+Steps to follow:
+1. Understand the conversation's context.
+2. Select the most appropriate info from the conversation for the tool_call.
+3. If there is a tool response, combine the tool's output to provide a clear and concise answer to the user's query, or attempt to select another tool if needed to provide a more comprehensive answer.
+
+{tool_info}
+
+System time: {system_time}
+&quot;&quot;&quot;
+</code></pre>
+<p>Here's how the <strong>refine_tool_call</strong> node looks like in <a href="https://github.com/esxr/langgraph-mcp/blob/ed8d6d5f2fcaa5a94d0a4236068199c7f473a3ea/src/langgraph_mcp/assistant_graph.py#L271">assistant_graph.py</a></p>
+<pre><code class="language-python">async def refine_tool_call(
+    state: State, *, config: RunnableConfig
+) -&gt; dict[str, list[BaseMessage]]:
+    &quot;&quot;&quot;Call the MCP server tool.&quot;&quot;&quot;
+
+    if state.current_tool == None:
+        return
+
+    # Fetch the current state and configs
+    ...
+
+    # Get the tool info
+    tool_info = state.current_tool.get(&quot;metadata&quot;, {}).get(&quot;tool_info&quot;, {})
+
+    # Bind the tool call to the model
+    # Prepare the LLM
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (&quot;system&quot;, configuration.tool_refiner_prompt),
+            (&quot;placeholder&quot;, &quot;{messages}&quot;),
+        ]
+    )
+    model = load_chat_model(configuration.tool_refiner_model)
+    message_value = await prompt.ainvoke(
+        {
+            &quot;messages&quot;: state.messages[:-1],
+            &quot;tool_info&quot;: str(tool_info),
+            &quot;system_time&quot;: datetime.now(tz=timezone.utc).isoformat(),
+        },
+        config,
+    )
+
+    # Replace the last tool call with this one
+    # we don't want 2 tool calls in a line
+    last_msg_id = state.messages[-1].id
+    response = await model.bind_tools([state.current_tool]).ainvoke(
+        message_value, config
+    )
+    response.id = last_msg_id
+
+    return {
+      &quot;messages&quot;: [response],
+      &quot;current_tool&quot;: None # unset the current tool
+    }
+</code></pre>
+<p>You can view all the above changes together <a href="https://github.com/esxr/langgraph-mcp/commit/ed8d6d5f2fcaa5a94d0a4236068199c7f473a3ea">here</a>.</p>
+<h2>Conclusion</h2>
+<p>In this article we saw how to turn any server end-point with an Open API specification to an MCP server using a generic wrapper. This greatly enhances the current reach of our MCP based Universal assistant!</p>
+    </article>
+  </main>
+  <footer>
+    <p>&copy; 2026 Pranav Dhoolia</p>
+  </footer>
+</body>
+</html>

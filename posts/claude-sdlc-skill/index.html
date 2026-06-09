@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>'Spec-first, Agent Implemented' SDLC Skill for Claude — Pranav Dhoolia</title>
+  <meta name="description" content="'Spec-first, Agent Implemented' SDLC Skill for Claude">
+  <meta name="author" content="Pranav Dhoolia">
+  <meta property="og:title" content="'Spec-first, Agent Implemented' SDLC Skill for Claude">
+  <meta property="og:description" content="'Spec-first, Agent Implemented' SDLC Skill for Claude">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://pranav.com.au/posts/claude-sdlc-skill/">
+  <link rel="canonical" href="https://pranav.com.au/posts/claude-sdlc-skill/">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../about.html">About</a>
+    </nav>
+  </header>
+  <main>
+    <article>
+      <h1>'Spec-first, Agent Implemented' SDLC Skill for Claude</h1>
+      <time datetime="2025-12-21">Dec 21, 2025</time>
+      <p>Agents like Claude Code and Codex are seeing an increasing adoption in software development lifecycle. Here, I discuss a novel AI agents engagement method that has significantly enhanced my development experience.</p>
+      <p>AI generated code implementations for complex features may exhibit a wide spectrum of quality based on the AI engagement method. Widely used one shot prompt technique of asking AI agents to implement a feature / function often yields inferior results. More the feature complexity, and dependencies involved, more the divergence of the implementation from the intent.</p>
+      <p>Part of the reason for this is jumping straight from intent to final code without explicitly considering the high-level design (including primary control-flows, data models involved), preparing ADRs with rationale, and agreeing to an Executable Implementation Spec (with defined API contracts in place).</p>
+      <p>(Sometimes I really do wonder if the UML guys were right. Seems like they were!)</p>
+      <p>This skill forces Claude to consider those aspects in details, and even ask open-ended questions from the user before continuing with implementation. This reduces a lot of ambiguity and leverages Claude's thinking capability to the fullest.</p>
+      <blockquote><p>GitHub repo: <a href="https://github.com/esxr/sdlc-skill.git">https://github.com/esxr/sdlc-skill.git</a></p></blockquote>
+    </article>
+  </main>
+  <footer>
+    <p>&copy; 2026 Pranav Dhoolia</p>
+  </footer>
+</body>
+</html>

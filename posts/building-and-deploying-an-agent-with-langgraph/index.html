@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building &amp; Deploying an Agent with LangGraph — Pranav Dhoolia</title>
+  <meta name="description" content="Creating and deploying a RAG-based chatbot for Question Answering over website content using LangGraph">
+  <meta name="author" content="Pranav Dhoolia">
+  <meta property="og:title" content="Building &amp; Deploying an Agent with LangGraph">
+  <meta property="og:description" content="Creating and deploying a RAG-based chatbot for Question Answering over website content using LangGraph">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://pranav.com.au/posts/building-and-deploying-an-agent-with-langgraph/">
+  <link rel="canonical" href="https://pranav.com.au/posts/building-and-deploying-an-agent-with-langgraph/">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../about.html">About</a>
+    </nav>
+  </header>
+  <main>
+    <article>
+      <h1>Building &amp; Deploying an Agent with LangGraph</h1>
+      <time datetime="2025-01-17">Jan 17, 2025</time>
+      <p>This blog is part of a mini-series where I create and deploy a RAG (Retrieval Augmented Generation) based chatbot for Question Answering over website content using AI solution templates that I developed at AGAILE. This covers how to setup and deploy the backend on LangGraph.</p>
+<p>LangGraph is the most popular platform for developing AI solutions. It provides ready templates for common AI solution patterns. We took its <a href="https://github.com/langchain-ai/retrieval-agent-template">retrieval agent template</a> and customised it for our client needs. In the subsequent sections I describe those customisations in detail.</p>
+<p>Please refer to the code in <a href="https://github.com/esxr/retrieval-agent-template">this repo</a> to follow along.</p>
+<h2>Start with langgraph template</h2>
+<p>Let's install the LangGraph CLI</p>
+<pre><code class="language-bash">pip install langgraph-cli --upgrade
+</code></pre>
+<p>Let's now create a new app from a template</p>
+<pre><code class="language-bash">langgraph new
+</code></pre>
+<h2>Indexing Graph Enhancements</h2>
+<p>Add starter_urls, and hops to <code>IndexConfiguration</code> in <code>configuration.py</code>. Also add a method to get the list of urls from the comma-separated <code>starter_urls</code> string.</p>
+<pre><code class="language-python">starter_urls: str = field(
+    default=&quot;https://zohlar.com&quot;,
+    metadata={
+        &quot;description&quot;: &quot;Comma-separated string of starter URLs to crawl for indexing web pages.&quot;
+    },
+)
+
+hops: int = field(
+ default=2,
+ metadata={
+  &quot;description&quot;: &quot;Maximum number of hops to traverse pages linked to the starter URLs.&quot;
+ },
+)
+
+def parse_starter_urls(self) -&gt; list[str]:
+ &quot;&quot;&quot;Parse the starter URLs into a list.
+ Returns:
+  list[str]: A list of URLs parsed from the comma-separated string.
+ &quot;&quot;&quot;
+ return [url.strip() for url in self.starter_urls.split(&quot;,&quot;) if url.strip()]
+</code></pre>
+<h2>Support For Open-source Retriever (Milvus)</h2>
+<p>Milvus is open source, and its Lite version can work off a file URI. This makes things economical (for dev), and handy for demos.</p>
+<p>Let's begin by adding <code>langchain-milvus</code> as a dependency in <code>pyproject.toml</code></p>
+<p>Then add <code>milvus</code> to <code>retriever_provider</code> list</p>
+<pre><code class="language-python">retriever_provider: Annotated[
+    Literal[&quot;elastic&quot;, &quot;elastic-local&quot;, &quot;pinecone&quot;, &quot;mongodb&quot;, &quot;milvus&quot;],
+    {&quot;__template_metadata__&quot;: {&quot;kind&quot;: &quot;retriever&quot;}},
+] = field(
+    default=&quot;milvus&quot;,
+    metadata={
+        &quot;description&quot;: &quot;The vector store provider to use for retrieval. Options are 'elastic', 'pinecone', 'mongodb', or, 'milvus'.&quot;
+    },
+)
+</code></pre>
+<p>Now to add a new method to create a milvus retriever in <code>retrieval.py</code></p>
+<pre><code class="language-python">@contextmanager
+def make_milvus_retriever(
+    configuration: IndexConfiguration, embedding_model: Embeddings
+) -&gt; Generator[VectorStoreRetriever, None, None]:
+    &quot;&quot;&quot;Configure this agent to use milvus lite file based uri to store the vector index.&quot;&quot;&quot;
+    from langchain_milvus.vectorstores import Milvus
+
+vstore = Milvus (
+    embedding_function=embedding_model,
+    collection_name=configuration.user_id,
+    connection_args={&quot;uri&quot;: os.environ[&quot;MILVUS_DB&quot;]},
+    auto_id=True
+)
+yield vstore.as_retriever()
+</code></pre>
+<p>and then use this in the factory method</p>
+<pre><code class="language-python">@contextmanager
+def make_retriever(
+    config: RunnableConfig,
+) -&gt; Generator[VectorStoreRetriever, None, None]:
+    # ... same code as before
+
+match configuration.retriever_provider:
+      # ... same code as before
+      case &quot;milvus&quot;:
+          with make_milvus_retriever(configuration, embedding_model) as retriever:
+              yield retriever
+      case _:
+          # ... as before
+</code></pre>
+<p>We'll also add the following file uri in <code>.env</code> to store the vector index:</p>
+<pre><code class="language-bash">## Milvus
+MILVUS_DB=milvus.db
+</code></pre>
+<h2>Support for Crawling</h2>
+<p>Out of the box implementation of <code>index_graph</code> (in <a href="https://github.com/esxr/retrieval-agent-template/blob/main/src/retrieval_graph/index_graph.py">index_graph.py</a>) expects as input all the documents to be indexed. Since we are enhancing the graph to include an ingestion pipeline that crawls starting at the specified URL, we'll modify the <code>index_docs</code> node to kick start the crawl if docs list in the state is empty and <code>starter_urls</code> configuration has been provided.</p>
+<h3>Custom Crawler (using Playright)</h3>
+<p>We can create a <code>Crawler Component</code> using <code>playwright</code>, which uses headless browsers (Note: Please add <code>playwright</code> &amp; <code>requests</code> as dependencies in <code>pyproject.toml</code>)</p>
+<p>You can access the code to that <a href="https://github.com/esxr/retrieval-agent-template/blob/main/src/retrieval_graph/crawler.py">here</a>.</p>
+<blockquote>
+<p><strong><em>Note:</em></strong> <em>Just adding</em> <code>playwright</code> <em>package to the python environment is not sufficient. The headless browser, and its dependencies also need to be installed. So we need to run</em> <code>playright install</code> <em>, and</em> <code>playwright install-deps</code> <em>as well.</em></p>
+<p><em>You may use LangGraph Studio app on mac, using docker to locally deploy your graphs. In this case</em> <code>playwright install</code> <em>and</em> <code>playwright install-deps</code> <em>need to happen in the docker. For that we'll add the following to</em> <code>langgraph.json</code></p>
+<p><code>"dockerfile_lines": ["RUN pip install playwright", "RUN python -m playwright install", "RUN python -m playwright install-deps"]</code></p>
+</blockquote>
+<h3>APIfy Crawler</h3>
+<p>For simpler usecases, we can also use a readymade apify based crawler. We have to modify the <code>indexx_graph.py</code> like so:</p>
+<pre><code class="language-python"># new imports
+import json
+
+from langchain_community.utilities import ApifyWrapper
+from langchain_community.document_loaders import ApifyDatasetLoader
+# ... existing code
+def load_site_dataset_map() -&gt; dict:
+    with open(&quot;sites_dataset_map.json&quot;, 'r', encoding='utf-8') as file:
+        return json.load(file)
+def apify_crawl(tenant: str, starter_urls: list, hops: int):
+    site_dataset_map = load_site_dataset_map()
+    if dataset_id := site_dataset_map.get(tenant):
+        loader = ApifyDatasetLoader(
+            dataset_id=dataset_id,
+            dataset_mapping_function=lambda item: Document(
+                page_content=item[&quot;html&quot;] or &quot;&quot;, metadata={&quot;url&quot;: item[&quot;url&quot;]}
+            ),
+        )
+    else:
+        apify = ApifyWrapper()
+        loader = apify.call_actor(
+            actor_id=&quot;apify/website-content-crawler&quot;,
+            run_input={
+                &quot;startUrls&quot;: starter_urls,
+                &quot;saveHtml&quot;: True,
+                &quot;htmlTransformer&quot;: &quot;none&quot;
+            },
+            dataset_mapping_function=lambda item: Document(
+                page_content=item[&quot;html&quot;] or &quot;&quot;, metadata={&quot;url&quot;: item[&quot;url&quot;]}
+            ),
+        )
+        print(f&quot;Site: {tenant} crawled and loaded into Apify dataset: {loader.dataset_id}&quot;)
+    return loader.load()
+# ... existing code
+async def index_docs(
+    state: IndexState, *, config: Optional[RunnableConfig] = None
+) -&gt; dict[str, str]:
+    # ... as before
+    with retrieval.make_retriever(config) as retriever:
+        # code to kick start crawl if required
+        configuration = IndexConfiguration.from_runnable_config(config)
+        if not state.docs and configuration.starter_urls:
+            print(f&quot;starting crawl ...&quot;)
+            # state.docs = await crawl (
+            #     configuration.user_id,
+            #     configuration.parse_starter_urls(),
+            #     configuration.hops
+            # )
+            state.docs = apify_crawl (
+                configuration.user_id,
+                [{&quot;url&quot;: url} for url in configuration.parse_starter_urls()],
+                configuration.hops
+            )
+        # rest remains the same as before
+        stamped_docs = ensure_docs_have_user_id(state.docs, config)
+        if configuration.retriever_provider == &quot;milvus&quot;:
+            retriever.add_documents(stamped_docs)
+        else:
+            await retriever.aadd_documents(stamped_docs)
+    return {&quot;docs&quot;: &quot;delete&quot;}
+# ... existing code
+</code></pre>
+<p>I changed default values for parameters <code>saveHtml</code>, and <code>htmlTransformer</code> because, OpenAI embedding models understand HTML very well, and the clean up performed by html transformer loses some useful information.</p>
+<h2>Handling Edge Cases</h2>
+<h3>Splitting documents for fine-grained retrieval</h3>
+<p>So far we directly embedded a crawled document. Crawled documents may be arbitrarily large.</p>
+<ol>
+<li>This puts an uncertainity on how many <code>top_k</code> retrieval results we should consider for response generation.</li>
+<li>For complex queries, where composing high quality answers may need information from multiple documents, limiting <code>top_k</code> may lead to poor results.</li>
+</ol>
+<p>To address this, we split crawl documents into multiple documents as follows:</p>
+<pre><code class="language-python"># src/retrieval_graph/index_graph.py
+
+# new import
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+# same as before
+async def index_docs(
+    state: IndexState, *, config: Optional[RunnableConfig] = None
+) -&gt; dict[str, str]:
+    if not config:
+        raise ValueError(&quot;Configuration required to run index_docs.&quot;)
+    with retrieval.make_retriever(config) as retriever:
+        configuration = IndexConfiguration.from_runnable_config(config)
+        if not state.docs and (configuration.starter_urls or configuration.apify_dataset_id):
+            print(f&quot;starting crawl ...&quot;)
+            crawled_docs = apify_crawl(configuration)
+            # use a 1000 char size overlapping window based splitter to create smaller document chunks to index
+            text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+            state.docs = text_splitter.split_documents(crawled_docs)
+
+            # same as before
+</code></pre>
+<p>We can now retrieve a larger set of <code>top_k</code> results. Since the maximum chunk size here is <code>1000</code>, we can deterministically configure the <code>top_k</code> based on the token limits supported by the language model used in the response generation node. E.g., if the token limit is 100,000 tokens, we can potentially use <code>top_k</code> upto <code>500</code> (assuming an average token size of 5 characters).</p>
+<pre><code class="language-python"># src/retrieval_graph/retreival.py
+# ...
+def make_milvus_retriever(
+    configuration: IndexConfiguration, embedding_model: Embeddings, **kwargs
+) -&gt; Generator[VectorStoreRetriever, None, None]:
+    # ...
+    yield vstore.as_retriever(search_kwargs=configuration.search_kwargs)
+# ...
+</code></pre>
+<p>Here, <code>search_kwargs = {"k": 10}</code> conveys that retriever will return top 10 results.</p>
+<h3>Rate limits during embedding</h3>
+<p>Embedding Models put limits on the number of token per unit time. Initially, we embedded the whole set of crawled (or split) documents in a single call. For large sites, this ran into rate limit errors.</p>
+<p>With the following enhancement we can add a batch size configuration, split documents into multiple batches, and add a time delay to avoid rate limits.</p>
+<pre><code class="language-python"># src/retrieval_graph/configuration.py
+# ...
+@dataclass(kw_only=True)
+class IndexConfiguration(CommonConfiguration):
+    # ...
+    batch_size: int = field(
+        default=400,
+        metadata={
+            &quot;description&quot;: &quot;Number of documents to index in a single batch.&quot;
+        },
+    )
+    # ...
+</code></pre>
+<pre><code class="language-python"># src/retrieval_graph/index_graph.py
+# ...
+
+# generator function to create batches
+def create_batches(docs, batch_size):
+    &quot;&quot;&quot;Chunk documents into smaller batches.&quot;&quot;&quot;
+    for i in range(0, len(docs), batch_size):
+        yield docs[i:i + batch_size]
+async def index_docs(
+    state: IndexState, *, config: Optional[RunnableConfig] = None
+) -&gt; dict[str, str]:
+    if not config:
+        raise ValueError(&quot;Configuration required to run index_docs.&quot;)
+    with retrieval.make_retriever(config) as retriever:
+        configuration = IndexConfiguration.from_runnable_config(config)
+        # ...
+        stamped_docs = ensure_docs_have_user_id(state.docs, config)
+        # embed in batches to avoid rate limit errors
+        batch_size = configuration.batch_size
+        for i, batch in enumerate(create_batches(stamped_docs, batch_size)):
+            if configuration.retriever_provider == &quot;milvus&quot;:
+                retriever.add_documents(batch)
+            else:
+                await retriever.aadd_documents(batch)
+            # sleep if there are more batches to embed
+            if i &lt; (len(stamped_docs) // batch_size):
+                time.sleep(60)
+    return {&quot;docs&quot;: &quot;delete&quot;}
+# ...
+</code></pre>
+<h2>Cloud Deployment</h2>
+<p>We can now deploy the retrieval graph to langgraph cloud. The process is quite straight-forward:</p>
+<ol>
+<li>Create a Plus account on <a href="https://smith.langchain.com/">LangSmith</a>. This is necessary. Free-tier developer account does not allow deploying to LangGraph cloud. This costs 39 USD / month.</li>
+<li>Now from LangSmith left-nav bar, go to <em>Deployments &gt; LangGraph Platform</em>. Here we can initiate a + New Deployment.</li>
+<li>We can <em>Import from GitHub</em> my langGraph repo! And add environment configurations (the ones in <code>.env</code> file).</li>
+<li>And just Submit to deploy! This step takes around 15+ minutes. Once this finishes, click on LangGraph Studio to access the studio to test the graphs!</li>
+</ol>
+<h2>References</h2>
+<p>This blog was written in collaboration with Praneet Dhoolia ( <a href="https://praneetdhoolia.github.io/">https://praneetdhoolia.github.io</a>) <a href="https://praneetdhoolia.github.io/2024/12/31/expanding-langgraph-retrieval-template.html">https://praneetdhoolia.github.io/2024/12/31/expanding-langgraph-retrieval-template.html</a></p>
+    </article>
+  </main>
+  <footer>
+    <p>&copy; 2026 Pranav Dhoolia</p>
+  </footer>
+</body>
+</html>

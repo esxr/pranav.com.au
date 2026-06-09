@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adding ChatGPT-Like functionality to MacOS Spotlight Search — Pranav Dhoolia</title>
+  <meta name="description" content="Adding ChatGPT like search system to the MacOS filesystem with Spotlight, Ollama, and LangChain">
+  <meta name="author" content="Pranav Dhoolia">
+  <meta property="og:title" content="Adding ChatGPT-Like functionality to MacOS Spotlight Search">
+  <meta property="og:description" content="Adding ChatGPT like search system to the MacOS filesystem with Spotlight, Ollama, and LangChain">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://pranav.com.au/posts/adding-chatgpt-like-functionality-to-macos-spotlight-search/">
+  <link rel="canonical" href="https://pranav.com.au/posts/adding-chatgpt-like-functionality-to-macos-spotlight-search/">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../about.html">About</a>
+    </nav>
+  </header>
+  <main>
+    <article>
+      <h1>Adding ChatGPT-Like functionality to MacOS Spotlight Search</h1>
+      <time datetime="2024-06-24">Jun 24, 2024</time>
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/0*Pr09E-NGy4brcjxl.png" alt=""></p>
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/0*rja2PX_7W38z_o4a.png" alt=""></p>
+      <p>Adding ChatGPT like search system to the MacOS filesystem with Spotlight, Ollama, and LangChain</p>
+      <h2>Introduction</h2>
+      <p>In one of my <a href="https://youtu.be/4Rl2r9JV-6Q">YouTube videos</a>, I locally hosted LLMs using <a href="https://ollama.ai/">Ollama</a>, and interacted with them in a ChatGPT like interface using <a href="https://github.com/ollama-webui/ollama-webui">Ollama Web UI</a> also hosted locally. This continues that journey. Here, I build a solution using a locally hosted LLM and <a href="https://langchain.com/">LangChain</a> (the most popular framework for building LLM solutions).</p>
+      <p>The Youtube video for the same is available <a href="https://youtu.be/7S73a_XuTdg">here</a></p>
+      <h2>Motivation</h2>
+      <p>I love the built-in SpotLight on Mac. It indexes my documents and allows me to search for keywords and find relevant documents. In a lot of cases, I am not looking for a document, I am looking for answers to my questions that I know are somewhere there in my documents.</p>
+      <p>LLMs are good at answering questions. But they don't have my documents. So I want to build a solution that retrieves relevant documents using Spotlight, and then passes them to LLM to generate answers to my questions. Such technique where we first retrieve information from a database or corpus, and then pass it on to an LLM to generate a response is also referred to as a <strong>Retrieval Augmented Generation</strong> solution. Since we'll do everything local, let's call this <strong>Local RAG</strong>.</p>
+      <h2>Setup</h2>
+      <p>Let's begin by creating a python environment. Let me use conda for this.</p>
+<pre><code class="language-bash">conda create -n local_rag python=3.11
+conda activate local_rag</code></pre>
+      <p>Let's now install langchain</p>
+<pre><code class="language-bash">pip install langchain</code></pre>
+      <p>For this exercise I want to search thru PDF documents. So let's install <code>pypdf</code>. It will help extract text from PDF documents.</p>
+<pre><code class="language-bash">pip install pypdf</code></pre>
+      <h2>Programmatic use of Spotlight</h2>
+      <p>Let's first write a python program to use Spotlight programmatically. Let's create a shell program which receives the query as an input.</p>
+<pre><code class="language-python">import argparse  # To parse command line arguments
+def main():
+    # Setup argument parser
+    parser = argparse.ArgumentParser(description=&#39;Search files using Spotlight.&#39;)
+    parser.add_argument(&#39;query&#39;, type=str, help=&#39;Search query&#39;)
+    # Parse commandline arguments
+    args = parser.parse_args()
+
+if __name__ == &quot;__main__&quot;:      # Entry point of the program
+    main()</code></pre>
+      <p>Let's now write a function to search using spotlight for files matching this query. We'll use the <code>mdfind</code> command and run it as a subprocess. We'll then call this from our <code>main</code> function.</p>
+<pre><code class="language-python">import argparse  # To parse command line arguments
+import subprocess  # To run spotlight as a subprocess
+def search_with_spotlight(query):
+    # Prepare the command
+    command = [&quot;mdfind&quot;]
+    command += [query]
+
+    # Execute mdfind command and capture output
+    result = subprocess.run(command, capture_output=True, text=True)
+
+    # Check if the command was successful
+    if result.returncode != 0:
+        print(&quot;Error in executing search&quot;)
+        return []
+
+    # Split the output into lines to get individual file paths
+    file_paths = result.stdout.strip().split(&#39;\n&#39;)
+    return file_paths
+
+def main():
+    # Setup argument parser
+    parser = argparse.ArgumentParser(description=&#39;Search files using Spotlight.&#39;)
+    parser.add_argument(&#39;query&#39;, type=str, help=&#39;Search query&#39;)
+    # Parse commandline arguments
+    args = parser.parse_args()
+    # Perform spotlight search
+    search_results = search_with_spotlight(args.query)
+    # Print search results
+    print(search_results)
+
+if __name__ == &quot;__main__&quot;:  # Entry point of the program
+    main()</code></pre>
+      <p>Let's run it now.</p>
+<pre><code class="language-bash">python spotlight.py &quot;search_with_spotlight using mdfind&quot;</code></pre>
+      <p>We should see the program file in results.</p>
+      <p>Let me also extend this to support restricting the search to a specific folder. We'll add a new argument to our program to optionally take in a folder. We'll relay this folder to the <code>search</code> function. And use it to restrict the search to this folder.</p>
+<pre><code class="language-python">import argparse  # To parse command line arguments
+import subprocess  # To run spotlight as a subprocess
+
+def search_with_spotlight(query, folder=None):
+    # Prepare the command
+    command = [&quot;mdfind&quot;]
+    if folder is not None:
+        command += [&quot;-onlyin&quot;, folder]
+    command += [query]
+    # Execute mdfind command and capture output
+    result = subprocess.run(command, capture_output=True, text=True)
+    # Check if the command was successful
+    if result.returncode != 0:
+        print(&quot;Error in executing search&quot;)
+        return []
+    # Split the output into lines to get individual file paths
+    file_paths = result.stdout.strip().split(&#39;\n&#39;)
+    return file_paths
+
+def main():
+    # Setup argument parser
+    parser = argparse.ArgumentParser(description=&#39;Search files using Spotlight.&#39;)
+    parser.add_argument(&#39;--folder&#39;, type=str, help=&#39;Folder to search in&#39;, default=None)
+    parser.add_argument(&#39;query&#39;, type=str, help=&#39;Search query&#39;)
+    # Parse commandline arguments
+    args = parser.parse_args()
+    # Perform spotlight search
+    search_results = search_with_spotlight(args.query, folder=args.folder)
+    # Print search results
+    print(search_results)
+
+if __name__ == &quot;__main__&quot;:  # Entry point of the program
+    main()</code></pre>
+      <p>We can now run our search in a specific folder like this:</p>
+<pre><code class="language-bash">python spotlight.py --folder . &quot;search_with_spotlight using mdfind&quot;</code></pre>
+      <p><img src="https://miro.medium.com/v2/resize:fit:650/0*ZO6NVhTIA-QQl_FA.png" alt=""></p>
+      <p>Since we restricted our search to the current folder, it got us just our program file (which has the query string in it).</p>
+      <h2>Layering LLM on top of Spotlight</h2>
+      <p>While Spotlight gets us the files of interest containing certain keywords. It doesn't precisely answer our questions. Let's say we have a bunch of resumes in a folder, and want to ask a complex question like " <em>Give me a short (about 100 words) summary, including contact details, of candidates having coursera certification in Generative AI</em>". Based on keywords like <em>resume</em>, <em>coursera</em>, <em>generative AI</em>; Spotlight may get us the resume files of interest. But it will not give us a short summary including contact details for the candidates. Let's now use LLMs to do this for us.</p>
+      <p>Let's begin by writing our driver function.</p>
+<pre><code class="language-python">def generate_answer(question: str, file_paths: list[str], **kwargs: dict) -&gt; str:
+    # Get Document objects with text content from file paths
+    docs = get_docs(file_paths)
+
+    # Construct QA chain
+    qa_chain = build_qa_chain()
+    # Prepare input
+    input = {&quot;docs&quot;:docs, &quot;question&quot;:question}
+    input.update(kwargs)
+    # Invoke the chain
+    return qa_chain.invoke(input)
+
+if __name__ == &quot;__main__&quot;:  # Entry point of the program
+    print(generate_answer(
+        question=&quot;Give me a short, 100 words summary of each candidate having a coursera certification in Generative AI. Please include their contact details as well.&quot;,
+        file_paths=[&quot;~/Documents/Resumes/Pranav Dhoolia.pdf&quot;],
+        doc_type=&quot;Candidate Resume&quot;
+    ))</code></pre>
+      <p>For this exercise let's assume all our documents are PDFs. Let's write the get_docs function to extract text documents from pdf files.</p>
+<pre><code class="language-python">from langchain.document_loaders import PyPDFLoader
+from langchain.schema import Document
+def get_docs(file_paths: list[str]) -&gt; list[Document]:
+    docs = []
+    for file_path in file_paths:
+        loader = PyPDFLoader(file_path)
+        pages = loader.load()
+        docs.append(Document(
+            page_content=&quot;\n&quot;.join(page.page_content for page in pages),
+            metadata={&quot;source&quot;: file_path}
+        ))
+    return docs
+
+def generate_answer(question: str, file_paths: list[str], **kwargs: dict) -&gt; str:
+    ...</code></pre>
+      <p>Let's now build our QA chain. We'll use the LangChain Expression Language syntax for this. Let's start by defining the Prompt, the LLM model, and the OutputParser</p>
+<pre><code class="language-python">from langchain.document_loaders import PyPDFLoader
+from langchain.prompts import PromptTemplate
+from langchain.schema import Document, StrOutputParser
+from langchain_community.chat_models import ChatOllama
+from langchain_core.runnables.base import RunnableSerializable
+def get_docs(file_paths: list[str]) -&gt; list[Document]:
+    ...
+
+def build_qa_chain() -&gt; RunnableSerializable:
+    return (
+        {}  ## Build the data to be injected into the prompt
+        | PromptTemplate.from_template(
+            &quot;Use only the following context to answer the question at the end.&quot;
+            &quot;\nDo not use anything other than the context below to answer the question.&quot;
+            &quot;\nI&#39;ll repeat it is extremely important that you only use the provided context below to answer the question.&quot;
+            &quot;\nIf the context below is not sufficient to answer, just say that you don&#39;t know, don&#39;t try to make up an answer.&quot;
+            &quot;\n\nContext:\n\n{context}\n\nQuestion: {question}&quot;
+        )
+        | ChatOllama(model=&quot;zephyr:7b-beta-q5_K_M&quot;)
+        | StrOutputParser()
+    )
+
+def generate_answer(question: str, file_paths: list[str], **kwargs: dict) -&gt; str:
+    ...</code></pre>
+      <p>Let's now build the data to be injected into the prompt. we'll use the <code>docs</code>, <code>question</code>, and <code>doc_type</code> expected while invoking the chain.</p>
+<pre><code class="language-python">...
+from langchain_core.prompts import format_document
+...
+def build_qa_chain() -&gt; RunnableSerializable:
+    def build_context(docs: list[Document], doc_type: str=&quot;Document&quot;) -&gt; str:
+        doc_prompt = PromptTemplate.from_template(&quot;{page_content}&quot;)
+        context = &quot;&quot;
+        for i, doc in enumerate(docs):
+            context += f&quot;{doc_type} {i + 1}\n---\n{format_document(doc, doc_prompt)}\n\n&quot;
+        return context
+    return (
+        {
+            &quot;context&quot;: lambda input: build_context(input[&quot;docs&quot;], input.get(&quot;doc_type&quot;, &quot;Document&quot;)),
+            &quot;question&quot;: lambda input: input[&quot;question&quot;]
+        }
+        | ...
+    )</code></pre>
+      <h2>Debugging LLM solutions</h2>
+      <p>One of the reasons I really love LangChain, is that with LangSmith, it offers a very powerful debugging experience. So before running our LLM layer, let's set up LangSmith.</p>
+      <ol>
+        <li><p>Go to <a href="https://smith.langchain.com/">LangSmith</a> and login with your credentials</p></li>
+      </ol>
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/0*soWtsF9Br6EPbqVP.jpg" alt=""></p>
+      <ol start="2">
+        <li><p>Create your API key for your Organization</p></li>
+      </ol>
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/0*65eWCaTdBxyxzk03.jpg" alt=""></p>
+      <ol start="3">
+        <li><p>Create a new project</p></li>
+      </ol>
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/0*GHMM6keqTz51dEZo.jpg" alt=""></p>
+      <ol start="4">
+        <li><p>Setup the environment variables. I have set these up in my <code>.zshrc</code>.</p></li>
+      </ol>
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/0*xqhpKMn5sBlga0V5.jpg" alt=""></p>
+      <ol start="5">
+        <li><p>Let's now run our LLM layer.</p></li>
+      </ol>
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/0*BCHK9lAoS2ajqCd2.png" alt=""></p>
+      <p>It returns here a quick summary of the candidate matching the query, along with their contact details.</p>
+      <p>Let's now goto LangSmith and see the various aspects of LLM execution that happened here!</p>
+      <ul>
+        <li>Let go back to our project and check Traces</li>
+      </ul>
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/0*4GHzkz-NUiBJjKuK.png" alt=""></p>
+      <p>We see a trace for our chain execution. Let's expand it</p>
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/0*mw2VjFCIIjBikEfl.png" alt=""></p>
+      <p>We can see the things corresponding to components we used in building the chains, i.e., the data, the prompt, the chat model, and the output parser</p>
+      <p>For the data, we can see the input, and what the context built from it looks like</p>
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/0*0ewyndBZlt7-MtR7.png" alt=""></p>
+      <p>For the prompt, we can see data input to the template, and the prompt generated from it</p>
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/0*hcYLooB2oizzm5Bd.png" alt=""></p>
+      <p>For the chat model, we can see the prompt input to the model, and the output generated by it</p>
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/0*On5_9aZspHglUU6z.png" alt=""></p>
+      <p>For the output parser, we can see the input to it, and the output produced by it.</p>
+      <p>This offers a powerful general debugging experience.</p>
+      <p>Further, if we want to fine tune our model, based on the usage of our application over a period of time, we can select the traces we want to use for fine tuning, and easily construct a dataset to use for fine tuning from it like this.</p>
+      <p>Select the trace(s) and click on the <code>Add to Dataset</code> button</p>
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/0*2WCuPbjhZeOXqYII.png" alt=""></p>
+      <p>Since we don't already have a dataset, we'll create a new one</p>
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/0*j5x-Ngh8QyKKZeeU.png" alt=""></p>
+      <p>And now we can see a preview of dataset being created as well. -- In the preview here we can see as input columns: the context, the question, and the doc domain type, and as output the LLM's response.</p>
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/0*ob9nqt5_zqJ9PdYA.png" alt=""></p>
+      <p>Over a period of time, once we have enough traces, we can select and add all good traces to this dataset, and use it for fine tuning our model!</p>
+      <h2>Combining the two</h2>
+      <p>So we have built a programmatic interface to Spotlight, and we have built an LLM based QA chain that given some content can precisely answer a question based on that content. We now need to chain the two together. Before we do that, let's first understand a little complication that we anticipate here. As we saw earlier, for our complex query, Spotlight didn't return anything. That's because it searched for files contained all the words in our query. But our query really wants a much smaller subset of keywords to be searched for. Most of the query is really a description of what we want from the files found containing that subset of keywords.</p>
+      <p>So we need to first extract the keywords from our query, and then use Spotlight to search for files containing those keywords. Once again an LLM chain is perhaps the best for identifying those keywords so let's write first write a function to do that.</p>
+<pre><code class="language-python">import json
+from langchain.prompts import PromptTemplate
+from langchain.schema import StrOutputParser
+from langchain_community.chat_models import ChatOllama
+
+def extract_keywords(query: str) -&gt; list[str]:
+    # Construct the keyword extraction chain
+    keyword_extraction_chain = (
+        {
+            &quot;query&quot;: lambda query: query
+        }
+        | PromptTemplate.from_template(
+            &quot;From the query below please extract search keywords. &quot;
+            &quot;The search keywords must be part of the query string. &quot;
+            &quot;Avoid words general to this domain such as: candidates, resume, contact, and details. &quot;
+            &quot;Output a json formatted list of keyword strings. &quot;
+            &quot;Each item in the output json should be a string.&quot;
+            &quot;\n\nQuery:\n```{query}\n```&quot;
+        )
+        | ChatOllama(model=&quot;zephyr:7b-beta-q5_K_M&quot;)
+        | StrOutputParser()
+    )
+    # Invoke the chain
+    response = keyword_extraction_chain.invoke(query)
+    # Get the substring between last `[` and `]`
+    return json.loads(f&#39;[{response[response.rfind(&quot;[&quot;) + 1:response.rfind(&quot;]&quot;)].strip()}]&#39;)
+
+if __name__ == &quot;__main__&quot;:  # Entry point of the program
+    print(extract_keywords(&quot;Give me a short (about 100 words) summary of candidates having coursera certification in Generative AI. Please include their contact details.&quot;))</code></pre>
+      <p>Now that we have our search keywords extractor, let's modify our main function to combine everything.</p>
+<pre><code class="language-python">...
+from keywords import extract_keywords
+from qa import generate_answer
+def search_with_spotlight(query, folder=None):
+    ...
+    return file_paths
+
+def main():
+    ...
+    args = parser.parse_args()
+    # Let&#39;s extact keywords from the query
+    keywords = extract_keywords(args.query)
+    # Construct an OR query from the keywords
+    query = &quot; OR &quot;.join(keywords)
+    # Perform spotlight search
+    search_results = search_with_spotlight(query, folder=args.folder)
+    # Generate answer from the query and top 3 search results
+    return generate_answer(args.query, search_results[:3], doc_type=&quot;Candidate&quot;)
+
+if __name__ == &quot;__main__&quot;:  # Entry point of the program
+    print(main())</code></pre>
+      <p>Let's now run everything together!</p>
+<pre><code class="language-bash">python spotlight.py --folder ../test/resume &quot;Give me a short (about 100 words) summary of candidates having coursera certification in Generative AI. Please include their contact details.&quot;</code></pre>
+      <p><img src="https://miro.medium.com/v2/resize:fit:700/0*LVwF28xobQP4DSrj.png" alt=""></p>
+      <p>Works like a charm!</p>
+      <h2>Conclusion</h2>
+      <p>We successfully used locally hosted LLMs along with Langchain framework to build an LLM solution. This solution provided amazing answers to quite complex questions on our local content. What's more, we didn't even have to setup any additional tools.</p>
+      <p>We used Spotlight to search for files containing certain keywords, and then used LLMs to precisely answer questions based on those files. We also saw the power of the LangChain framework, in how easy it was to use LangSmith to debug our LLM based solutions, and how easily we could use it to create datasets, based on the usage traces of our solution, to fine tune our models.</p>
+    </article>
+  </main>
+  <footer>
+    <p>&copy; 2026 Pranav Dhoolia</p>
+  </footer>
+</body>
+</html>

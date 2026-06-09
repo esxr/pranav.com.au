@@ -1,0 +1,5 @@
+title: "Adding ChatGPT-Like functionality to MacOS Spotlight Search"
+date: "2024-06-24"
+description: "Adding ChatGPT like search system to the MacOS filesystem with Spotlight, Ollama, and LangChain"
+tags: ["ai", "genai", "langchain", "langsmith", "ollama"]
+draft: false

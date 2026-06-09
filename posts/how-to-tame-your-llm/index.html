@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to tame your LLM — Pranav Dhoolia</title>
+  <meta name="description" content="LLMs are intelligent beasts. Think of them as unicorns. Channel their powers">
+  <meta name="author" content="Pranav Dhoolia">
+  <meta property="og:title" content="How to tame your LLM">
+  <meta property="og:description" content="LLMs are intelligent beasts. Think of them as unicorns. Channel their powers">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://pranav.com.au/posts/how-to-tame-your-llm/">
+  <link rel="canonical" href="https://pranav.com.au/posts/how-to-tame-your-llm/">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../about.html">About</a>
+    </nav>
+  </header>
+  <main>
+    <article>
+      <h1>How to tame your LLM</h1>
+      <time datetime="2026-05-16">May 16, 2026</time>
+      <ul>
+        <li>Let&#39;s Start With a List
+          <ul>
+            <li>At the base of it, a harness is to keep reminding the LLM of things it might&#39;ve forgotten</li>
+            <li>Let&#39;s just write that down in a markdown file</li>
+            <li>Congratulations you&#39;ve made your first Skill!</li>
+          </ul>
+        </li>
+        <li>Using MCPs Unconventionally
+          <ul>
+            <li>Skills are good, but the LLMs can still forget</li>
+            <li>Did you know you could create your own checklist MCP?</li>
+            <li>Tool Call = Tick a box</li>
+          </ul>
+        </li>
+        <li>The Power of Thinking Tools
+          <ul>
+            <li>History: Sequential Thinking Tool</li>
+            <li>An MCP server expecting 10-20+ nested params = LLM is forced to think</li>
+          </ul>
+        </li>
+        <li>Reward Hacking/Gaming
+          <ul>
+            <li>All that is good, but what if the LLM just doesn&#39;t want to?</li>
+            <li>LLMs marking done even when not (examples)</li>
+            <li>LLMs &quot;forgetting&quot; instructions (examples)</li>
+          </ul>
+        </li>
+        <li>The Carrot And The Stick
+          <ul>
+            <li>Requiring Proof of work</li>
+            <li>Hooks for detecting task done</li>
+            <li>Not everything has to be AI</li>
+            <li>Deterministic and Heuristic checks</li>
+          </ul>
+        </li>
+        <li>Cryptography? Seriously?
+          <ul>
+            <li>Pipeline integrity and preventing state tampering</li>
+            <li>Using hooks to block state file edits</li>
+            <li>Using cryptography and hashing to prevent spoofing</li>
+          </ul>
+        </li>
+        <li>Practical Considerations</li>
+      </ul>
+      <h2>Let&#39;s Start with a List</h2>
+      <p>Taming a large language model doesn&#39;t have to be complicated. If you&#39;re a busy person, and you&#39;re reading this on a subway (like me), or while having lunch, or a coffee, don&#39;t worry. Start simple!</p>
+      <p>LLMs are beautiful machines, and more often than not, simply writing tasks in a markdown checklist and telling the LLM to tick the tasks as they get completed brings attention back to the tasks, which makes it hard for your LLM to forget them.</p>
+      <p><em>To try it, paste this prompt in your AI</em></p>
+<pre><code>&lt;INSERT CHECKLIST SKILL PROMPT HERE&gt;</code></pre>
+      <p>Alternatively, you can also paste this in a markdown file called <code>SKILL.md</code> inside your <code>.claude/skills/checklist</code> folder, and this will be a skill!</p>
+      <h2>Using MCPs Unconventionally</h2>
+      <p>Using a text based list works well, when you have few tasks, and they&#39;re not nested. Where it doesn&#39;t work well is an example like so:</p>
+<pre><code></code></pre>
+      <p>To understand why something like this might pose a problem, we have to understand the difference between us and LLMs</p>
+      <blockquote>
+        <p>LLMs have inherently been taught to think in prose. They&#39;re able to think better in paragraphs as opposed to clear bullet points. So while the process of hierarchically laying down our tasks might look flawless and appealing to us humans, LLMs will club them together as a paragraph, and focus on the gist, which causes them to tick multiple points at once, and confuse the state of the tasks.</p>
+        <p>Moreover, if your list is ordered, that increases the chances of hallucination since previous incomplete tasks assumed complete by the LLM will confuse it even further!</p>
+      </blockquote>
+      <p>One fix to this is making the list &quot;hard&quot; in nature, which means making the process of ticking boxes more explicit. Consider a task checklist like this:</p>
+<pre><code></code></pre>
+      <p>We could explicitly define an MCP server which ... &lt;INSERT PIPELINE DEFINITION HERE/&gt;</p>
+      <p><em>To try it, paste this prompt in your AI</em></p>
+<pre><code>&lt;INSERT PROMPT TO CREATE A PIPELINE MCP SERVER HERE&gt;</code></pre>
+      <p>I know there are some nuances here which</p>
+      <h2>The Power Of Thinking Tools</h2>
+      <p>Have you ever had to prepare for an exam for a subject overnight, and after that exam, you almost instantaneously had a much better idea of that subject than you&#39;ve had the previous couple of weeks?</p>
+      <p>There is a difference between when you study a subject all by yourself vs when you study for it through a formal course. A well designed formal curriculum (and related tests) are meant to direct your attention towards crucial topics of the subject, which not only help you understand the subject faster, but also make sure you&#39;re grasping the</p>
+      <h2>Process</h2>
+      <p>Hopefully, I was able to impart useful knowledge about harnesses and how we can go thinking about them through this article. However, we still need a concrete process for actually going ahead and creating a harness.</p>
+      <p>The best way to start is by just opening your favourite orchestration tool (<code>claude-code</code> for example), walk it through a real usecase for your domain, correct it where its wrong, and record that sample in <strong>LESSONS.md</strong></p>
+      <p>Later, you give points from <strong>LESSONS.md</strong> to <code>sdlc-skill</code> (where you define intents, constraints, high level design, architectural decision records, and executable implementation specifications for a specific functionality), and build out that component of the pipeline.</p>
+    </article>
+  </main>
+  <footer>
+    <p>&copy; 2026 Pranav Dhoolia</p>
+  </footer>
+</body>
+</html>

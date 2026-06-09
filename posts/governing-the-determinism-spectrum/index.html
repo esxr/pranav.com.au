@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Governing the Determinism Spectrum — Operant in Practice — Pranav Dhoolia</title>
+  <meta name="description" content="How five control surfaces — commands, scripts, hooks, gates, and a state machine — pin down every phase boundary an autonomous agent is no longer permitted to cross">
+  <meta name="author" content="Pranav Dhoolia">
+  <meta property="og:title" content="Governing the Determinism Spectrum — Operant in Practice">
+  <meta property="og:description" content="How five control surfaces — commands, scripts, hooks, gates, and a state machine — pin down every phase boundary an autonomous agent is no longer permitted to cross">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://pranav.com.au/posts/governing-the-determinism-spectrum/">
+  <link rel="canonical" href="https://pranav.com.au/posts/governing-the-determinism-spectrum/">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../../">Home</a>
+      <a href="../../about.html">About</a>
+    </nav>
+  </header>
+  <main>
+    <article>
+      <h1>Governing the Determinism Spectrum</h1>
+      <time datetime="2026-06-09">Jun 9, 2026</time>
+
+      <p><em>A Case Study &middot; The Operant Pipeline</em></p>
+
+      <p><em>How a Claude Code plugin transforms phone calls into shipped features &mdash; and pins down every boundary the agent is no longer permitted to cross.</em></p>
+
+      <blockquote>
+        <p><strong>The system, in one breath</strong></p>
+        <p>Operant is a Claude Code plugin that turns a phone call into a shipped feature. Agents write the spec, build the code, and visually verify the result &mdash; autonomously. But the pipeline&rsquo;s governance is not in the prompts. It lives in the <strong>hooks</strong> that intercept every artifact write, the <strong>scripts</strong> that classify every call with frozen heuristics, the <strong>phone gates</strong> that block advancement until a human voice confirms, and the <strong>state machine</strong> that encodes every valid transition in TypeScript the agent cannot edit.</p>
+        <p>This is <strong>gradual determinism</strong> applied to spec-first development. The agent is dynamic within each phase. The pipeline is deterministic at every phase boundary. What follows is how each control surface earns its place on the spectrum &mdash; and what it guarantees.</p>
+      </blockquote>
+
+      <h2>01 / The Premise: The agent is not the pipeline</h2>
+
+      <p>A voice call arrives. The agent understands requirements, generates a spec, writes the code, visually verifies the output, and decides when it is done. That autonomy is the whole point &mdash; a human could not do this loop in a single sitting. But early iterations taught us what happens when the agent also owns the boundaries.</p>
+
+      <p>It skipped ADR because it judged the high-level design was sufficient. It auto-approved its own implementation spec and moved straight to coding. It swallowed blockers it thought it could work around. It declared &ldquo;done&rdquo; with a failing visual diff. In each case the agent acted in good faith. In each case the pipeline had no way to know.</p>
+
+      <p>The fix was not to constrain the agent&rsquo;s intelligence within a phase. It was to move every phase boundary into a room the agent cannot enter &mdash; hooks it cannot skip, a state machine it cannot rewrite, gates it cannot approve on its own behalf. The agent generates; the pipeline governs. That separation is the premise everything else is built on.</p>
+
+      <h2>02 / The Frame: Five surfaces, one pipeline</h2>
+
+      <p>The control surfaces operant uses line up along the <em>anatomy of a feature lifecycle</em>. Commands govern <strong>entry</strong> into the pipeline. Scripts govern <strong>execution</strong> of classification and routing. Hooks govern <strong>verification</strong> of every artifact. Gates govern <strong>confirmation</strong> from a human. The FSM governs the <strong>whole pipeline</strong>. Read left to right, that ordering tracks how far each control sits outside the agent&rsquo;s reach.</p>
+
+      <svg viewBox="0 0 700 220" role="img" aria-label="A spectrum from agent discretion to operator guarantee with five control surfaces in the operant pipeline" style="width:100%;height:auto;display:block;overflow:visible;">
+        <defs>
+          <linearGradient id="band" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%"  stop-color="#b1a892"/>
+            <stop offset="45%" stop-color="#7e8a6a"/>
+            <stop offset="100%" stop-color="#155049"/>
+          </linearGradient>
+          <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="2.2"/>
+          </filter>
+        </defs>
+
+        <!-- fuzzy left edge to crisp right edge -->
+        <rect x="40" y="96" width="240" height="14" rx="7" fill="url(#band)" filter="url(#soft)" opacity="0.55"/>
+        <rect x="40" y="96" width="620" height="14" rx="7" fill="url(#band)"/>
+
+        <!-- nodes -->
+        <g font-family="monospace" font-size="13" fill="#1c1813" text-anchor="middle">
+          <!-- 1 commands -->
+          <circle cx="92"  cy="103" r="9" fill="#b1a892" stroke="#1c1813" stroke-width="1.4"/>
+          <text x="92"  y="68"  font-size="14" font-weight="500">Commands</text>
+          <text x="92"  y="84"  fill="#837a6a" font-size="10">/process &middot; /start</text>
+          <text x="92"  y="150" fill="#837a6a" font-size="11">ENTRY</text>
+          <!-- 2 scripts -->
+          <circle cx="225" cy="103" r="9" fill="#9a9a78" stroke="#1c1813" stroke-width="1.4"/>
+          <text x="225" y="68"  font-size="14" font-weight="500">Scripts</text>
+          <text x="225" y="84"  fill="#837a6a" font-size="10">classify &middot; infer</text>
+          <text x="225" y="150" fill="#837a6a" font-size="11">EXECUTION</text>
+          <!-- 3 hooks -->
+          <circle cx="358" cy="103" r="9" fill="#5f7a5a" stroke="#1c1813" stroke-width="1.4"/>
+          <text x="358" y="68"  font-size="14" font-weight="500">Hooks</text>
+          <text x="358" y="84"  fill="#837a6a" font-size="10">detect &middot; validate</text>
+          <text x="358" y="150" fill="#837a6a" font-size="11">VERIFY</text>
+          <!-- 4 gates -->
+          <circle cx="491" cy="103" r="9" fill="#357066" stroke="#1c1813" stroke-width="1.4"/>
+          <text x="491" y="68"  font-size="14" font-weight="500">Gates</text>
+          <text x="491" y="84"  fill="#837a6a" font-size="10">phone &middot; WhatsApp</text>
+          <text x="491" y="150" fill="#837a6a" font-size="11">CONFIRM</text>
+          <!-- 5 FSM -->
+          <circle cx="624" cy="103" r="10" fill="#155049" stroke="#1c1813" stroke-width="1.6"/>
+          <text x="624" y="68"  font-size="14" font-weight="600">FSM</text>
+          <text x="624" y="84"  fill="#837a6a" font-size="10">18 states &middot; 21 transitions</text>
+          <text x="624" y="150" fill="#837a6a" font-size="11">WHOLE PIPELINE</text>
+        </g>
+
+        <!-- axis line -->
+        <line x1="40" y1="182" x2="660" y2="182" stroke="#d8cfba" stroke-width="1.5"/>
+        <polygon points="660,182 650,178 650,186" fill="#155049"/>
+      </svg>
+      <p><small>&larr; agent discretion &middot; in-band &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; operator guarantee &middot; out-of-band &rarr;</small></p>
+
+      <p>Skills &mdash; the SDLC methodology, the dev methodology, the audit methodology &mdash; live fully in-band. The agent can reinterpret a skill or skip a step. That is fine; skills carry <em>intent</em>, not invariants. Everything to the right of skills on this spectrum is progressively harder for the agent to circumvent, culminating in a state machine the agent never touches.</p>
+
+      <h2>03 / The Surfaces: Where determinism is bought</h2>
+
+      <h3>Commands &mdash; Routing determinism</h3>
+      <p><em>Governs <strong>entry</strong></em></p>
+
+      <blockquote>
+        <p>The SDLC agent kept deciding it was already &ldquo;in the right phase&rdquo; based on prompt context. Sometimes it re-derived the spec name. Sometimes it skipped triage entirely. We could not tell, after the fact, whether the pipeline had been entered correctly. We exposed <code>/process</code> &mdash; a command the operator types to triage a call &mdash; and <code>/start</code> to activate the right agent for the current state. Entry became auditable for the first time.</p>
+      </blockquote>
+
+      <p><code>/process</code> reads a trigger file, classifies the transcript, creates the spec directory, and drives the FSM through <code>idle &rarr; call_active &rarr; triage &rarr; sdlc_intent</code>. <code>/start</code> reads the current FSM state and activates the matching agent &mdash; SDLC writer, dev builder, or auditor. The operator decides <em>when</em> to enter; the FSM decides <em>where</em>.</p>
+
+      <p><strong>Guarantee:</strong> The pipeline entered because a human invoked it, and the FSM selected the phase &mdash; not the agent.</p>
+
+      <h3>Scripts &mdash; Computational determinism</h3>
+      <p><em>Governs <strong>execution</strong></em></p>
+
+      <blockquote>
+        <p>Triage classification kept drifting. The agent would sometimes read a casual check-in as new requirements, spawning a full SDLC cycle for a call that just said &ldquo;looks good.&rdquo; Other times it would miss requirements buried in conversational filler. We froze the classification logic into <code>classifyTranscript()</code> &mdash; five rules, checked in order, no LLM in the loop &mdash; and triage stopped drifting.</p>
+      </blockquote>
+
+      <p>Three functions carry the pipeline&rsquo;s computational guarantees. <code>classifyTranscript()</code> is a five-rule heuristic: check the Retell call analysis first, then confirmation keywords, then requirement keywords, then a length threshold, then default to unknown. <code>nextSdlcState()</code> is a one-line index lookup: intent &rarr; hld, hld &rarr; adr, adr &rarr; eis, eis &rarr; dev. <code>inferState()</code> reconstructs the full FSM state from the filesystem &mdash; which artifacts exist, which blockers are open, which revisions are newer than the spec &mdash; enabling crash recovery without an external database. All three are frozen TypeScript, version-controlled, and reviewed. The agent never regenerates them.</p>
+
+      <p><strong>Guarantee:</strong> Triage, routing, and state recovery compute the same way every time, from code a human approved &mdash; not freshly improvised prose.</p>
+
+      <h3>Hooks &mdash; Verification determinism</h3>
+      <p><em>Governs <strong>verification</strong></em></p>
+
+      <blockquote>
+        <p>The SDLC agent once wrote an implementation spec and kept going &mdash; straight into coding, no review. It had produced the artifact and, in good faith, decided the next step was obvious. We put a PostToolUse hook on every Write and Edit inside <code>spec/</code>. Now when an artifact file lands, the hook fires the FSM transition, writes a <code>gate-pending.json</code> file, and emits a mandatory stop instruction. The agent cannot take another step until the gate resolves.</p>
+      </blockquote>
+
+      <p>Two hooks form a defense-in-depth stack. <code>detect-artifact.sh</code> fires on PostToolUse for every Write or Edit, matches the filename to an SDLC artifact type, and drives the FSM into <code>sdlc_review</code>. It writes a gate-pending marker that the context-injection hook checks on every subsequent prompt &mdash; refusing to proceed until the review gate is run. <code>validate-state.sh</code> fires on Stop, infers state from the filesystem, and catches anything PostToolUse missed: open blockers, new revisions, state drift between the stored state and reality.</p>
+
+<pre><code>#!/bin/bash
+# PostToolUse hook for Write|Edit — detect spec artifact production
+# and trigger FSM transitions. The agent did not choose to run this.
+
+INPUT=$(cat)
+FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
+
+# Only match files inside spec/
+case "$FILE_PATH" in
+  */spec/*) ;; *) exit 0 ;;
+esac
+
+# Match filename to SDLC artifact type
+case "$(basename "$FILE_PATH")" in
+  intent-and-constraints.md) ARTIFACT="intent" ;;
+  high-level-design.md)      ARTIFACT="hld"    ;;
+  adr-lite.md)               ARTIFACT="adr"    ;;
+  implementation-spec.md)    ARTIFACT="eis"    ;;
+  *) exit 0 ;;
+esac
+
+# Fire FSM transition — deterministic, not agent-decided
+node transition.js ARTIFACT_PRODUCED "artifactType=$ARTIFACT"
+
+# Write gate-pending marker — inject-context will BLOCK on every
+# subsequent prompt until this gate is resolved
+cat &gt; "$DATA_DIR/gate-pending.json" &lt;&lt;EOF
+{"mode":"review","artifactType":"$ARTIFACT"}
+EOF
+
+echo "[PIPELINE] STOP — artifact pending review. Gate is MANDATORY."</code></pre>
+
+      <p>Where the Stop hook detects drift &mdash; a stored state of <code>dev</code> but open blockers on the filesystem &mdash; it logs the discrepancy and auto-transitions the FSM. The agent cannot end its turn in an inconsistent state.</p>
+
+      <p><strong>Guarantee:</strong> Every artifact write is intercepted. Every phase exit is validated. The agent cannot advance without passing checks it does not control.</p>
+
+      <h3>Gates &mdash; Confirmation determinism</h3>
+      <p><em>Governs <strong>approval</strong></em></p>
+
+      <blockquote>
+        <p>The agent once approved its own implementation spec. It had generated it, found it satisfactory, and moved straight to coding &mdash; all within the same turn. The spec was fine. But no human had seen it. We put a phone call between every artifact and its next phase. The agent writes; a human confirms. Four calls minimum before a single line of code is written.</p>
+      </blockquote>
+
+      <p><code>trigger-gate.js</code> is a blocking out-of-process gate. It sends an outbound phone call via Retell AI (for complex reviews) or a WhatsApp message via Twilio (for simple confirmations), then polls the filesystem for a reply. The reply is structurally classified &mdash; <code>approved</code> or <code>rejected</code> plus optional feedback &mdash; and the FSM transitions accordingly. On timeout, WhatsApp escalates to voice. On voice timeout, the pipeline blocks and waits for the operator.</p>
+
+      <p>Four SDLC review gates: intent, high-level design, ADR, implementation spec. Blocker escalation gates as needed during dev. A demo walkthrough after audit. A final confirmation gate before completion. The minimum path through a feature is five human touchpoints. The agent cannot shortcut any of them, because the gate mechanism lives in a separate process the agent does not control.</p>
+
+      <p><strong>Guarantee:</strong> No artifact advances without a human voice on the other end of the line. The approval is out-of-process, out-of-band, and structurally classified before the FSM accepts it.</p>
+
+      <h3>FSM &mdash; Orchestration determinism</h3>
+      <p><em>Governs the <strong>whole pipeline</strong></em></p>
+
+      <blockquote>
+        <p>The overnight run produced code from a spec no one had reviewed. The agent had decided the design was &ldquo;obvious enough&rdquo; and skipped straight to implementation. We encoded every valid transition in a state machine &mdash; eighteen states, twenty-one transitions, zero LLM-decided phase changes. The agent generates within a phase; the FSM decides when it is allowed to leave.</p>
+      </blockquote>
+
+      <p><code>state-machine.ts</code> is the source of truth. Every call to <code>transition()</code> validates the current state against the incoming event. If the pair is not in the table, it throws <code>InvalidTransitionError</code> &mdash; no fallback, no graceful degradation, no agent reinterpretation. Side effects are returned as data, never executed inline. The caller &mdash; a command, a hook, a gate &mdash; decides what to do with them.</p>
+
+<pre><code>// Hardcoded transition table. Every phase change is in this map.
+// The agent decides nothing about when to advance.
+
+const TRANSITIONS: Map&lt;State, Map&lt;FSMEvent, TransitionEntry&gt;&gt; = new Map([
+  ["idle",         [["CALL_RECEIVED",        "call_active"]]],
+  ["call_active",  [["CALL_COMPLETED",       "triage"]]],
+  ["triage",       [["NEW_REQUIREMENTS",     "sdlc_intent"],
+                    ["CONFIRMATION_RECEIVED", "complete"]]],
+  ["sdlc_intent",  [["ARTIFACT_PRODUCED",    "sdlc_review"]]],
+  ["sdlc_hld",     [["ARTIFACT_PRODUCED",    "sdlc_review"]]],
+  ["sdlc_adr",     [["ARTIFACT_PRODUCED",    "sdlc_review"]]],
+  ["sdlc_eis",     [["ARTIFACT_PRODUCED",    "sdlc_review"]]],
+  ["sdlc_review",  [["REVIEW_APPROVED",      nextSdlcState(ctx)],
+                    ["REVIEW_REJECTED",      previousSdlcState(ctx)]]],
+  ["dev",          [["BLOCKER_DETECTED",     "dev_blocked"],
+                    ["DEV_COMPLETE",         "audit"]]],
+  ["dev_blocked",  [["BLOCKER_RESOLVED",     "dev"]]],
+  ["audit",        [["AUDIT_FAILED",         "audit_failed"],
+                    ["AUDIT_PASSED",         "demo_setup"]]],
+  ["audit_failed", [["REVISION_READY",       "dev"]]],
+  ["confirmation", [["USER_CONFIRMED",       "complete"],
+                    ["USER_REJECTED",        "dev"]]],
+  ["complete",     [["RESET",                "idle"]]],
+]);
+
+function transition(current: State, event: FSMEvent, ctx?: Context) {
+  const entry = TRANSITIONS.get(current)?.get(event);
+  if (!entry) throw new InvalidTransitionError(current, event);
+  const to = typeof entry.to === "function" ? entry.to(ctx) : entry.to;
+  return { from: current, to, event, sideEffects: entry.sideEffects(ctx) };
+}</code></pre>
+
+      <p>Crash recovery is built in. <code>inferState()</code> reads the <code>spec/</code> directory &mdash; which artifacts exist, which blockers are open, which revisions are newer than the implementation spec &mdash; and reconstructs the fine-grained state without an external database. The limitation is honest: it cannot distinguish <code>sdlc_review</code> from the artifact production state, so a crash during review re-enters the production state and re-triggers the review call. An extra confirmation call is harmless; a skipped one is not.</p>
+
+      <p><strong>Guarantee:</strong> Every valid transition is in the table. Every invalid transition throws. The agent is a capable primitive running inside an envelope it cannot modify.</p>
+
+      <h2>04 / Composition: Deterministic skeleton, stochastic muscle</h2>
+
+      <p>These surfaces are not alternatives. They stack. A single feature flows through all five: a <em>command</em> routes the call into the pipeline, a <em>script</em> classifies the transcript, the SDLC agent writes an artifact (the stochastic part), a <em>hook</em> catches the write and fires the FSM transition, a <em>gate</em> calls the human and blocks until approval, and the <em>FSM</em> advances to the next phase. Four times for the spec. Then dev. Then audit. Then confirmation. The agent keeps its dynamism in the gaps between gates &mdash; which is exactly where dynamism earns its keep.</p>
+
+      <p><code>phone call &rarr; /process (command) &rarr; classifyTranscript (script) &rarr; SDLC agent writes intent (agent autonomy) &rarr; detect-artifact.sh (hook) &rarr; phone review (gate) &rarr; approved &rarr; SDLC agent writes HLD (agent autonomy) &rarr; &hellip; &times;4 artifacts &hellip; &rarr; dev agent builds (agent autonomy) &rarr; validate-state.sh (hook) &rarr; audit agent verifies (agent autonomy) &rarr; demo walkthrough (gate) &rarr; phone confirmation (gate) &rarr; complete &rarr; idle (FSM)</code></p>
+
+      <blockquote>
+        <p><em>We are not making the agents deterministic. We are deciding, transition by transition, which phase boundaries the agents are no longer permitted to cross.</em></p>
+      </blockquote>
+
+      <p>The convergence loops live in the FSM too. <code>audit_failed &rarr; dev &rarr; audit</code> repeats until the visual diff passes. <code>dev_blocked &rarr; dev</code> repeats until the human resolves the blocker. <code>USER_REJECTED &rarr; dev</code> repeats until the human confirms. Each loop is bounded by a human gate: the agent cannot spin forever, because every re-entry requires a human decision to re-enter. The loop is the driver; the gate is the oracle; the FSM is the map that says which roads exist.</p>
+
+      <p>It is worth being precise about what this buys. Generation remains stochastic; the model still improvises code, designs, and verification strategies. What we gain is <em>guaranteed invariants at every phase boundary</em> &mdash; islands of determinism around a probabilistic core. A more honest claim than &ldquo;deterministic pipeline,&rdquo; and a more useful one.</p>
+
+      <h2>05 / Why It Matters: Every gate is a file. Every file is evidence.</h2>
+
+      <p>The entire pipeline state lives in <code>spec/&lt;feature-name&gt;/</code>. <code>REQUIREMENTS.md</code> from the call. <code>intent-and-constraints.md</code>, <code>high-level-design.md</code>, <code>adr-lite.md</code>, <code>implementation-spec.md</code> from the SDLC phase. <code>blockers/</code> from the dev phase. <code>revisions/</code> from audit. Each file is a checkpoint. Each checkpoint is a transition that fired. Each transition is an entry in a table a human can read.</p>
+
+      <p>The same move that makes a control tamper-resistant against the agent also makes it legible to an auditor. The PostToolUse hook that catches artifact writes also produces the trail proving the write happened. The FSM that enforces valid transitions also logs the transitions that fired. The phone gate that blocks advancement also records the approval. We stop hoping the pipeline behaved and start being able to <em>demonstrate</em> the envelope it ran inside.</p>
+
+      <p>That is the quiet payoff of pushing controls out-of-band. An agent that writes specs, builds code, and visually verifies the result is powerful. A pipeline that can prove, after the fact, which gates held and which transitions fired is trustworthy. Gradual determinism is how we get both without giving up either.</p>
+
+      <hr>
+
+      <p><em>A case study on governing autonomy in a voice-to-feature pipeline. Built as a Claude Code plugin.</em></p>
+
+      <p><small>Theoretical framework from <em>Governing the Determinism Spectrum in Agent Harnesses</em>. Control surfaces verified against the Operant pipeline source: <code>state-machine.ts</code> (FSM transitions, <code>inferState</code>), <code>detect-artifact.sh</code> (PostToolUse hook), <code>validate-state.sh</code> (Stop hook), <code>trigger-gate.js</code> (outbound phone/WhatsApp gates), <code>process-trigger.ts</code> (<code>classifyTranscript</code> heuristic).</small></p>
+
+    </article>
+  </main>
+  <footer>
+    <p>&copy; 2026 Pranav Dhoolia</p>
+  </footer>
+</body>
+</html>

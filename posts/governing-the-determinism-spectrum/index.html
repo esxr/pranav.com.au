@@ -1,53 +1,333 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Governing the Determinism Spectrum — Operant in Practice — Pranav Dhoolia</title>
-  <meta name="description" content="How five control surfaces — commands, scripts, hooks, gates, and a state machine — pin down every phase boundary an autonomous agent is no longer permitted to cross">
-  <meta name="author" content="Pranav Dhoolia">
-  <meta property="og:title" content="Governing the Determinism Spectrum — Operant in Practice">
-  <meta property="og:description" content="How five control surfaces — commands, scripts, hooks, gates, and a state machine — pin down every phase boundary an autonomous agent is no longer permitted to cross">
-  <meta property="og:type" content="article">
-  <meta property="og:url" content="https://pranav.com.au/posts/governing-the-determinism-spectrum/">
-  <link rel="canonical" href="https://pranav.com.au/posts/governing-the-determinism-spectrum/">
-  <link rel="stylesheet" href="../../style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Governing the Determinism Spectrum in Agent Harnesses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f6f2e8;
+    --paper-2: #efe9da;
+    --ink: #1c1813;
+    --ink-soft: #4a443a;
+    --ink-faint: #837a6a;
+    --rule: #d8cfba;
+    --rust: #b3492a;
+    --rust-deep: #8f3a21;
+    --teal: #155049;
+    --teal-soft: #2f6c63;
+    --stoch: #b1a892;
+    --display: "Fraunces", Georgia, serif;
+    --body: "Newsreader", Georgia, serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(ellipse 120% 80% at 80% -10%, rgba(179,73,42,0.06), transparent 60%),
+      radial-gradient(ellipse 100% 70% at 0% 110%, rgba(21,80,73,0.06), transparent 55%),
+      var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-weight: 400;
+    font-size: 19px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .grain {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    opacity: 0.035;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 28px 120px;
+  }
+
+  /* ---------- masthead ---------- */
+  header.masthead {
+    padding: 78px 0 30px;
+    border-bottom: 1.5px solid var(--ink);
+    animation: rise 0.9s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .kicker {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin: 0 0 26px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .kicker::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+  h1 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(40px, 7.6vw, 70px);
+    line-height: 0.99;
+    letter-spacing: -0.018em;
+    margin: 0 0 8px;
+  }
+  h1 em {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--rust-deep);
+  }
+  .standfirst {
+    font-size: clamp(20px, 2.6vw, 25px);
+    line-height: 1.42;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin: 26px 0 0;
+    max-width: 38ch;
+  }
+
+  /* ---------- abstract ---------- */
+  .abstract {
+    margin: 46px 0 10px;
+    padding: 34px 36px;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--rust);
+    position: relative;
+    animation: rise 0.9s cubic-bezier(.2,.7,.2,1) both;
+    animation-delay: 0.12s;
+  }
+  .abstract .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 14px;
+  }
+  .abstract p {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.5;
+  }
+  .abstract p + p { margin-top: 14px; }
+  .abstract strong { font-weight: 500; color: var(--ink); }
+
+  /* ---------- section scaffolding ---------- */
+  section { margin-top: 64px; }
+  .sec-no {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--rust);
+  }
+  h2 {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: clamp(28px, 4.4vw, 40px);
+    line-height: 1.06;
+    letter-spacing: -0.012em;
+    margin: 8px 0 18px;
+  }
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 23px;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  p { margin: 0 0 18px; }
+  a { color: var(--rust-deep); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  em.term { font-style: italic; color: var(--teal); font-weight: 400; }
+
+  /* ---------- spectrum visual ---------- */
+  .spectrum {
+    margin: 30px 0 8px;
+    padding: 8px 0 0;
+  }
+  .spectrum svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .axis-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-top: 10px;
+  }
+  .axis-row span:first-child { color: var(--stoch); }
+  .axis-row span:last-child { color: var(--teal); }
+
+  /* ---------- surface entries ---------- */
+  .surface {
+    margin-top: 40px;
+    padding-top: 28px;
+    border-top: 1px solid var(--rule);
+  }
+  .surface-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .chip {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: 2px;
+    background: var(--teal);
+    color: var(--paper);
+    white-space: nowrap;
+  }
+  .governs {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+  }
+  .governs b { color: var(--rust-deep); font-weight: 500; }
+  .vignette {
+    font-style: italic;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule);
+    padding: 2px 0 2px 20px;
+    margin: 0 0 18px;
+    font-size: 18px;
+    line-height: 1.5;
+  }
+  .guarantee {
+    font-size: 17px;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    padding: 14px 18px;
+    margin: 18px 0 0;
+  }
+  .guarantee b {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--teal-soft);
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+
+  /* ---------- code ---------- */
+  pre {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.6;
+    background: #20201c;
+    color: #e7e2d4;
+    padding: 22px 24px;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 22px 0;
+    border: 1px solid #34332c;
+  }
+  pre .c { color: #8f9a7d; font-style: italic; }
+  pre .k { color: #d98b6a; }
+  pre .s { color: #c9b27e; }
+  code.inl {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    background: var(--paper-2);
+    padding: 1px 6px;
+    border-radius: 3px;
+    border: 1px solid var(--rule);
+  }
+
+  /* ---------- compose / closing ---------- */
+  .pull {
+    font-family: var(--display);
+    font-weight: 500;
+    font-style: italic;
+    font-size: clamp(24px, 3.6vw, 32px);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--rust-deep);
+    margin: 40px 0;
+    padding-left: 22px;
+    border-left: 3px solid var(--rust);
+  }
+
+  footer {
+    margin-top: 78px;
+    padding-top: 26px;
+    border-top: 1.5px solid var(--ink);
+    font-size: 14px;
+    color: var(--ink-faint);
+    line-height: 1.55;
+  }
+  footer .refs { font-family: var(--mono); font-size: 12px; letter-spacing: 0.02em; }
+  footer .refs p { margin: 0 0 6px; }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 560px) {
+    body { font-size: 18px; }
+    .wrap { padding: 0 20px 90px; }
+    .abstract { padding: 26px 22px; }
+    .abstract p { font-size: 18px; }
+  }
+</style>
 </head>
 <body>
-  <header>
-    <nav>
-      <a href="../../">Home</a>
-      <a href="../../about.html">About</a>
-    </nav>
+<div class="grain"></div>
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="kicker">A Position Piece &middot; Agentic Middleware</p>
+    <h1>Governing the<br>Determinism <em>Spectrum</em></h1>
+    <p class="standfirst">Agent harnesses are stochastic by design. Governance is the discipline of deciding, deliberately, which parts of them must not be.</p>
   </header>
-  <main>
-    <article>
-      <h1>Governing the Determinism Spectrum</h1>
-      <time datetime="2026-06-09">Jun 9, 2026</time>
 
-      <p><em>A Case Study &middot; The Operant Pipeline</em></p>
+  <div class="abstract">
+    <p class="tag">The pitch, in one breath</p>
+    <p>Modern agent harnesses generate, execute, and verify code with remarkable autonomy &mdash; and almost no guarantees. An agent can paraphrase a compliance check, skip a validation, or route around a safeguard, because today those controls live in the same operational space the agent is free to reinterpret.</p>
+    <p>We propose treating determinism as a <strong>spectrum we govern</strong> rather than a property we wish for. The standardization of skills, commands, plugins, and hooks gives us a set of control surfaces &mdash; each one a place to convert probabilistic behavior into a guarantee. The value of a surface is set by how far <strong>outside the agent's discretion</strong> it sits. We call the practice <strong>gradual determinism</strong>: keep the agent dynamic everywhere it earns its keep, and pin down only what must not vary.</p>
+  </div>
 
-      <p><em>How a Claude Code plugin transforms phone calls into shipped features &mdash; and pins down every boundary the agent is no longer permitted to cross.</em></p>
+  <section id="problem">
+    <p class="sec-no">01 / THE PREMISE</p>
+    <h2>The controls are in the wrong room</h2>
+    <p>The power of a harness like an autonomous coding agent is precisely its freedom: it interprets intent, writes the code, runs it, and decides when it is done. That freedom is not a bug to be removed. But a control that the agent can rewrite is not a control &mdash; it is a suggestion.</p>
+    <p>A skill that says &ldquo;validate the license headers&rdquo; depends on the agent choosing to validate, choosing to do so correctly, and not quietly deciding the step was unnecessary this time. When the rule and the actor share a room, the actor always wins. The fix is not to constrain the agent's intelligence. It is to move the rules into a room the agent cannot enter &mdash; and to do so only where a guarantee is actually worth its cost.</p>
+  </section>
 
-      <blockquote>
-        <p><strong>The system, in one breath</strong></p>
-        <p>Operant is a Claude Code plugin that turns a phone call into a shipped feature. Agents write the spec, build the code, and visually verify the result &mdash; autonomously. But the pipeline&rsquo;s governance is not in the prompts. It lives in the <strong>hooks</strong> that intercept every artifact write, the <strong>scripts</strong> that classify every call with frozen heuristics, the <strong>phone gates</strong> that block advancement until a human voice confirms, and the <strong>state machine</strong> that encodes every valid transition in TypeScript the agent cannot edit.</p>
-        <p>This is <strong>gradual determinism</strong> applied to spec-first development. The agent is dynamic within each phase. The pipeline is deterministic at every phase boundary. What follows is how each control surface earns its place on the spectrum &mdash; and what it guarantees.</p>
-      </blockquote>
+  <section id="spectrum">
+    <p class="sec-no">02 / THE FRAME</p>
+    <h2>Five surfaces, one axis</h2>
+    <p>The mechanisms we already have line up along the <em class="term">anatomy of the agent loop</em>. Commands govern its <b>entry</b>. Scripts govern <b>execution</b>. Hooks govern the <b>exit</b>. Loops govern <b>continuation</b>. Wrappers own the <b>whole loop</b>. Read left to right, that ordering also tracks two things at once: how much is guaranteed, and how far the control sits outside the agent's reach.</p>
 
-      <h2>01 / The Premise: The agent is not the pipeline</h2>
-
-      <p>A voice call arrives. The agent understands requirements, generates a spec, writes the code, visually verifies the output, and decides when it is done. That autonomy is the whole point &mdash; a human could not do this loop in a single sitting. But early iterations taught us what happens when the agent also owns the boundaries.</p>
-
-      <p>It skipped ADR because it judged the high-level design was sufficient. It auto-approved its own implementation spec and moved straight to coding. It swallowed blockers it thought it could work around. It declared &ldquo;done&rdquo; with a failing visual diff. In each case the agent acted in good faith. In each case the pipeline had no way to know.</p>
-
-      <p>The fix was not to constrain the agent&rsquo;s intelligence within a phase. It was to move every phase boundary into a room the agent cannot enter &mdash; hooks it cannot skip, a state machine it cannot rewrite, gates it cannot approve on its own behalf. The agent generates; the pipeline governs. That separation is the premise everything else is built on.</p>
-
-      <h2>02 / The Frame: Five surfaces, one pipeline</h2>
-
-      <p>The control surfaces operant uses line up along the <em>anatomy of a feature lifecycle</em>. Commands govern <strong>entry</strong> into the pipeline. Scripts govern <strong>execution</strong> of classification and routing. Hooks govern <strong>verification</strong> of every artifact. Gates govern <strong>confirmation</strong> from a human. The FSM governs the <strong>whole pipeline</strong>. Read left to right, that ordering tracks how far each control sits outside the agent&rsquo;s reach.</p>
-
-      <svg viewBox="0 0 700 220" role="img" aria-label="A spectrum from agent discretion to operator guarantee with five control surfaces in the operant pipeline" style="width:100%;height:auto;display:block;overflow:visible;">
+    <div class="spectrum">
+      <svg viewBox="0 0 700 220" role="img" aria-label="A spectrum from agent discretion to operator guarantee with five control surfaces">
         <defs>
           <linearGradient id="band" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%"  stop-color="#b1a892"/>
@@ -64,201 +344,177 @@
         <rect x="40" y="96" width="620" height="14" rx="7" fill="url(#band)"/>
 
         <!-- nodes -->
-        <g font-family="monospace" font-size="13" fill="#1c1813" text-anchor="middle">
+        <g font-family="IBM Plex Mono, monospace" font-size="13" fill="#1c1813" text-anchor="middle">
           <!-- 1 commands -->
           <circle cx="92"  cy="103" r="9" fill="#b1a892" stroke="#1c1813" stroke-width="1.4"/>
           <text x="92"  y="68"  font-size="14" font-weight="500">Commands</text>
-          <text x="92"  y="84"  fill="#837a6a" font-size="10">/process &middot; /start</text>
           <text x="92"  y="150" fill="#837a6a" font-size="11">ENTRY</text>
           <!-- 2 scripts -->
           <circle cx="225" cy="103" r="9" fill="#9a9a78" stroke="#1c1813" stroke-width="1.4"/>
           <text x="225" y="68"  font-size="14" font-weight="500">Scripts</text>
-          <text x="225" y="84"  fill="#837a6a" font-size="10">classify &middot; infer</text>
           <text x="225" y="150" fill="#837a6a" font-size="11">EXECUTION</text>
           <!-- 3 hooks -->
           <circle cx="358" cy="103" r="9" fill="#5f7a5a" stroke="#1c1813" stroke-width="1.4"/>
           <text x="358" y="68"  font-size="14" font-weight="500">Hooks</text>
-          <text x="358" y="84"  fill="#837a6a" font-size="10">detect &middot; validate</text>
-          <text x="358" y="150" fill="#837a6a" font-size="11">VERIFY</text>
-          <!-- 4 gates -->
+          <text x="358" y="150" fill="#837a6a" font-size="11">EXIT &middot; VERIFY</text>
+          <!-- 4 loops -->
           <circle cx="491" cy="103" r="9" fill="#357066" stroke="#1c1813" stroke-width="1.4"/>
-          <text x="491" y="68"  font-size="14" font-weight="500">Gates</text>
-          <text x="491" y="84"  fill="#837a6a" font-size="10">phone &middot; WhatsApp</text>
-          <text x="491" y="150" fill="#837a6a" font-size="11">CONFIRM</text>
-          <!-- 5 FSM -->
+          <text x="491" y="68"  font-size="14" font-weight="500">Loops</text>
+          <text x="491" y="150" fill="#837a6a" font-size="11">CONTINUATION</text>
+          <!-- 5 wrappers -->
           <circle cx="624" cy="103" r="10" fill="#155049" stroke="#1c1813" stroke-width="1.6"/>
-          <text x="624" y="68"  font-size="14" font-weight="600">FSM</text>
-          <text x="624" y="84"  fill="#837a6a" font-size="10">18 states &middot; 21 transitions</text>
-          <text x="624" y="150" fill="#837a6a" font-size="11">WHOLE PIPELINE</text>
+          <text x="624" y="68"  font-size="14" font-weight="600">Wrappers</text>
+          <text x="624" y="150" fill="#837a6a" font-size="11">WHOLE LOOP</text>
         </g>
 
         <!-- axis line -->
         <line x1="40" y1="182" x2="660" y2="182" stroke="#d8cfba" stroke-width="1.5"/>
         <polygon points="660,182 650,178 650,186" fill="#155049"/>
       </svg>
-      <p><small>&larr; agent discretion &middot; in-band &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; operator guarantee &middot; out-of-band &rarr;</small></p>
+      <div class="axis-row">
+        <span>&larr; agent discretion &middot; in-band</span>
+        <span>operator guarantee &middot; out-of-band &rarr;</span>
+      </div>
+    </div>
 
-      <p>Skills &mdash; the SDLC methodology, the dev methodology, the audit methodology &mdash; live fully in-band. The agent can reinterpret a skill or skip a step. That is fine; skills carry <em>intent</em>, not invariants. Everything to the right of skills on this spectrum is progressively harder for the agent to circumvent, culminating in a state machine the agent never touches.</p>
+    <p>It is, strictly, two dimensions: the <em class="term">breadth of the guarantee</em> and its <em class="term">tamper-resistance</em>. A skill is fully in-band &mdash; the agent can paraphrase or skip it. A hook is enforced by the harness runtime whether or not the agent cooperates. That gap is what separates a pattern from a control.</p>
+  </section>
 
-      <h2>03 / The Surfaces: Where determinism is bought</h2>
+  <section id="surfaces">
+    <p class="sec-no">03 / THE SURFACES</p>
+    <h2>Where determinism is bought</h2>
 
-      <h3>Commands &mdash; Routing determinism</h3>
-      <p><em>Governs <strong>entry</strong></em></p>
+    <!-- 1 -->
+    <div class="surface">
+      <div class="surface-head">
+        <span class="chip">Commands</span>
+        <h3>Routing determinism</h3>
+        <span class="governs">governs <b>entry</b></span>
+      </div>
+      <p class="vignette">For three sprints, the &ldquo;run the compliance gate&rdquo; skill simply never fired. The agent kept deciding, in good faith, that it had already covered the spirit of the rule. Nobody could point to the run that proved it. We exposed the gate as <code class="inl">/comply</code> &mdash; a command the reviewer types &mdash; and the question &ldquo;did the gate run?&rdquo; became answerable for the first time.</p>
+      <p>Skill selection belongs to the agent; the user cannot compel a skill to fire. Commands invert that. A command is operator-invoked, so it is a routing guarantee: a named, auditable entry point into a known procedure. You cannot force the agent to <em class="term">choose</em> the right path, but you can hand the operator a path the agent cannot decline to take.</p>
+      <div class="guarantee"><b>Guarantee</b>This procedure ran, because a human invoked it &mdash; not because the model judged it relevant.</div>
+    </div>
 
-      <blockquote>
-        <p>The SDLC agent kept deciding it was already &ldquo;in the right phase&rdquo; based on prompt context. Sometimes it re-derived the spec name. Sometimes it skipped triage entirely. We could not tell, after the fact, whether the pipeline had been entered correctly. We exposed <code>/process</code> &mdash; a command the operator types to triage a call &mdash; and <code>/start</code> to activate the right agent for the current state. Entry became auditable for the first time.</p>
-      </blockquote>
+    <!-- 2 -->
+    <div class="surface">
+      <div class="surface-head">
+        <span class="chip">Scripts</span>
+        <h3>Computational determinism</h3>
+        <span class="governs">governs <b>execution</b></span>
+      </div>
+      <p class="vignette">The settlement-rounding step came out a cent different across runs &mdash; never wrong enough to fail a test, never right enough to trust. The skill had described the calculation in prose and left the agent to re-derive it each time. We froze the reviewed implementation into a script and reduced the skill phase to &ldquo;invoke it.&rdquo; The cent stopped moving.</p>
+      <p>A skill phase written in natural language leaves interpretation &mdash; and code generation &mdash; to the agent at runtime. That is the right default for novel work. But once a phase has been generated, reviewed, curated, and approved, the same code can be packaged as a script and the phase description reduced to an instruction to adapt or invoke it. The non-determinism of regeneration collapses into the determinism of a frozen, version-controlled artifact.</p>
+      <div class="guarantee"><b>Guarantee</b>This step computes the same way every time, from code a human approved &mdash; not freshly improvised prose.</div>
+    </div>
 
-      <p><code>/process</code> reads a trigger file, classifies the transcript, creates the spec directory, and drives the FSM through <code>idle &rarr; call_active &rarr; triage &rarr; sdlc_intent</code>. <code>/start</code> reads the current FSM state and activates the matching agent &mdash; SDLC writer, dev builder, or auditor. The operator decides <em>when</em> to enter; the FSM decides <em>where</em>.</p>
+    <!-- 3 -->
+    <div class="surface">
+      <div class="surface-head">
+        <span class="chip">Hooks</span>
+        <h3>Verification determinism</h3>
+        <span class="governs">governs <b>exit</b></span>
+      </div>
+      <p class="vignette">&ldquo;Done&rdquo; meant whatever the agent felt was done &mdash; sometimes with a failing test suite and a missing license header in the diff. We put a gate at the end of the turn. Now &ldquo;done&rdquo; has to survive a checker that does not negotiate.</p>
+      <p>At a hook point &mdash; the stop-hook fires when the agent tries to end its turn &mdash; deterministic code inspects the output for structural and semantic properties. And the loop <em>can</em> be re-driven from here: a stop-hook that returns a block decision with a reason prevents the agent from stopping and feeds that reason back as its next instruction. The hook becomes a hard exit gate. One guardrail is mandatory &mdash; the harness passes a <code class="inl">stop_hook_active</code> flag, true when the agent is already in a forced continuation, and the hook must honor it or it will loop forever.</p>
+<pre><span class="c">#!/usr/bin/env python3</span>
+<span class="c">"""Stop-hook gate: refuse to end the turn until the build is verifiably clean.</span>
+<span class="c"></span>
+<span class="c">The harness invokes this when the agent tries to stop. Emitting a "block"</span>
+<span class="c">decision returns control to the agent with `reason` as its next instruction;</span>
+<span class="c">exiting 0 silently lets it stop.</span>
+<span class="c">"""</span>
+<span class="k">import</span> json, subprocess, sys
 
-      <p><strong>Guarantee:</strong> The pipeline entered because a human invoked it, and the FSM selected the phase &mdash; not the agent.</p>
+payload = json.load(sys.stdin)
 
-      <h3>Scripts &mdash; Computational determinism</h3>
-      <p><em>Governs <strong>execution</strong></em></p>
+<span class="c"># Honor the forced-continuation flag, or this gate loops forever.</span>
+<span class="k">if</span> payload.get(<span class="s">"stop_hook_active"</span>):
+    sys.exit(0)
 
-      <blockquote>
-        <p>Triage classification kept drifting. The agent would sometimes read a casual check-in as new requirements, spawning a full SDLC cycle for a call that just said &ldquo;looks good.&rdquo; Other times it would miss requirements buried in conversational filler. We froze the classification logic into <code>classifyTranscript()</code> &mdash; five rules, checked in order, no LLM in the loop &mdash; and triage stopped drifting.</p>
-      </blockquote>
+checks = subprocess.run([<span class="s">"make"</span>, <span class="s">"verify"</span>], capture_output=<span class="k">True</span>, text=<span class="k">True</span>)
+<span class="k">if</span> checks.returncode != 0:
+    print(json.dumps({
+        <span class="s">"decision"</span>: <span class="s">"block"</span>,
+        <span class="s">"reason"</span>: <span class="s">f"Verification failed; fix before finishing:\n{checks.stdout}"</span>,
+    }))
+sys.exit(0)</pre>
+      <p>Where the property needs judgment rather than an exit code &mdash; &ldquo;is this actually complete?&rdquo; &mdash; a prompt- or agent-type hook runs a cheap evaluator in the same slot. The shape is identical; only the oracle changes.</p>
+      <div class="guarantee"><b>Guarantee</b>The turn cannot end until the output passes a check the agent does not control &mdash; and failure re-drives the work.</div>
+    </div>
 
-      <p>Three functions carry the pipeline&rsquo;s computational guarantees. <code>classifyTranscript()</code> is a five-rule heuristic: check the Retell call analysis first, then confirmation keywords, then requirement keywords, then a length threshold, then default to unknown. <code>nextSdlcState()</code> is a one-line index lookup: intent &rarr; hld, hld &rarr; adr, adr &rarr; eis, eis &rarr; dev. <code>inferState()</code> reconstructs the full FSM state from the filesystem &mdash; which artifacts exist, which blockers are open, which revisions are newer than the spec &mdash; enabling crash recovery without an external database. All three are frozen TypeScript, version-controlled, and reviewed. The agent never regenerates them.</p>
+    <!-- 4 -->
+    <div class="surface">
+      <div class="surface-head">
+        <span class="chip">Loops</span>
+        <h3>Conditional continuation</h3>
+        <span class="governs">governs <b>iteration</b></span>
+      </div>
+      <p class="vignette">The migration guide needed four passes before the style linter went quiet. Doing those passes by hand &mdash; re-prompting, re-reading the report &mdash; was the least deterministic part of an otherwise tidy pipeline. A <code class="inl">/loop</code> turned &ldquo;keep going until it's clean&rdquo; from a habit into a construct.</p>
+      <p>A <code class="inl">/loop</code>-style construct runs a task repeatedly until a satisfactory outcome is reached. This is not deterministic on its own &mdash; but it raises the floor of what we can expect. The honest caveat: a loop is only as deterministic as its verifier. A loop without an oracle just burns turns. Which is why loops and hooks compose naturally &mdash; the hook is the oracle, the loop is the driver &mdash; and the pair converges toward a property you can actually name.</p>
+      <div class="guarantee"><b>Guarantee</b>The harness keeps working until a stated condition holds &mdash; as trustworthy as the condition you can verify.</div>
+    </div>
 
-      <p><strong>Guarantee:</strong> Triage, routing, and state recovery compute the same way every time, from code a human approved &mdash; not freshly improvised prose.</p>
+    <!-- 5 -->
+    <div class="surface">
+      <div class="surface-head">
+        <span class="chip">Wrappers</span>
+        <h3>Orchestration determinism</h3>
+        <span class="governs">governs the <b>whole loop</b></span>
+      </div>
+      <p class="vignette">The overnight batch was fine right up until the morning it wasn't &mdash; an agent applied a plan no one had seen. We did not want it slower; we wanted a hard gate between <em>plan</em> and <em>apply</em>, owned by something that was not the agent. So we wrote the gate ourselves and called the harness from inside it.</p>
+      <p>A custom wrapper drives the harness through its API or CLI &mdash; a more bespoke, more deterministic relative of <code class="inl">/loop</code>. And the multi-turn question resolves cleanly: a first headless call returns a session id, and subsequent calls resume that same session, preserving full context across invocations &mdash; exactly the thread-id pattern familiar from graph-based orchestration SDKs. The control flow now lives in code the operator owns. The agent supplies capability; the wrapper supplies the guarantee that nothing is applied unreviewed.</p>
+<pre><span class="c">"""Deterministic envelope around an agent harness.</span>
+<span class="c"></span>
+<span class="c">The orchestrator &mdash; not the agent &mdash; owns the control flow: it opens a</span>
+<span class="c">session, holds it open across turns by session id, and inserts a hard</span>
+<span class="c">human-approval gate between *plan* and *apply*.</span>
+<span class="c">"""</span>
+<span class="k">import</span> json, subprocess
 
-      <h3>Hooks &mdash; Verification determinism</h3>
-      <p><em>Governs <strong>verification</strong></em></p>
+<span class="k">def</span> run(prompt, session=<span class="k">None</span>):
+    <span class="c">"""Invoke the harness for one turn; return its parsed JSON result.</span>
+<span class="c"></span>
+<span class="c">    :param prompt: the operator message for this turn.</span>
+<span class="c">    :param session: an existing session id to resume, or None to start one.</span>
+<span class="c">    :returns: the result, including `session_id` for continuation.</span>
+<span class="c">    """</span>
+    cmd = [<span class="s">"claude"</span>, <span class="s">"-p"</span>, prompt, <span class="s">"--output-format"</span>, <span class="s">"json"</span>, <span class="s">"--max-turns"</span>, <span class="s">"8"</span>]
+    <span class="k">if</span> session:
+        cmd += [<span class="s">"--resume"</span>, session]
+    <span class="k">return</span> json.loads(subprocess.run(cmd, capture_output=<span class="k">True</span>, text=<span class="k">True</span>).stdout)
 
-      <blockquote>
-        <p>The SDLC agent once wrote an implementation spec and kept going &mdash; straight into coding, no review. It had produced the artifact and, in good faith, decided the next step was obvious. We put a PostToolUse hook on every Write and Edit inside <code>spec/</code>. Now when an artifact file lands, the hook fires the FSM transition, writes a <code>gate-pending.json</code> file, and emits a mandatory stop instruction. The agent cannot take another step until the gate resolves.</p>
-      </blockquote>
+plan = run(<span class="s">"Plan the migration. Do not modify any files yet."</span>)
+sid = plan[<span class="s">"session_id"</span>]
 
-      <p>Two hooks form a defense-in-depth stack. <code>detect-artifact.sh</code> fires on PostToolUse for every Write or Edit, matches the filename to an SDLC artifact type, and drives the FSM into <code>sdlc_review</code>. It writes a gate-pending marker that the context-injection hook checks on every subsequent prompt &mdash; refusing to proceed until the review gate is run. <code>validate-state.sh</code> fires on Stop, infers state from the filesystem, and catches anything PostToolUse missed: open blockers, new revisions, state drift between the stored state and reality.</p>
+<span class="k">if</span> input(<span class="s">"Approve this plan? [y/N] "</span>).strip().lower() == <span class="s">"y"</span>:
+    run(<span class="s">"Apply the approved plan exactly as described."</span>, session=sid)</pre>
+      <div class="guarantee"><b>Guarantee</b>The entire control flow &mdash; gates, approvals, retries &mdash; lives in code the operator owns; the agent is a callable primitive inside it.</div>
+    </div>
+  </section>
 
-<pre><code>#!/bin/bash
-# PostToolUse hook for Write|Edit — detect spec artifact production
-# and trigger FSM transitions. The agent did not choose to run this.
+  <section id="compose">
+    <p class="sec-no">04 / COMPOSITION</p>
+    <h2>Deterministic skeleton, stochastic muscle</h2>
+    <p>These surfaces are not alternatives. They stack. A mature harness uses a <em class="term">command</em> to route into a known procedure, a <em class="term">script</em> to perform the step that must compute identically, a <em class="term">hook</em> to verify the result and re-drive on failure, and a <em class="term">wrapper</em> to own the approvals around the whole exchange. The agent keeps its dynamism in the gaps between &mdash; which is exactly where dynamism is worth having.</p>
+    <p class="pull">We are not making the agent deterministic. We are deciding, surface by surface, which invariants the agent is no longer permitted to violate.</p>
+    <p>It is worth being precise about what this buys. Generation remains stochastic; the model still improvises. What we gain is <em class="term">guaranteed invariants at chosen checkpoints</em> &mdash; islands of determinism around a probabilistic core. That is a more honest claim than &ldquo;deterministic agents,&rdquo; and a more useful one.</p>
+  </section>
 
-INPUT=$(cat)
-FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
+  <section id="why">
+    <p class="sec-no">05 / WHY IT MATTERS</p>
+    <h2>The control surface is the audit surface</h2>
+    <p>Compliance, security, and governance do not ask for cleverness. They ask: can you show, after the fact, that the rule held? Every surface on this spectrum is code &mdash; a command definition, a frozen script, a hook, an orchestration wrapper. Code is versionable, reviewable, signable, and attestable. The same move that makes a control tamper-resistant against the agent also makes it legible to an auditor.</p>
+    <p>That is the quiet payoff of pushing controls out-of-band. We stop hoping the agent behaved and start being able to <em class="term">demonstrate</em> the envelope it ran inside. For any setting where an autonomous system touches regulated work, that shift &mdash; from trust to evidence &mdash; is the whole game. Gradual determinism is how we get there without giving up the autonomy that made the harness worth adopting in the first place.</p>
+  </section>
 
-# Only match files inside spec/
-case "$FILE_PATH" in
-  */spec/*) ;; *) exit 0 ;;
-esac
-
-# Match filename to SDLC artifact type
-case "$(basename "$FILE_PATH")" in
-  intent-and-constraints.md) ARTIFACT="intent" ;;
-  high-level-design.md)      ARTIFACT="hld"    ;;
-  adr-lite.md)               ARTIFACT="adr"    ;;
-  implementation-spec.md)    ARTIFACT="eis"    ;;
-  *) exit 0 ;;
-esac
-
-# Fire FSM transition — deterministic, not agent-decided
-node transition.js ARTIFACT_PRODUCED "artifactType=$ARTIFACT"
-
-# Write gate-pending marker — inject-context will BLOCK on every
-# subsequent prompt until this gate is resolved
-cat &gt; "$DATA_DIR/gate-pending.json" &lt;&lt;EOF
-{"mode":"review","artifactType":"$ARTIFACT"}
-EOF
-
-echo "[PIPELINE] STOP — artifact pending review. Gate is MANDATORY."</code></pre>
-
-      <p>Where the Stop hook detects drift &mdash; a stored state of <code>dev</code> but open blockers on the filesystem &mdash; it logs the discrepancy and auto-transitions the FSM. The agent cannot end its turn in an inconsistent state.</p>
-
-      <p><strong>Guarantee:</strong> Every artifact write is intercepted. Every phase exit is validated. The agent cannot advance without passing checks it does not control.</p>
-
-      <h3>Gates &mdash; Confirmation determinism</h3>
-      <p><em>Governs <strong>approval</strong></em></p>
-
-      <blockquote>
-        <p>The agent once approved its own implementation spec. It had generated it, found it satisfactory, and moved straight to coding &mdash; all within the same turn. The spec was fine. But no human had seen it. We put a phone call between every artifact and its next phase. The agent writes; a human confirms. Four calls minimum before a single line of code is written.</p>
-      </blockquote>
-
-      <p><code>trigger-gate.js</code> is a blocking out-of-process gate. It sends an outbound phone call via Retell AI (for complex reviews) or a WhatsApp message via Twilio (for simple confirmations), then polls the filesystem for a reply. The reply is structurally classified &mdash; <code>approved</code> or <code>rejected</code> plus optional feedback &mdash; and the FSM transitions accordingly. On timeout, WhatsApp escalates to voice. On voice timeout, the pipeline blocks and waits for the operator.</p>
-
-      <p>Four SDLC review gates: intent, high-level design, ADR, implementation spec. Blocker escalation gates as needed during dev. A demo walkthrough after audit. A final confirmation gate before completion. The minimum path through a feature is five human touchpoints. The agent cannot shortcut any of them, because the gate mechanism lives in a separate process the agent does not control.</p>
-
-      <p><strong>Guarantee:</strong> No artifact advances without a human voice on the other end of the line. The approval is out-of-process, out-of-band, and structurally classified before the FSM accepts it.</p>
-
-      <h3>FSM &mdash; Orchestration determinism</h3>
-      <p><em>Governs the <strong>whole pipeline</strong></em></p>
-
-      <blockquote>
-        <p>The overnight run produced code from a spec no one had reviewed. The agent had decided the design was &ldquo;obvious enough&rdquo; and skipped straight to implementation. We encoded every valid transition in a state machine &mdash; eighteen states, twenty-one transitions, zero LLM-decided phase changes. The agent generates within a phase; the FSM decides when it is allowed to leave.</p>
-      </blockquote>
-
-      <p><code>state-machine.ts</code> is the source of truth. Every call to <code>transition()</code> validates the current state against the incoming event. If the pair is not in the table, it throws <code>InvalidTransitionError</code> &mdash; no fallback, no graceful degradation, no agent reinterpretation. Side effects are returned as data, never executed inline. The caller &mdash; a command, a hook, a gate &mdash; decides what to do with them.</p>
-
-<pre><code>// Hardcoded transition table. Every phase change is in this map.
-// The agent decides nothing about when to advance.
-
-const TRANSITIONS: Map&lt;State, Map&lt;FSMEvent, TransitionEntry&gt;&gt; = new Map([
-  ["idle",         [["CALL_RECEIVED",        "call_active"]]],
-  ["call_active",  [["CALL_COMPLETED",       "triage"]]],
-  ["triage",       [["NEW_REQUIREMENTS",     "sdlc_intent"],
-                    ["CONFIRMATION_RECEIVED", "complete"]]],
-  ["sdlc_intent",  [["ARTIFACT_PRODUCED",    "sdlc_review"]]],
-  ["sdlc_hld",     [["ARTIFACT_PRODUCED",    "sdlc_review"]]],
-  ["sdlc_adr",     [["ARTIFACT_PRODUCED",    "sdlc_review"]]],
-  ["sdlc_eis",     [["ARTIFACT_PRODUCED",    "sdlc_review"]]],
-  ["sdlc_review",  [["REVIEW_APPROVED",      nextSdlcState(ctx)],
-                    ["REVIEW_REJECTED",      previousSdlcState(ctx)]]],
-  ["dev",          [["BLOCKER_DETECTED",     "dev_blocked"],
-                    ["DEV_COMPLETE",         "audit"]]],
-  ["dev_blocked",  [["BLOCKER_RESOLVED",     "dev"]]],
-  ["audit",        [["AUDIT_FAILED",         "audit_failed"],
-                    ["AUDIT_PASSED",         "demo_setup"]]],
-  ["audit_failed", [["REVISION_READY",       "dev"]]],
-  ["confirmation", [["USER_CONFIRMED",       "complete"],
-                    ["USER_REJECTED",        "dev"]]],
-  ["complete",     [["RESET",                "idle"]]],
-]);
-
-function transition(current: State, event: FSMEvent, ctx?: Context) {
-  const entry = TRANSITIONS.get(current)?.get(event);
-  if (!entry) throw new InvalidTransitionError(current, event);
-  const to = typeof entry.to === "function" ? entry.to(ctx) : entry.to;
-  return { from: current, to, event, sideEffects: entry.sideEffects(ctx) };
-}</code></pre>
-
-      <p>Crash recovery is built in. <code>inferState()</code> reads the <code>spec/</code> directory &mdash; which artifacts exist, which blockers are open, which revisions are newer than the implementation spec &mdash; and reconstructs the fine-grained state without an external database. The limitation is honest: it cannot distinguish <code>sdlc_review</code> from the artifact production state, so a crash during review re-enters the production state and re-triggers the review call. An extra confirmation call is harmless; a skipped one is not.</p>
-
-      <p><strong>Guarantee:</strong> Every valid transition is in the table. Every invalid transition throws. The agent is a capable primitive running inside an envelope it cannot modify.</p>
-
-      <h2>04 / Composition: Deterministic skeleton, stochastic muscle</h2>
-
-      <p>These surfaces are not alternatives. They stack. A single feature flows through all five: a <em>command</em> routes the call into the pipeline, a <em>script</em> classifies the transcript, the SDLC agent writes an artifact (the stochastic part), a <em>hook</em> catches the write and fires the FSM transition, a <em>gate</em> calls the human and blocks until approval, and the <em>FSM</em> advances to the next phase. Four times for the spec. Then dev. Then audit. Then confirmation. The agent keeps its dynamism in the gaps between gates &mdash; which is exactly where dynamism earns its keep.</p>
-
-      <p><code>phone call &rarr; /process (command) &rarr; classifyTranscript (script) &rarr; SDLC agent writes intent (agent autonomy) &rarr; detect-artifact.sh (hook) &rarr; phone review (gate) &rarr; approved &rarr; SDLC agent writes HLD (agent autonomy) &rarr; &hellip; &times;4 artifacts &hellip; &rarr; dev agent builds (agent autonomy) &rarr; validate-state.sh (hook) &rarr; audit agent verifies (agent autonomy) &rarr; demo walkthrough (gate) &rarr; phone confirmation (gate) &rarr; complete &rarr; idle (FSM)</code></p>
-
-      <blockquote>
-        <p><em>We are not making the agents deterministic. We are deciding, transition by transition, which phase boundaries the agents are no longer permitted to cross.</em></p>
-      </blockquote>
-
-      <p>The convergence loops live in the FSM too. <code>audit_failed &rarr; dev &rarr; audit</code> repeats until the visual diff passes. <code>dev_blocked &rarr; dev</code> repeats until the human resolves the blocker. <code>USER_REJECTED &rarr; dev</code> repeats until the human confirms. Each loop is bounded by a human gate: the agent cannot spin forever, because every re-entry requires a human decision to re-enter. The loop is the driver; the gate is the oracle; the FSM is the map that says which roads exist.</p>
-
-      <p>It is worth being precise about what this buys. Generation remains stochastic; the model still improvises code, designs, and verification strategies. What we gain is <em>guaranteed invariants at every phase boundary</em> &mdash; islands of determinism around a probabilistic core. A more honest claim than &ldquo;deterministic pipeline,&rdquo; and a more useful one.</p>
-
-      <h2>05 / Why It Matters: Every gate is a file. Every file is evidence.</h2>
-
-      <p>The entire pipeline state lives in <code>spec/&lt;feature-name&gt;/</code>. <code>REQUIREMENTS.md</code> from the call. <code>intent-and-constraints.md</code>, <code>high-level-design.md</code>, <code>adr-lite.md</code>, <code>implementation-spec.md</code> from the SDLC phase. <code>blockers/</code> from the dev phase. <code>revisions/</code> from audit. Each file is a checkpoint. Each checkpoint is a transition that fired. Each transition is an entry in a table a human can read.</p>
-
-      <p>The same move that makes a control tamper-resistant against the agent also makes it legible to an auditor. The PostToolUse hook that catches artifact writes also produces the trail proving the write happened. The FSM that enforces valid transitions also logs the transitions that fired. The phone gate that blocks advancement also records the approval. We stop hoping the pipeline behaved and start being able to <em>demonstrate</em> the envelope it ran inside.</p>
-
-      <p>That is the quiet payoff of pushing controls out-of-band. An agent that writes specs, builds code, and visually verifies the result is powerful. A pipeline that can prove, after the fact, which gates held and which transitions fired is trustworthy. Gradual determinism is how we get both without giving up either.</p>
-
-      <hr>
-
-      <p><em>A case study on governing autonomy in a voice-to-feature pipeline. Built as a Claude Code plugin.</em></p>
-
-      <p><small>Theoretical framework from <em>Governing the Determinism Spectrum in Agent Harnesses</em>. Control surfaces verified against the Operant pipeline source: <code>state-machine.ts</code> (FSM transitions, <code>inferState</code>), <code>detect-artifact.sh</code> (PostToolUse hook), <code>validate-state.sh</code> (Stop hook), <code>trigger-gate.js</code> (outbound phone/WhatsApp gates), <code>process-trigger.ts</code> (<code>classifyTranscript</code> heuristic).</small></p>
-
-    </article>
-  </main>
   <footer>
-    <p>&copy; 2026 Pranav Dhoolia</p>
+    <p>A working position on governing autonomy in agent harnesses. Shared for discussion and refinement.</p>
+    <div class="refs">
+      <p>Mechanism details verified against the Claude Code <em>Hooks reference</em> (stop-hook block/continue semantics, <code style="font-family:inherit">stop_hook_active</code>) and the <em>Headless mode</em> documentation (<code style="font-family:inherit">--output-format json</code>, <code style="font-family:inherit">session_id</code>, <code style="font-family:inherit">--resume</code>, <code style="font-family:inherit">--max-turns</code>).</p>
+    </div>
   </footer>
+
+</div>
 </body>
 </html>

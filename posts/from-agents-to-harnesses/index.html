@@ -319,7 +319,7 @@
     <div class="byline">
       <span class="tag">τ²-bench &middot; airline · retail · telecom</span>
       <span class="tag">Claude Code plugins</span>
-      <span class="tag">Sequel to “Gradual Determinism”</span>
+      <a href=”../governing-the-determinism-spectrum/” style=”border:none”><span class=”tag”>Sequel to “Gradual Determinism”</span></a>
     </div>
   </div>
 </header>
@@ -340,7 +340,7 @@
     <h2><span class="num">01 · The turn</span>The software is not the code. It's the harness.</h2>
     <p class="lede">We have spent a while now building inside premier agent-harnesses — Claude Code, Codex, Cursor — and a conviction has hardened: the future of domain software is not legacy static code, and not free-form “vibe” code either. It is the <em>harnessing</em> of an LLM operating system for a domain, through natural-language procedures, rules, parallelization hints, and scripts that the agent composes on demand.</p>
     <p>Anthropic's emerging standards make this concrete. <strong>Agent Skills</strong>, and their packaging into <strong>plugins</strong> — skills, slash-commands, sub-agents, scripts, MCP connectors, and deterministic hooks bundled together — let us harness the harness itself: a higher-order, domain-specific configuration of a general agent.</p>
-    <p>In <a href="https://claude.ai/public/artifacts/f0f10971-0633-49c7-b408-714c9899a98b">Gradual Determinism</a> we argued for governing a <em>spectrum</em> — from soft, judgment-laden natural language to hard, mechanically-enforced invariants — and for moving rules along it deliberately rather than all-or-nothing. This piece is the applied sequel. τ²-bench gives us a laboratory with a scoreboard: three customer-service domains, real policies, real tools, and an evaluator that grades the trajectory. We will rebuild its agents as harnesses, and let the numbers speak.</p>
+    <p>In <a href="../governing-the-determinism-spectrum/">Gradual Determinism</a> we argued for governing a <em>spectrum</em> — from soft, judgment-laden natural language to hard, mechanically-enforced invariants — and for moving rules along it deliberately rather than all-or-nothing. This piece is the applied sequel. τ²-bench gives us a laboratory with a scoreboard: three customer-service domains, real policies, real tools, and an evaluator that grades the trajectory. We will rebuild its agents as harnesses, and let the numbers speak.</p>
   </section>
 
   <!-- ANECDOTE -->
@@ -473,7 +473,7 @@ SYSTEM_PROMPT = <span class="s">"""
 </main>
 
 <footer class="wrap">
-  <p>Part II of an ongoing series on the determinism spectrum. Part I — <a href="https://claude.ai/public/artifacts/f0f10971-0633-49c7-b408-714c9899a98b">Gradual Determinism &amp; the Governance of the Determinism Spectrum</a>.</p>
+  <p>Part II of an ongoing series on the determinism spectrum. Part I — <a href="../governing-the-determinism-spectrum/">Gradual Determinism &amp; the Governance of the Determinism Spectrum</a>.</p>
   <p>Built on <a href="https://taubench.com">τ²-bench</a> (Sierra) · this fork adds the MCP server layer under <code>src/tau2/mcp/</code> · plugins target the Claude Code agent runtime.</p>
 </footer>
 

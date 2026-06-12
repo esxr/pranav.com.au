@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operant AI &mdash; One Call. Full Delivery.</title>
+<meta name="description" content="Operant AI — an autonomous AI pipeline that takes the entire responsibility of delivery off the PM's plate, from spec to working code.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f6f2e8;
+    --paper-2: #efe9da;
+    --ink: #1c1813;
+    --ink-soft: #4a443a;
+    --ink-faint: #837a6a;
+    --rule: #d8cfba;
+    --rust: #b3492a;
+    --rust-deep: #8f3a21;
+    --teal: #155049;
+    --teal-soft: #2f6c63;
+    --stoch: #b1a892;
+    --display: "Fraunces", Georgia, serif;
+    --body: "Newsreader", Georgia, serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(ellipse 120% 80% at 80% -10%, rgba(179,73,42,0.06), transparent 60%),
+      radial-gradient(ellipse 100% 70% at 0% 110%, rgba(21,80,73,0.06), transparent 55%),
+      var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-weight: 400;
+    font-size: 19px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .grain {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    opacity: 0.035;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 28px 120px;
+  }
+
+  header.masthead {
+    padding: 78px 0 30px;
+    border-bottom: 1.5px solid var(--ink);
+    animation: rise 0.9s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .kicker {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin: 0 0 26px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .kicker::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+  h1 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(40px, 7.6vw, 70px);
+    line-height: 0.99;
+    letter-spacing: -0.018em;
+    margin: 0 0 8px;
+  }
+  h1 em {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--rust-deep);
+  }
+  .standfirst {
+    font-size: clamp(20px, 2.6vw, 25px);
+    line-height: 1.42;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin: 26px 0 0;
+    max-width: 38ch;
+  }
+
+  .abstract {
+    margin: 46px 0 10px;
+    padding: 34px 36px;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--rust);
+    position: relative;
+    animation: rise 0.9s cubic-bezier(.2,.7,.2,1) both;
+    animation-delay: 0.12s;
+  }
+  .abstract .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 14px;
+  }
+  .abstract p {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.5;
+  }
+  .abstract p + p { margin-top: 14px; }
+  .abstract strong { font-weight: 500; color: var(--ink); }
+
+  section { margin-top: 64px; }
+  .sec-no {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--rust);
+  }
+  h2 {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: clamp(28px, 4.4vw, 40px);
+    line-height: 1.06;
+    letter-spacing: -0.012em;
+    margin: 8px 0 18px;
+  }
+  h2 em { font-style: italic; font-weight: 500; color: var(--rust-deep); }
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 23px;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  p { margin: 0 0 18px; }
+  a { color: var(--rust-deep); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  em.term { font-style: italic; color: var(--teal); font-weight: 400; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 22px 0;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  thead th {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 2px solid var(--rule);
+    font-weight: 500;
+  }
+  tbody td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  tbody td strong { font-weight: 500; color: var(--ink); }
+  tbody tr:last-child td { border-bottom: 2px solid var(--rule); }
+  .total-row td {
+    font-weight: 500;
+    color: var(--ink);
+    border-top: 1.5px solid var(--ink-soft);
+  }
+  .hl-col {
+    background: rgba(21,80,73,0.06);
+  }
+  thead .hl-col {
+    color: var(--teal);
+    font-weight: 600;
+  }
+
+  .pull {
+    font-family: var(--display);
+    font-weight: 500;
+    font-style: italic;
+    font-size: clamp(24px, 3.6vw, 32px);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--rust-deep);
+    margin: 40px 0;
+    padding-left: 22px;
+    border-left: 3px solid var(--rust);
+  }
+
+  .vignette {
+    font-style: italic;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule);
+    padding: 2px 0 2px 20px;
+    margin: 0 0 18px;
+    font-size: 18px;
+    line-height: 1.5;
+  }
+  .vignette .attr {
+    font-size: 14px;
+    color: var(--ink-faint);
+    font-style: normal;
+    display: block;
+    margin-top: 4px;
+  }
+
+  .pipeline-flow {
+    margin: 28px 0;
+    padding: 22px 26px;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 15px;
+    line-height: 2;
+    color: var(--ink-soft);
+    overflow-x: auto;
+    text-align: center;
+    letter-spacing: 0.02em;
+  }
+  .pipeline-flow .step {
+    color: var(--teal);
+    font-weight: 500;
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .pipeline-flow .arrow {
+    color: var(--rule);
+    margin: 0 4px;
+    display: inline-block;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .pipeline-flow.animated .step,
+  .pipeline-flow.animated .arrow {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .diagram { margin: 30px 0; }
+  .diagram svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    overflow: visible;
+  }
+
+  .svg-fade {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .svg-fade.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .svg-draw {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    transition: stroke-dashoffset 0.7s ease;
+  }
+  .svg-draw.visible {
+    stroke-dashoffset: 0;
+  }
+
+  .steps {
+    counter-reset: step;
+    list-style: none;
+    padding: 0;
+    margin: 22px 0;
+  }
+  .steps li {
+    counter-increment: step;
+    padding: 0 0 16px 50px;
+    position: relative;
+    margin: 0;
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .steps li.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .steps li::before {
+    content: counter(step);
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--paper);
+    background: var(--teal);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    left: 0;
+    top: 1px;
+  }
+  .steps li strong { font-weight: 500; color: var(--ink); }
+
+  .mantra {
+    font-family: var(--mono);
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    color: var(--teal);
+    text-align: center;
+    margin: 28px 0;
+    padding: 18px;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .guarantee {
+    font-size: 17px;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    padding: 14px 18px;
+    margin: 18px 0 0;
+  }
+  .guarantee b {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--teal-soft);
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+
+  ul.features {
+    padding-left: 24px;
+    margin: 18px 0;
+  }
+  ul.features li {
+    margin-bottom: 12px;
+    opacity: 0;
+    transform: translateX(-16px);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+  }
+  ul.features li.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  ul.features li strong { font-weight: 500; color: var(--ink); }
+
+  .timeline { margin: 22px 0; }
+  .timeline-entry {
+    display: flex;
+    gap: 20px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule);
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+  }
+  .timeline-entry.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .timeline-entry:last-child { border-bottom: none; }
+  .time {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--teal);
+    white-space: nowrap;
+    min-width: 100px;
+    padding-top: 2px;
+  }
+  .timeline-entry p { margin: 0; }
+  .channel {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    display: block;
+    margin-top: 4px;
+  }
+
+  .community-list {
+    list-style: none;
+    padding: 0;
+    margin: 18px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .community-list li {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    padding: 7px 14px;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    opacity: 0;
+    transform: scale(0.85);
+    transition: opacity 0.4s ease, transform 0.4s cubic-bezier(.34,1.56,.64,1);
+  }
+  .community-list li.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .community-list li strong { color: var(--ink); font-weight: 500; }
+
+  .era-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin: 26px 0;
+  }
+  .era {
+    padding: 20px 22px;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .era.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .era-future {
+    border-color: var(--teal-soft);
+    border-width: 1.5px;
+  }
+  .era-future.visible {
+    box-shadow: 0 0 20px rgba(21,80,73,0.12);
+  }
+  .era-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin: 0 0 10px;
+  }
+  .era p:last-child { margin-bottom: 0; }
+
+  .anim-table tbody tr {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .anim-table tbody tr.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .anim-table .total-row.visible td {
+    background: rgba(179,73,42,0.06);
+  }
+
+  .comp-table .hl-col {
+    position: relative;
+    transition: background 0.6s ease;
+  }
+  .comp-table.animated .hl-col {
+    background: rgba(21,80,73,0.1);
+  }
+
+  @keyframes loopPulse {
+    0%   { opacity: 0; offset-distance: 0%; }
+    5%   { opacity: 1; }
+    90%  { opacity: 1; }
+    100% { opacity: 0; offset-distance: 100%; }
+  }
+  .loop-pulse {
+    offset-path: path("M84,82 L230,82 L376,82 L522,82 L604,82 L604,26 L84,26 L84,82");
+    offset-rotate: 0deg;
+    animation: loopPulse 4s linear infinite;
+    animation-play-state: paused;
+  }
+  .loop-pulse.running {
+    animation-play-state: running;
+  }
+
+  /* ---------- moat cards ---------- */
+  .moat-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin: 26px 0;
+  }
+  .moat-card {
+    padding: 24px 26px;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--teal);
+    border-radius: 0 4px 4px 0;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .moat-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .moat-card .moat-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--teal-soft);
+    margin: 0 0 6px;
+  }
+  .moat-card h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 21px;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+  .moat-card p { margin: 0; font-size: 17px; line-height: 1.55; }
+
+  /* ---------- traction metrics ---------- */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 26px 0;
+  }
+  .metric {
+    text-align: center;
+    padding: 22px 14px;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .metric.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .metric .num {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 32px;
+    color: var(--teal);
+    letter-spacing: -0.02em;
+  }
+  .metric .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-top: 4px;
+  }
+
+  /* ---------- team ---------- */
+  .team-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 36px;
+    margin: 30px 0;
+  }
+  .team-card {
+    display: flex;
+    gap: 24px;
+    padding: 28px;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(.2,.7,.2,1), box-shadow 0.3s ease;
+  }
+  .team-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .team-card:hover {
+    box-shadow: 0 8px 30px rgba(28,24,19,0.08);
+    transform: translateY(-2px);
+  }
+  .team-photo {
+    flex-shrink: 0;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--rule);
+    position: relative;
+    background: var(--teal);
+  }
+  .team-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .team-photo .initials {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--display);
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--paper);
+    letter-spacing: -0.02em;
+  }
+  .team-info { flex: 1; }
+  .team-name {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 22px;
+    margin: 0 0 2px;
+    letter-spacing: -0.01em;
+  }
+  .team-role {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin: 0 0 10px;
+  }
+  .team-bio {
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    margin: 0 0 12px;
+  }
+  .team-creds {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .team-creds li {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-faint);
+    padding: 3px 0;
+    line-height: 1.5;
+  }
+  .team-creds li strong {
+    font-weight: 500;
+    color: var(--teal);
+  }
+  .team-superpower {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--teal);
+    font-weight: 500;
+    margin-top: 8px;
+    padding: 6px 10px;
+    background: rgba(21,80,73,0.06);
+    border-radius: 3px;
+    display: inline-block;
+  }
+
+  .cta-bar {
+    margin-top: 48px;
+    padding: 32px 36px;
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 4px;
+    text-align: center;
+  }
+  .cta-bar .brand {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 28px;
+    letter-spacing: -0.01em;
+    margin: 0 0 4px;
+  }
+  .cta-bar .tagline {
+    font-style: italic;
+    color: var(--stoch);
+    margin: 0 0 14px;
+    font-size: 18px;
+  }
+  .cta-bar a {
+    color: var(--paper);
+    font-family: var(--mono);
+    font-size: 14px;
+    letter-spacing: 0.06em;
+  }
+
+  footer {
+    margin-top: 78px;
+    padding-top: 26px;
+    border-top: 1.5px solid var(--ink);
+    font-size: 14px;
+    color: var(--ink-faint);
+    line-height: 1.55;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes countPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); color: var(--rust); }
+    100% { transform: scale(1); }
+  }
+  .count-up {
+    display: inline-block;
+  }
+  .count-up.done {
+    animation: countPulse 0.5s ease;
+  }
+
+  @media (max-width: 560px) {
+    body { font-size: 18px; }
+    .wrap { padding: 0 20px 90px; }
+    .abstract { padding: 26px 22px; }
+    .abstract p { font-size: 18px; }
+    .timeline-entry { flex-direction: column; gap: 4px; }
+    .time { min-width: auto; }
+    .era-compare { grid-template-columns: 1fr; }
+    .metrics { grid-template-columns: 1fr; }
+    table { font-size: 14px; }
+    thead th, tbody td { padding: 8px 10px; }
+    .team-card { flex-direction: column; align-items: center; text-align: center; }
+    .team-creds { text-align: left; }
+  }
+
+  @media print {
+    .grain { display: none; }
+    body {
+      background: white;
+      font-size: 16px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .wrap { padding: 0 0 40px; max-width: none; }
+    header.masthead, .abstract { animation: none; }
+    section { page-break-inside: avoid; }
+    .cta-bar { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    a { text-decoration: none; }
+    .team-card, .era, .steps li, ul.features li,
+    .timeline-entry, .community-list li, .moat-card, .metric,
+    .anim-table tbody tr, .pipeline-flow .step,
+    .pipeline-flow .arrow { opacity: 1 !important; transform: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="kicker">Operant AI</p>
+    <h1>One Call.<br>Full <em>Delivery.</em></h1>
+    <p class="standfirst">The PM describes what they want built, hangs up, and an autonomous AI pipeline delivers working code &mdash; calling back only when it needs a decision.</p>
+  </header>
+
+  <div class="abstract">
+    <p class="tag">The shift</p>
+    <p>Every AI tool for PMs makes delivery <em>faster</em>. We think that&rsquo;s the wrong frame. <strong>Operant removes the PM from delivery entirely.</strong> You call in with what you want built. You hang up. The AI writes specs, builds code, visually audits the result, and schedules a Google Meet walkthrough. Your only interface is your phone.</p>
+    <p>This isn&rsquo;t SaaS that assists. It&rsquo;s <strong>SaiS that operates.</strong></p>
+  </div>
+
+  <!-- ===================== 01 / THE PROBLEM ===================== -->
+  <section id="problem">
+    <p class="sec-no">01 / THE PROBLEM</p>
+    <h2>PMs don&rsquo;t have a delivery problem. They have a delivery <em>headache.</em></h2>
+    <p>They already know what to build. The pain is everything that happens next.</p>
+
+    <table class="anim-table">
+      <thead>
+        <tr>
+          <th>The reality today</th>
+          <th>Hours&thinsp;/&thinsp;week</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Translating requirements into specs</td><td>4&ndash;6 hrs</td></tr>
+        <tr><td>Babysitting dev through implementation</td><td>6&ndash;10 hrs</td></tr>
+        <tr><td>QA-ing what was built vs. what was asked for</td><td>3&ndash;5 hrs</td></tr>
+        <tr><td>Re-explaining context after every handoff</td><td>2&ndash;4 hrs</td></tr>
+        <tr class="total-row"><td><strong>Total delivery overhead</strong></td><td><strong><span class="count-up" data-target="25">0</span>&ndash;25 hrs</strong></td></tr>
+      </tbody>
+    </table>
+
+    <p class="vignette">&ldquo;I know what to build. I just need someone &mdash; or something &mdash; to build it.&rdquo;<span class="attr">&mdash; The consistent signal from 800+ PMs across our community</span></p>
+  </section>
+
+  <!-- ===================== 02 / THE INSIGHT ===================== -->
+  <section id="insight">
+    <p class="sec-no">02 / THE INSIGHT</p>
+    <h2>From SaaS to SaiS &mdash; but for the PM&rsquo;s entire&nbsp;workflow</h2>
+    <p>The SaaS-to-SaiS transition isn&rsquo;t just about bolting AI features onto existing software. The most interesting companies will sit at the centre of how <em class="term">next-generation professions get built.</em></p>
+    <p>For PMs, that means moving from tools that help you manage delivery to a system that <strong>takes responsibility for delivery</strong>.</p>
+    <p class="pull">AI should do the work for you &mdash; and only call when it&rsquo;s stuck.</p>
+    <p>What if delivery looked like this:</p>
+    <div class="pipeline-flow" data-anim="sequential">
+      <span class="step">You call</span> <span class="arrow">&rarr;</span>
+      <span class="step">You describe</span> <span class="arrow">&rarr;</span>
+      <span class="step">You hang up</span> <span class="arrow">&rarr;</span>
+      <span class="step">It builds</span>
+    </div>
+  </section>
+
+  <!-- ===================== 03 / THE PRODUCT ===================== -->
+  <section id="product">
+    <p class="sec-no">03 / THE PRODUCT</p>
+    <h2>Introducing <em>Operant&nbsp;AI</em></h2>
+    <h3>One call. Full delivery. Walk through it on Meet.</h3>
+    <p>Operant takes the <strong>entire responsibility of delivery</strong> off the PM&rsquo;s plate and gives it to an autonomous AI pipeline.</p>
+
+    <ol class="steps" data-anim="stagger">
+      <li><strong>Call in</strong> with what you want built</li>
+      <li><strong>Hang up</strong> &mdash; the AI writes specs, builds code, and audits it against your requirements</li>
+      <li><strong>Pick up</strong> when it calls back with a question or a blocker</li>
+      <li><strong>Join a Google Meet</strong> &mdash; walk through the live feature together</li>
+      <li><strong>Say &ldquo;ship it&rdquo;</strong> or give feedback &mdash; the loop continues until you&rsquo;re satisfied</li>
+    </ol>
+
+    <div class="mantra">No terminal &middot; No Jira &middot; No chat &middot; No IDE</div>
+  </section>
+
+  <!-- ===================== 04 / HOW IT WORKS ===================== -->
+  <section id="how">
+    <p class="sec-no">04 / HOW IT WORKS</p>
+    <h2>A deterministic pipeline with AI agents doing the&nbsp;work</h2>
+
+    <div class="diagram" data-anim="svg-pipeline">
+      <svg viewBox="0 0 680 510" role="img" aria-label="Pipeline flow: phone call through triage, spec, build, audit, demo, to satisfaction check">
+        <defs>
+          <marker id="p-arr" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="10" markerHeight="7" orient="auto">
+            <polygon points="0,0 10,3 0,6" fill="#2f6c63"/>
+          </marker>
+        </defs>
+        <g class="svg-fade" data-delay="0">
+          <rect x="85" y="2" width="230" height="44" rx="6" fill="#b3492a"/>
+          <text x="200" y="30" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="14" font-weight="600" fill="#f6f2e8">YOUR PHONE CALL</text>
+        </g>
+        <line class="svg-draw" data-delay="200" x1="200" y1="46" x2="200" y2="80" stroke="#2f6c63" stroke-width="1.5" marker-end="url(#p-arr)"/>
+        <g class="svg-fade" data-delay="400">
+          <rect x="115" y="80" width="170" height="42" rx="5" fill="#2f6c63"/>
+          <text x="200" y="106" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="#f6f2e8">TRIAGE</text>
+          <text x="310" y="105" font-family="Newsreader, Georgia, serif" font-size="14" fill="#837a6a" font-style="italic">&ldquo;What do you want built?&rdquo;</text>
+        </g>
+        <line class="svg-draw" data-delay="600" x1="200" y1="122" x2="200" y2="156" stroke="#2f6c63" stroke-width="1.5" marker-end="url(#p-arr)"/>
+        <g class="svg-fade" data-delay="800">
+          <rect x="115" y="156" width="170" height="42" rx="5" fill="#357066"/>
+          <text x="200" y="182" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="#f6f2e8">SPEC PHASE</text>
+          <text x="310" y="175" font-family="Newsreader, Georgia, serif" font-size="13" fill="#837a6a" font-style="italic">AI writes Intent &#x2192; HLD &#x2192; ADR &#x2192; Impl Spec</text>
+          <text x="310" y="193" font-family="Newsreader, Georgia, serif" font-size="13" fill="#837a6a" font-style="italic">Calls you once per doc for approval</text>
+        </g>
+        <line class="svg-draw" data-delay="1000" x1="200" y1="198" x2="200" y2="232" stroke="#2f6c63" stroke-width="1.5" marker-end="url(#p-arr)"/>
+        <g class="svg-fade" data-delay="1200">
+          <rect x="115" y="232" width="170" height="42" rx="5" fill="#357066"/>
+          <text x="200" y="258" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="#f6f2e8">BUILD PHASE</text>
+          <text x="310" y="251" font-family="Newsreader, Georgia, serif" font-size="13" fill="#837a6a" font-style="italic">AI agents implement the code</text>
+          <text x="310" y="269" font-family="Newsreader, Georgia, serif" font-size="13" fill="#837a6a" font-style="italic">Calls you only if blocked</text>
+        </g>
+        <line class="svg-draw" data-delay="1400" x1="200" y1="274" x2="200" y2="308" stroke="#2f6c63" stroke-width="1.5" marker-end="url(#p-arr)"/>
+        <g class="svg-fade" data-delay="1600">
+          <rect x="115" y="308" width="170" height="42" rx="5" fill="#1e5e54"/>
+          <text x="200" y="334" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="#f6f2e8">AUDIT PHASE</text>
+          <text x="310" y="327" font-family="Newsreader, Georgia, serif" font-size="13" fill="#837a6a" font-style="italic">AI visually verifies every requirement</text>
+          <text x="310" y="345" font-family="Newsreader, Georgia, serif" font-size="13" fill="#837a6a" font-style="italic">against the running app</text>
+        </g>
+        <line class="svg-draw" data-delay="1800" x1="200" y1="350" x2="200" y2="384" stroke="#2f6c63" stroke-width="1.5" marker-end="url(#p-arr)"/>
+        <g class="svg-fade" data-delay="2000">
+          <rect x="115" y="384" width="170" height="42" rx="5" fill="#155049"/>
+          <text x="200" y="410" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="#f6f2e8">DEMO PHASE</text>
+          <text x="310" y="403" font-family="Newsreader, Georgia, serif" font-size="13" fill="#837a6a" font-style="italic">Google Meet walkthrough</text>
+          <text x="310" y="421" font-family="Newsreader, Georgia, serif" font-size="13" fill="#837a6a" font-style="italic">You see it live, give feedback</text>
+        </g>
+        <line class="svg-draw" data-delay="2200" x1="200" y1="426" x2="200" y2="460" stroke="#2f6c63" stroke-width="1.5" marker-end="url(#p-arr)"/>
+        <g class="svg-fade" data-delay="2400">
+          <rect x="115" y="460" width="170" height="42" rx="5" fill="#8f3a21"/>
+          <text x="200" y="486" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="#f6f2e8">SATISFIED?</text>
+          <text x="310" y="476" font-family="IBM Plex Mono, monospace" font-size="12" fill="#155049" font-weight="500">Yes &#x2192; Ship it</text>
+          <text x="310" y="494" font-family="IBM Plex Mono, monospace" font-size="12" fill="#8f3a21" font-weight="500">No &ensp;&#x2192; Loop back</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="guarantee"><b>Key principle</b>Every phase transition is deterministic code &mdash; not LLM judgment. The AI does the creative work. The pipeline enforces the process.</div>
+  </section>
+
+  <!-- ===================== 05 / THE LOOP ===================== -->
+  <section id="loop">
+    <p class="sec-no">05 / THE LOOP</p>
+    <h2>It doesn&rsquo;t stop until you say &ldquo;done&rdquo;</h2>
+
+    <div class="diagram" data-anim="svg-loop">
+      <svg viewBox="0 0 640 210" role="img" aria-label="Feedback loop: Build to Audit to Demo to satisfaction check, with loop-back on rejection">
+        <defs>
+          <marker id="l-arr" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="10" markerHeight="7" orient="auto">
+            <polygon points="0,0 10,3 0,6" fill="#2f6c63"/>
+          </marker>
+          <marker id="l-arr-r" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="10" markerHeight="7" orient="auto">
+            <polygon points="0,0 10,3 0,6" fill="#b3492a"/>
+          </marker>
+        </defs>
+        <g class="svg-fade" data-delay="0">
+          <rect x="30" y="62" width="108" height="40" rx="5" fill="#2f6c63"/>
+          <text x="84" y="87" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="#f6f2e8">BUILD</text>
+        </g>
+        <line class="svg-draw" data-delay="300" x1="138" y1="82" x2="172" y2="82" stroke="#2f6c63" stroke-width="1.5" marker-end="url(#l-arr)"/>
+        <g class="svg-fade" data-delay="500">
+          <rect x="176" y="62" width="108" height="40" rx="5" fill="#357066"/>
+          <text x="230" y="87" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="#f6f2e8">AUDIT</text>
+        </g>
+        <line class="svg-draw" data-delay="700" x1="284" y1="82" x2="318" y2="82" stroke="#2f6c63" stroke-width="1.5" marker-end="url(#l-arr)"/>
+        <g class="svg-fade" data-delay="900">
+          <rect x="322" y="62" width="108" height="40" rx="5" fill="#155049"/>
+          <text x="376" y="87" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="#f6f2e8">DEMO</text>
+        </g>
+        <line class="svg-draw" data-delay="1100" x1="430" y1="82" x2="464" y2="82" stroke="#2f6c63" stroke-width="1.5" marker-end="url(#l-arr)"/>
+        <g class="svg-fade" data-delay="1300">
+          <rect x="468" y="62" width="108" height="40" rx="5" fill="#8f3a21"/>
+          <text x="522" y="87" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="#f6f2e8">HAPPY?</text>
+        </g>
+        <g class="svg-fade" data-delay="1600">
+          <line x1="502" y1="102" x2="502" y2="152" stroke="#155049" stroke-width="1.5" marker-end="url(#l-arr)"/>
+          <text x="486" y="134" font-family="IBM Plex Mono, monospace" font-size="11" fill="#155049" font-weight="500">Yes</text>
+          <rect x="476" y="156" width="52" height="34" rx="5" fill="#155049"/>
+          <text x="502" y="178" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="500" fill="#f6f2e8">DONE</text>
+        </g>
+        <polyline class="svg-draw loop-path" data-delay="1900" points="576,82 604,82 604,26 84,26 84,62" fill="none" stroke="#b3492a" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#l-arr-r)"/>
+        <text class="svg-fade" data-delay="2100" x="344" y="20" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#b3492a" font-weight="500">No</text>
+        <circle class="loop-pulse" r="5" fill="#b3492a" opacity="0"/>
+      </svg>
+    </div>
+
+    <ul class="features">
+      <li><strong>Audit fails?</strong> AI writes a revision and rebuilds. You never know it happened.</li>
+      <li><strong>You reject the demo?</strong> AI extracts your pain points on the call and loops back.</li>
+      <li><strong>Blocker?</strong> AI calls you, gets the answer, keeps going.</li>
+      <li><strong>Multiple features?</strong> Each runs its own pipeline in parallel.</li>
+    </ul>
+
+    <p class="pull">You are the decision-maker, not the delivery manager.</p>
+  </section>
+
+  <!-- ===================== 06 / WHY THIS IS DIFFERENT ===================== -->
+  <section id="different">
+    <p class="sec-no">06 / WHY THIS IS DIFFERENT</p>
+    <h2>Operant AI vs. everything&nbsp;else</h2>
+
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Cursor / Copilot</th>
+          <th>ChatGPT / Claude</th>
+          <th>Agencies</th>
+          <th class="hl-col">Operant AI</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Interface</strong></td>
+          <td>IDE</td>
+          <td>Chat</td>
+          <td>Email / Slack</td>
+          <td class="hl-col"><strong>Phone call</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Who drives?</strong></td>
+          <td>You</td>
+          <td>You</td>
+          <td>PM + devs</td>
+          <td class="hl-col"><strong>The AI</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Spec to code</strong></td>
+          <td>Manual</td>
+          <td>Manual</td>
+          <td>Manual</td>
+          <td class="hl-col"><strong>Autonomous</strong></td>
+        </tr>
+        <tr>
+          <td><strong>QA</strong></td>
+          <td>Manual</td>
+          <td>None</td>
+          <td>Manual</td>
+          <td class="hl-col"><strong>Visual AI audit</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Feedback loop</strong></td>
+          <td>Manual</td>
+          <td>Manual</td>
+          <td>Days / weeks</td>
+          <td class="hl-col"><strong>One phone call</strong></td>
+        </tr>
+        <tr>
+          <td><strong>PM time / feature</strong></td>
+          <td>15&ndash;25 hrs</td>
+          <td>10&ndash;15 hrs</td>
+          <td>5&ndash;10 hrs</td>
+          <td class="hl-col"><strong>&lt;&thinsp;1 hr</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="vignette">Other tools make you faster at delivery. <strong>We remove you from delivery entirely.</strong></p>
+  </section>
+
+  <!-- ===================== 07 / DEFENSIBILITY ===================== -->
+  <section id="moat">
+    <p class="sec-no">07 / DEFENSIBILITY</p>
+    <h2>This is not a GPT&nbsp;wrapper</h2>
+    <p>The product&rsquo;s value comes from <strong>deep non-AI infrastructure</strong> that the AI operates within &mdash; not from a thin prompt layer on top of a model API.</p>
+
+    <div class="moat-grid">
+      <div class="moat-card">
+        <p class="moat-num">Moat 1 &mdash; The Product Layer</p>
+        <h3>A hardcoded state machine with 18 states and 23 events</h3>
+        <p>Phase transitions are deterministic TypeScript &mdash; not LLM decisions. Strip the AI out entirely and you still have a full delivery pipeline: file-based state, multi-channel gates (voice + WhatsApp with timeout escalation), visual audit loops, revision stacking, and crash-resumable architecture. The pipeline is as reliable as CI/CD. The AI does the creative work inside each phase, but the <strong>process enforcement</strong> is pure product engineering.</p>
+      </div>
+      <div class="moat-card">
+        <p class="moat-num">Moat 2 &mdash; Product UX</p>
+        <h3>The phone is the interface &mdash; and that&rsquo;s the moat</h3>
+        <p>Every incumbent is constrained by their existing product design: IDEs, chat windows, ticket boards. They cannot retrofit &ldquo;call in, hang up, get a Google Meet demo&rdquo; onto their architecture. Operant is AI-native from the ground up &mdash; built for a world where the PM never touches a keyboard. This is the Leonardo vs. Midjourney bet, taken further.</p>
+      </div>
+      <div class="moat-card">
+        <p class="moat-num">Moat 3 &mdash; Orchestration</p>
+        <h3>Multi-agent coordination is an engineering problem, not a prompting&nbsp;problem</h3>
+        <p>The pipeline coordinates spec-writing agents, 3-agent dev teams (Maintainer &rarr; Builder &rarr; Police), and visual audit agents &mdash; each with scoped skills, constraints, and handoff protocols. This orchestration layer compounds: every pipeline run generates data on blocker patterns, revision frequencies, and agent performance that tightens the system.</p>
+      </div>
+    </div>
+
+    <div class="guarantee"><b>The test</b>If the underlying models improve 10x tomorrow, Operant gets better &mdash; it doesn&rsquo;t get displaced. The pipeline is the product. The AI is the workforce.</div>
+  </section>
+
+  <!-- ===================== 08 / A DAY IN THE LIFE ===================== -->
+  <section id="day">
+    <p class="sec-no">08 / A DAY IN THE LIFE</p>
+    <h2>Monday morning. Three features to ship this&nbsp;week.</h2>
+
+    <div class="timeline" data-anim="stagger-timeline">
+      <div class="timeline-entry">
+        <span class="time">8:00 AM</span>
+        <div><p>Call Operant. Describe Feature A. Hang up.</p><span class="channel">Voice &middot; 3 min</span></div>
+      </div>
+      <div class="timeline-entry">
+        <span class="time">8:05 AM</span>
+        <div><p>Call again. Describe Feature B. Hang up.</p><span class="channel">Voice &middot; 4 min</span></div>
+      </div>
+      <div class="timeline-entry">
+        <span class="time">8:10 AM</span>
+        <div><p>Call again. Describe Feature C. Hang up.</p><span class="channel">Voice &middot; 2 min</span></div>
+      </div>
+      <div class="timeline-entry">
+        <span class="time">8:15 AM</span>
+        <div><p>You&rsquo;re done. Go do product strategy.</p></div>
+      </div>
+      <div class="timeline-entry">
+        <span class="time">10:30 AM</span>
+        <div><p>&ldquo;Feature A spec ready for review.&rdquo; You reply &ldquo;approved.&rdquo;</p><span class="channel">WhatsApp</span></div>
+      </div>
+      <div class="timeline-entry">
+        <span class="time">11:45 AM</span>
+        <div><p>Phone rings: &ldquo;Feature B has a blocker &mdash; which auth provider?&rdquo; You answer. It continues.</p><span class="channel">Voice</span></div>
+      </div>
+      <div class="timeline-entry">
+        <span class="time">2:00 PM</span>
+        <div><p>&ldquo;Feature C spec ready.&rdquo; You reply &ldquo;approved.&rdquo;</p><span class="channel">WhatsApp</span></div>
+      </div>
+      <div class="timeline-entry">
+        <span class="time">4:30 PM</span>
+        <div><p>Google Meet invite: Feature A demo. You walk through it. &ldquo;Ship it.&rdquo;</p><span class="channel">Google Meet</span></div>
+      </div>
+      <div class="timeline-entry">
+        <span class="time">Tuesday</span>
+        <div><p>Features B and C demos. All three shipped.</p></div>
+      </div>
+    </div>
+
+    <div class="guarantee"><b>Total active time</b>~45 minutes across three features.</div>
+  </section>
+
+  <!-- ===================== 09 / PROOF IN MARKET ===================== -->
+  <section id="traction">
+    <p class="sec-no">09 / PROOF IN MARKET</p>
+    <h2>Growth from the ground&nbsp;up</h2>
+
+    <p>We didn&rsquo;t build this in a vacuum. We built it by <strong>doing the job ourselves</strong> &mdash; embedding as the PM at real companies and delivering real features through the pipeline.</p>
+
+    <div class="metrics">
+      <div class="metric">
+        <div class="num">$10K</div>
+        <div class="label">Revenue (2 months)</div>
+      </div>
+      <div class="metric">
+        <div class="num">$25K</div>
+        <div class="label">Pipeline</div>
+      </div>
+      <div class="metric">
+        <div class="num">4</div>
+        <div class="label">Paying companies</div>
+      </div>
+    </div>
+
+    <table class="anim-table">
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th>What we delivered</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Extuitive</strong></td>
+          <td>First pilot &mdash; proved the pipeline end-to-end</td>
+          <td>$60K pipeline (2025)</td>
+        </tr>
+        <tr>
+          <td><strong>Second Axis</strong></td>
+          <td>Product OS features &mdash; embedded as PM, shipping via Operant</td>
+          <td>Active trial</td>
+        </tr>
+        <tr>
+          <td><strong>StudyOracle</strong></td>
+          <td>VET training material pipeline &mdash; complex multi-phase workflow</td>
+          <td>Active trial</td>
+        </tr>
+        <tr>
+          <td><strong>PeggApp</strong></td>
+          <td>Consumer app features &mdash; embedded as PM</td>
+          <td>Active trial</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:30px;">The community behind it</h3>
+    <p><strong>PMs in AI</strong> &mdash; a 900+ member community of product leaders. 13 curated events across NYC, Boston, and SF. This is where the problem signal came from.</p>
+
+    <ul class="community-list" data-anim="scatter">
+      <li><strong>AWS</strong> &mdash; Global GenAI GTM Lead</li>
+      <li><strong>Salesforce</strong> &mdash; Director of AI/ML Product</li>
+      <li><strong>MIT</strong> &mdash; Martin Trust Center</li>
+      <li><strong>Walmart</strong> &mdash; Senior PM</li>
+    </ul>
+
+    <h3 style="margin-top:30px;">Strategic partnerships</h3>
+    <p><strong>GPTNB</strong> &mdash; Compute partnership for pipeline infrastructure.<br>
+    <strong>OpenDeploy</strong> &mdash; Agent-native deployment platform (co-founded by our team) &mdash; the platform play for deploying what Operant builds.</p>
+  </section>
+
+  <!-- ===================== 10 / THE TEAM ===================== -->
+  <section id="team">
+    <p class="sec-no">10 / THE TEAM</p>
+    <h2>Australian-built. Globally&nbsp;deployed.</h2>
+    <p>Three Australian engineers who&rsquo;ve shipped AI systems, cloud infra, and deployment pipelines independently &mdash; now building the pipeline that connects all&nbsp;three.</p>
+
+    <div class="team-grid">
+
+      <div class="team-card">
+        <div class="team-photo" style="background: linear-gradient(135deg, #155049, #2f6c63);">
+          <img src="https://media.licdn.com/dms/image/v2/D5603AQG-pXMoI-1D_A/profile-displayphoto-shrink_400_400/B56ZcDFQCaHgAg-/0/1748055393437?e=1755561600&v=beta&t=PNi19-p4jT4OQ3xU2h6gxFfIz7bPqNlHpQbw2VsQG7w" alt="Pranav Dhoolia" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="initials" style="display:none;">PD</div>
+        </div>
+        <div class="team-info">
+          <p class="team-name">Pranav Dhoolia</p>
+          <p class="team-role">Founder &amp; CEO</p>
+          <p class="team-bio">Building AI agents since before ChatGPT. His GPT-3 thesis with CSIRO (UQ, Dean&rsquo;s Global Scholar) became a Slack meeting assistant. Founded Godel &mdash; an AI agent that hit $60K revenue in 3 months. Open-source LangGraph+MCP integration featured by LangChain. Embedded as PM at trial companies to dogfood Operant from the inside.</p>
+          <ul class="team-creds">
+            <li><strong>UQ</strong> &mdash; BE (Hons) Software Engineering, Dean&rsquo;s Global Scholar</li>
+            <li><strong>Godel</strong> &mdash; AI agent, $60K revenue in 3 months</li>
+            <li><strong>LangChain</strong> &mdash; Featured open-source LangGraph+MCP integration</li>
+            <li><strong>Relevance AI</strong> &mdash; Built MCP client for core stack</li>
+          </ul>
+          <div class="team-superpower">End-to-end AI systems &mdash; LLM plumbing to product delivery</div>
+        </div>
+      </div>
+
+      <div class="team-card">
+        <div class="team-photo" style="background: linear-gradient(135deg, #8f3a21, #b3492a);">
+          <img src="https://media.licdn.com/dms/image/v2/D5603AQHnT0OJGHw-Tw/profile-displayphoto-shrink_400_400/B56ZbNcabMGsAk-/0/1747208285261?e=1755561600&v=beta&t=dlxWMfaAq_tEJlrSKbwLJuJPaFIBe7VTZfgkxvx_n5s" alt="Ziyan (Purple) He" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="initials" style="display:none;">ZH</div>
+        </div>
+        <div class="team-info">
+          <p class="team-name">Ziyan (Purple) He</p>
+          <p class="team-role">Co-Founder &amp; Head of Infrastructure</p>
+          <p class="team-bio">Nearly two years at AWS (RDS &amp; Networking) building infrastructure that Fortune 500s run on. 2.5 years at Telstra shipping backend systems at Australia&rsquo;s largest telco. Co-founded OpenDeploy &mdash; the agent-native deployment platform that serves as Operant&rsquo;s deployment layer.</p>
+          <ul class="team-creds">
+            <li><strong>AWS</strong> &mdash; Software Engineer, RDS &amp; Networking (1 yr 10 mos)</li>
+            <li><strong>Telstra</strong> &mdash; Backend Engineer, Media Technologies (2 yrs 4 mos)</li>
+            <li><strong>University of Sydney</strong> &mdash; Computer Science</li>
+          </ul>
+          <div class="team-superpower">Production-grade cloud infra &mdash; AWS, microservices, CI/CD at scale</div>
+        </div>
+      </div>
+
+      <div class="team-card">
+        <div class="team-photo" style="background: linear-gradient(135deg, #1c1813, #4a443a);">
+          <img src="https://media.licdn.com/dms/image/v2/D5603AQFSmkr-IEe3xw/profile-displayphoto-shrink_400_400/B56Zaq5FU3GkAg-/0/1746666791814?e=1755561600&v=beta&t=BsHKgfuEVCqFqX6AHuUL7UUc06TmEp1UsmB0FvJXrHA" alt="Jeff Zhu" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="initials" style="display:none;">JZ</div>
+        </div>
+        <div class="team-info">
+          <p class="team-name">Jeff Zhu</p>
+          <p class="team-role">Co-Founder &amp; CTO</p>
+          <p class="team-bio">8+ years of engineering. Built an LLM routing platform that scaled to ~$2M ARR. Led DevOps and Kubernetes infra at Susquehanna International Group (SIG) across APAC. Co-founded OpenDeploy, architecting the entire deployment pipeline end-to-end.</p>
+          <ul class="team-creds">
+            <li><strong>LLM platform</strong> &mdash; Scaled to ~$2M ARR</li>
+            <li><strong>SIG</strong> &mdash; DevOps, Kubernetes, APAC infrastructure (1 yr 6 mos)</li>
+            <li><strong>Combined Energy</strong> &mdash; Microservices architecture (2 yrs 5 mos)</li>
+            <li><strong>University of Sydney</strong> &mdash; Computer Science</li>
+          </ul>
+          <div class="team-superpower">Distributed systems &amp; deployment automation &mdash; things that don&rsquo;t break</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="guarantee"><b>The convergence</b>Pranav builds the AI pipeline. Purple and Jeff build the deployment platform. Together: an end-to-end system that goes from phone call to deployed feature.</div>
+  </section>
+
+  <!-- ===================== 11 / WHY NOW ===================== -->
+  <section id="why-now">
+    <p class="sec-no">11 / WHY NOW</p>
+    <h2>The window is&nbsp;open</h2>
+
+    <ul class="features" data-anim="stagger">
+      <li><strong>Models crossed the capability threshold.</strong> Claude Opus and GPT-4o can reliably write production code, understand specs, and follow multi-step instructions. This wasn&rsquo;t true 18 months ago.</li>
+      <li><strong>Voice AI is production-ready.</strong> Retell, ElevenLabs, and Twilio&rsquo;s voice APIs make phone-based interfaces viable at startup scale and cost.</li>
+      <li><strong>SaaS &rarr; SaiS creates category openings.</strong> Incumbents (Jira, Linear, Notion) are bolting AI features onto existing architectures. They cannot rebuild around a phone-first, agent-operated paradigm. The window for AI-native entrants is now.</li>
+      <li><strong>PMs are ready.</strong> The &ldquo;vibe coding&rdquo; wave proved PMs will use AI to ship. But they don&rsquo;t want to learn Cursor &mdash; they want to stay in their lane. Operant meets them where they are: on a phone call.</li>
+    </ul>
+  </section>
+
+  <!-- ===================== 12 / THE VISION ===================== -->
+  <section id="vision">
+    <p class="sec-no">12 / THE VISION</p>
+    <h2>From Product OS to Product <em>Autopilot</em></h2>
+
+    <div class="era-compare" data-anim="era-reveal">
+      <div class="era">
+        <p class="era-label">Today</p>
+        <p>You call. AI builds. You review on Meet. Ship.</p>
+      </div>
+      <div class="era era-future">
+        <p class="era-label">Tomorrow</p>
+        <p>AI monitors your product metrics, identifies what to build next, builds it, audits it, and schedules the walkthrough. You just show up.</p>
+      </div>
+    </div>
+
+    <p class="pull">The last PM tool you&rsquo;ll ever need is the one that makes you the decision-maker &mdash; not the delivery manager.</p>
+  </section>
+
+  <!-- ===================== 13 / THE CONVERSATION ===================== -->
+  <section id="ask">
+    <p class="sec-no">13 / LET&rsquo;S TALK</p>
+    <h2>Where we are and what we&rsquo;re&nbsp;building</h2>
+
+    <p>We&rsquo;re pre-seed with early revenue, paying customers, and a 900+ member community. We&rsquo;re having conversations with a few funds and are looking for a lead investor who understands that the future of PM isn&rsquo;t faster tools &mdash; it&rsquo;s fewer tools.</p>
+
+    <p>We&rsquo;d love to hear how you think about this space.</p>
+
+    <h3 style="margin-top:30px;">References</h3>
+    <table class="anim-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Role</th>
+          <th>Context</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Chong</strong></td><td>Founder, Extuitive</td><td>First pilot customer &mdash; $60K pipeline</td></tr>
+        <tr><td><strong>Aakash Bhatnagar</strong></td><td>Founder, Second Axis</td><td>Active trial &mdash; embedded PM delivery</td></tr>
+        <tr><td><strong>India</strong></td><td>Founder, PeggApp</td><td>Active trial &mdash; consumer app delivery</td></tr>
+        <tr><td><strong>Jugandeep Singh</strong></td><td>Investor, StudyOracle</td><td>Investor perspective on Operant-delivered product</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="cta-bar">
+    <p class="brand">Operant AI</p>
+    <p class="tagline">One call. Full delivery.</p>
+    <p style="margin:0;"><a href="https://operantlabs.com">operantlabs.com</a></p>
+  </div>
+
+  <footer>
+    <p>Operant AI &mdash; autonomous delivery for product managers. Built in Australia. Deployed globally. Powered by a deterministic FSM pipeline with AI agents, voice gates, and visual verification.</p>
+  </footer>
+
+</div>
+
+<script>
+(function() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+
+      if (el.classList.contains('anim-table')) {
+        const rows = el.querySelectorAll('tbody tr');
+        rows.forEach((row, i) => {
+          setTimeout(() => row.classList.add('visible'), i * 120);
+        });
+        observer.unobserve(el);
+      }
+
+      if (el.classList.contains('pipeline-flow')) {
+        const children = el.querySelectorAll('.step, .arrow');
+        children.forEach((child, i) => {
+          setTimeout(() => {
+            child.style.opacity = '1';
+            child.style.transform = 'translateY(0)';
+          }, i * 280);
+        });
+        observer.unobserve(el);
+      }
+
+      if (el.matches('.steps[data-anim="stagger"]') || el.matches('ol.steps')) {
+        const items = el.querySelectorAll('li');
+        items.forEach((li, i) => {
+          setTimeout(() => li.classList.add('visible'), i * 180);
+        });
+        observer.unobserve(el);
+      }
+
+      if (el.closest('[data-anim="svg-pipeline"]') || el.matches('[data-anim="svg-pipeline"]')) {
+        const container = el.matches('[data-anim]') ? el : el.closest('[data-anim]');
+        if (container) {
+          container.querySelectorAll('.svg-fade').forEach(fe => {
+            setTimeout(() => fe.classList.add('visible'), parseInt(fe.dataset.delay || 0));
+          });
+          container.querySelectorAll('.svg-draw').forEach(de => {
+            const len = de.getTotalLength ? de.getTotalLength() : 100;
+            de.style.strokeDasharray = len;
+            de.style.strokeDashoffset = len;
+            setTimeout(() => {
+              de.style.transition = 'stroke-dashoffset 0.5s ease';
+              de.style.strokeDashoffset = '0';
+            }, parseInt(de.dataset.delay || 0));
+          });
+          observer.unobserve(container);
+        }
+      }
+
+      if (el.matches('[data-anim="svg-loop"]')) {
+        el.querySelectorAll('.svg-fade').forEach(fe => {
+          setTimeout(() => fe.classList.add('visible'), parseInt(fe.dataset.delay || 0));
+        });
+        el.querySelectorAll('.svg-draw').forEach(de => {
+          const len = de.getTotalLength ? de.getTotalLength() : 200;
+          de.style.strokeDasharray = len;
+          de.style.strokeDashoffset = len;
+          setTimeout(() => {
+            de.style.transition = 'stroke-dashoffset 0.8s ease';
+            de.style.strokeDashoffset = '0';
+          }, parseInt(de.dataset.delay || 0));
+        });
+        const pulse = el.querySelector('.loop-pulse');
+        if (pulse) setTimeout(() => pulse.classList.add('running'), 2600);
+        observer.unobserve(el);
+      }
+
+      if (el.classList.contains('comp-table')) {
+        setTimeout(() => el.classList.add('animated'), 300);
+        observer.unobserve(el);
+      }
+
+      if (el.matches('ul.features[data-anim="stagger"]') || el.matches('ul.features')) {
+        el.querySelectorAll('li').forEach((li, i) => {
+          setTimeout(() => li.classList.add('visible'), i * 140);
+        });
+        observer.unobserve(el);
+      }
+
+      if (el.matches('[data-anim="stagger-timeline"]') || el.classList.contains('timeline')) {
+        el.querySelectorAll('.timeline-entry').forEach((te, i) => {
+          setTimeout(() => te.classList.add('visible'), i * 180);
+        });
+        observer.unobserve(el);
+      }
+
+      if (el.matches('[data-anim="scatter"]') || el.classList.contains('community-list')) {
+        el.querySelectorAll('li').forEach((li, i) => {
+          setTimeout(() => li.classList.add('visible'), i * 120 + Math.random() * 80);
+        });
+        observer.unobserve(el);
+      }
+
+      if (el.matches('[data-anim="era-reveal"]') || el.classList.contains('era-compare')) {
+        el.querySelectorAll('.era').forEach((era, i) => {
+          setTimeout(() => era.classList.add('visible'), i * 300);
+        });
+        observer.unobserve(el);
+      }
+
+      if (el.classList.contains('team-card')) {
+        el.classList.add('visible');
+        observer.unobserve(el);
+      }
+
+      if (el.classList.contains('moat-card')) {
+        el.classList.add('visible');
+        observer.unobserve(el);
+      }
+
+      if (el.classList.contains('metric')) {
+        el.classList.add('visible');
+        observer.unobserve(el);
+      }
+    });
+  }, {
+    threshold: 0.15,
+    rootMargin: '0px 0px -40px 0px'
+  });
+
+  document.querySelectorAll(
+    '.anim-table, .pipeline-flow, .steps, [data-anim="svg-pipeline"], ' +
+    '[data-anim="svg-loop"], .comp-table, ul.features, .timeline, ' +
+    '.community-list, .era-compare, .team-card, .moat-card, .metric'
+  ).forEach(el => observer.observe(el));
+
+  const countObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const target = parseInt(el.dataset.target);
+      if (!target) return;
+      const duration = 1200;
+      const start = performance.now();
+      function tick(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(eased * target);
+        if (progress < 1) requestAnimationFrame(tick);
+        else el.classList.add('done');
+      }
+      requestAnimationFrame(tick);
+      countObserver.unobserve(el);
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('.count-up').forEach(el => countObserver.observe(el));
+})();
+</script>
+
+</body>
+</html>

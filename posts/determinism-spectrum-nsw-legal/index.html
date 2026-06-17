@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Governing the Determinism Spectrum in Legal Practice — A Governed AI Harness for NSW</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f6f2e8;
+    --paper-2: #efe9da;
+    --ink: #1c1813;
+    --ink-soft: #4a443a;
+    --ink-faint: #837a6a;
+    --rule: #d8cfba;
+    --rust: #b3492a;
+    --rust-deep: #8f3a21;
+    --teal: #155049;
+    --teal-soft: #2f6c63;
+    --stoch: #b1a892;
+    --display: "Fraunces", Georgia, serif;
+    --body: "Newsreader", Georgia, serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(ellipse 120% 80% at 80% -10%, rgba(179,73,42,0.06), transparent 60%),
+      radial-gradient(ellipse 100% 70% at 0% 110%, rgba(21,80,73,0.06), transparent 55%),
+      var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 19px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+  .grain {
+    pointer-events: none; position: fixed; inset: 0; z-index: 9999;
+    opacity: 0.035; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 0 28px 120px; }
+
+  header.masthead { padding: 78px 0 30px; border-bottom: 1.5px solid var(--ink); animation: rise 0.9s cubic-bezier(.2,.7,.2,1) both; }
+  .kicker {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--rust); margin: 0 0 26px; display: flex; align-items: center; gap: 14px;
+  }
+  .kicker::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+  h1 { font-family: var(--display); font-weight: 600; font-size: clamp(38px, 7vw, 64px); line-height: 1.0; letter-spacing: -0.018em; margin: 0; }
+  h1 em { font-style: italic; font-weight: 500; color: var(--rust-deep); }
+  .standfirst { font-size: clamp(20px, 2.6vw, 25px); line-height: 1.42; color: var(--ink-soft); font-style: italic; margin: 24px 0 0; max-width: 40ch; }
+
+  .abstract {
+    margin: 46px 0 10px; padding: 34px 36px; background: var(--paper-2);
+    border: 1px solid var(--rule); border-left: 4px solid var(--rust); position: relative;
+    animation: rise 0.9s cubic-bezier(.2,.7,.2,1) both; animation-delay: 0.12s;
+  }
+  .abstract .tag { font-family: var(--mono); font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--ink-faint); margin: 0 0 14px; }
+  .abstract p { margin: 0; font-size: 20px; line-height: 1.5; }
+  .abstract p + p { margin-top: 14px; }
+  .abstract strong { font-weight: 500; color: var(--ink); }
+
+  section { margin-top: 64px; }
+  .sec-no { font-family: var(--mono); font-size: 12px; letter-spacing: 0.2em; color: var(--rust); }
+  h2 { font-family: var(--display); font-weight: 500; font-size: clamp(28px, 4.4vw, 40px); line-height: 1.06; letter-spacing: -0.012em; margin: 8px 0 18px; }
+  h3 { font-family: var(--display); font-weight: 600; font-size: 23px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  p { margin: 0 0 18px; }
+  a { color: var(--rust-deep); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  em.term { font-style: italic; color: var(--teal); font-weight: 400; }
+
+  /* spectrum */
+  .spectrum { margin: 30px 0 8px; }
+  .spectrum svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .axis-row { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint); margin-top: 10px; }
+  .axis-row span:first-child { color: var(--stoch); }
+  .axis-row span:last-child { color: var(--teal); }
+
+  /* risk map */
+  .riskmap { margin: 26px 0 0; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+  .riskmap .row { display: grid; grid-template-columns: 1fr 150px; gap: 0; border-top: 1px solid var(--rule); }
+  .riskmap .row:first-child { border-top: none; }
+  .riskmap .row > div { padding: 13px 14px; }
+  .riskmap .rh { background: var(--ink); color: var(--paper); font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; }
+  .riskmap .rh > div { padding: 11px 14px; }
+  .riskmap .pn { font-family: var(--mono); font-size: 14px; color: var(--rust-deep); border-right: 1px solid var(--rule); }
+  .riskmap .pd { font-size: 16px; line-height: 1.4; border-right: 1px solid var(--rule); }
+  .riskmap .ps { font-family: var(--mono); font-size: 12px; color: var(--teal); line-height: 1.45; letter-spacing: 0.02em; }
+  .riskmap .ps.sub { color: var(--ink-faint); }
+  .riskmap .row:nth-child(even) { background: rgba(255,255,255,0.32); }
+
+  /* results scoreboard */
+  .results { margin: 28px 0 6px; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+  .results .row { display: grid; grid-template-columns: 1fr 230px 56px 56px; border-top: 1px solid var(--rule); }
+  .results .row:first-child { border-top: none; }
+  .results .row > div { padding: 11px 13px; }
+  .results .rh { background: var(--ink); color: var(--paper); }
+  .results .rh > div { padding: 10px 13px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; }
+  .results .scn { font-size: 16px; line-height: 1.36; border-right: 1px solid var(--rule); }
+  .results .need { font-size: 13.5px; color: var(--ink-soft); line-height: 1.42; border-right: 1px solid var(--rule); }
+  .results .need .tagref { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); display: inline-block; margin-left: 4px; padding: 1px 6px; border: 1px solid var(--rule); border-radius: 2px; vertical-align: middle; }
+  .results .mk { text-align: center; font-family: var(--mono); font-weight: 600; font-size: 17px; border-right: 1px solid var(--rule); }
+  .results .mk:last-child { border-right: none; }
+  .results .pass { color: var(--teal); }
+  .results .fail { color: var(--rust); }
+  .results .row:nth-child(even) { background: rgba(255,255,255,0.32); }
+  .results .row.tot { background: var(--paper-2); }
+  .results .row.tot > div { font-family: var(--mono); font-size: 13px; letter-spacing: 0.03em; }
+  .results .row.tot .scn { color: var(--ink); grid-column: 1 / 3; }
+
+  /* surfaces */
+  .surface { margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--rule); }
+  .surface-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; }
+  .chip { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; padding: 4px 9px; border-radius: 2px; background: var(--teal); color: var(--paper); white-space: nowrap; }
+  .governs { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); letter-spacing: 0.04em; }
+  .governs b { color: var(--rust-deep); font-weight: 500; }
+
+  .examples { margin: 16px 0 4px; padding: 0; list-style: none; }
+  .examples li { padding: 13px 0 13px 22px; border-left: 2px solid var(--rule); margin-bottom: 12px; }
+  .examples li:hover { border-left-color: var(--rust); }
+  .examples .cmd { font-family: var(--mono); font-size: 0.84em; color: var(--rust-deep); font-weight: 500; }
+  .examples b { font-weight: 500; color: var(--ink); }
+  .examples .tagref { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); display: inline-block; margin-left: 4px; padding: 1px 6px; border: 1px solid var(--rule); border-radius: 2px; vertical-align: middle; }
+
+  .guarantee { font-size: 17px; background: var(--paper-2); border: 1px solid var(--rule); padding: 14px 18px; margin: 18px 0 0; }
+  .guarantee b { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--teal-soft); display: block; margin-bottom: 5px; font-weight: 500; }
+  .mustnot { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.04em; color: var(--rust-deep); margin-top: 14px; }
+  .mustnot::before { content: "▸ must not be stochastic: "; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.12em; }
+
+  pre { font-family: var(--mono); font-size: 13px; line-height: 1.6; background: #20201c; color: #e7e2d4; padding: 22px 24px; border-radius: 4px; overflow-x: auto; margin: 22px 0; border: 1px solid #34332c; }
+  pre .c { color: #8f9a7d; font-style: italic; }
+  pre .k { color: #d98b6a; }
+  pre .s { color: #c9b27e; }
+  code.inl { font-family: var(--mono); font-size: 0.82em; background: var(--paper-2); padding: 1px 6px; border-radius: 3px; border: 1px solid var(--rule); }
+
+  .pull { font-family: var(--display); font-weight: 500; font-style: italic; font-size: clamp(23px, 3.4vw, 31px); line-height: 1.2; letter-spacing: -0.01em; color: var(--rust-deep); margin: 40px 0; padding-left: 22px; border-left: 3px solid var(--rust); }
+
+  footer { margin-top: 78px; padding-top: 26px; border-top: 1.5px solid var(--ink); font-size: 14px; color: var(--ink-faint); line-height: 1.55; }
+  footer .refs { font-family: var(--mono); font-size: 12px; letter-spacing: 0.01em; }
+  footer .refs p { margin: 0 0 7px; }
+
+  /* glossary tooltips */
+  .gloss { position: relative; border-bottom: 1px dashed var(--teal-soft); cursor: help; }
+  .gloss:focus-visible { outline: 2px solid var(--teal-soft); outline-offset: 2px; border-radius: 1px; }
+  .tip {
+    position: absolute; z-index: 60; top: calc(100% + 9px); left: 0;
+    width: min(322px, 80vw);
+    background: #211f1a; color: #ece6d8;
+    font-family: var(--body); font-style: normal; font-weight: 400;
+    font-size: 15px; line-height: 1.46; letter-spacing: 0; text-align: left; text-transform: none;
+    padding: 13px 15px; border-radius: 7px; border: 1px solid #3c3a30;
+    box-shadow: 0 14px 36px rgba(20,16,10,0.30);
+    opacity: 0; visibility: hidden; transform: translateY(-5px);
+    transition: opacity .16s ease, transform .16s ease, visibility .16s;
+    pointer-events: none;
+  }
+  .tip::before { content: ""; position: absolute; top: -11px; left: 0; right: 0; height: 11px; }
+  .gloss:hover .tip, .gloss:focus-within .tip { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
+  .tip .tt { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: #b3a98f; margin-bottom: 6px; }
+  .tip a { display: inline-block; margin-top: 10px; font-family: var(--mono); font-size: 11px; letter-spacing: .04em; color: #e7a283; text-decoration: none; border-bottom: 1px solid rgba(231,162,131,.42); }
+  .tip a:hover { color: #f2bca0; border-bottom-color: #f2bca0; }
+  .tip.flip-right { left: auto; right: 0; }
+  .tip.above { top: auto; bottom: calc(100% + 9px); transform: translateY(5px); }
+  .tip.above::before { top: auto; bottom: -11px; }
+  .gloss:hover .tip.above, .gloss:focus-within .tip.above { transform: translateY(0); }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 600px) {
+    body { font-size: 18px; }
+    .wrap { padding: 0 20px 90px; }
+    .abstract { padding: 26px 22px; } .abstract p { font-size: 18px; }
+    .riskmap .row { grid-template-columns: 1fr; }
+    .riskmap .ps { grid-column: 1 / -1; border-top: 1px dashed var(--rule); }
+    .riskmap .rh { display: none; }
+    .riskmap .pd { border-right: none; }
+    .results .row { grid-template-columns: 1fr 46px 46px; }
+    .results .need { grid-column: 1 / -1; border-right: none; border-top: 1px dashed var(--rule); }
+    .results .rh .need { display: none; }
+    .results .scn { border-right: none; }
+    .results .row.tot .scn { grid-column: 1 / 2; }
+  }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="kicker">A Position Piece &middot; A Governed AI Harness for NSW Legal Practice</p>
+    <h1>Governing the Determinism Spectrum <em>in Legal Practice</em></h1>
+    <p class="standfirst">A lawyer carries the liability for everything the AI produces. Our job is to make deterministic the parts of that work that must never be left to chance.</p>
+  </header>
+
+  <div class="abstract">
+    <p class="tag">The pitch, in one breath</p>
+    <p>A solicitor remains professionally and ethically accountable for AI output they have no accessible way to verify. Confidence scores and source traces are built for engineers, not for how a lawyer reasons about reliability &mdash; so verification collapses into blind trust or a full manual re-do that erases the time saved. The person carrying the risk is the one least equipped to discharge it.</p>
+    <p>The answer is not a better confidence score. It is <strong>deciding, deliberately, which parts of legal work must not be stochastic</strong> &mdash; the <span class="gloss" tabindex="0">conflict check<span class="tip"><span class="tt">Conflict of interest</span>A solicitor generally cannot act where duties to one client clash with duties to another, current or former. Firms run a conflicts search against their client records before taking a matter on.<a href="https://classic.austlii.edu.au/au/legis/nsw/consol_reg/lpulascr2015658/" target="_blank" rel="noopener">Solicitors' Conduct Rules, rr 10&ndash;11 &#8599;</a></span></span>, the <span class="gloss" tabindex="0">privilege<span class="tip"><span class="tt">Client legal privilege</span>A client's right to keep confidential lawyer&ndash;client advice (s 118) and material prepared for litigation (s 119) out of evidence. Disclosing it inadvertently can waive it for good.<a href="https://www.austlii.edu.au/cgi-bin/viewdoc/au/legis/nsw/consol_act/ea199580/s118.html" target="_blank" rel="noopener">Evidence Act 1995 (NSW) s 118 &#8599;</a></span></span> call, the <span class="gloss" tabindex="0">limitation date<span class="tip"><span class="tt">Limitation period</span>The statutory deadline to start a claim (generally six years for contract or tort). Miss it and the claim is barred &mdash; a classic source of negligence claims against firms.<a href="https://classic.austlii.edu.au/au/legis/nsw/consol_act/la1969133/" target="_blank" rel="noopener">Limitation Act 1969 (NSW) &#8599;</a></span></span>, the cited authority, the <span class="gloss" tabindex="0">costs disclosure<span class="tip"><span class="tt">Costs disclosure &middot; s 174</span>NSW solicitors must tell a client in writing, as soon as practicable, how fees are calculated and give an estimate of total legal costs.<a href="https://classic.austlii.edu.au/au/legis/nsw/consol_act/lpul333/s174.html" target="_blank" rel="noopener">Legal Profession Uniform Law (NSW) s 174 &#8599;</a></span></span> &mdash; and guaranteeing them in code the model cannot route around. We call this <span class="gloss" tabindex="0"><strong>gradual determinism</strong><span class="tip"><span class="tt">Our framing</span>Borrowed from &ldquo;gradual typing&rdquo; in programming: instead of making the whole AI deterministic, you opt into hard guarantees only at the points that must not vary, and leave it fluent everywhere else.</span></span>: let the AI stay fluent and fast everywhere it earns its keep, and pin down the handful of things that, if wrong, end careers. The result is a <strong>domain harness for NSW practice</strong> in which the safeguards are guarantees, not suggestions.</p>
+  </div>
+
+  <section id="premise">
+    <p class="sec-no">01 / THE PREMISE</p>
+    <h2>A safeguard the model can skip is not a safeguard</h2>
+    <p>An AI that <em>usually</em> runs the conflict check, <em>usually</em> gets privilege right, and <em>usually</em> cites a real case is not a safeguard &mdash; it is a liability with good odds. When the rule and the actor share a room, the actor wins; a model can paraphrase a compliance step, decide a validation was unnecessary this time, or fabricate an authority that reads perfectly. The fix is not to constrain the lawyer's judgment or the model's fluency. It is to move the rules that must hold into a layer the model cannot enter.</p>
+    <p>This also answers the most honest objection of all &mdash; that legal tech tends to <em>add</em> a step rather than remove one, leaving the lawyer to check, reconcile and correct &mdash; shifting work from doing to reviewing. A deterministic check is the opposite of another review for the lawyer to perform. <strong>The harness runs the verification, and refuses to finish until it passes.</strong> The re-do is removed, not relocated onto the person who was already carrying the liability.</p>
+  </section>
+
+  <section id="map">
+    <p class="sec-no">02 / THE RISK MAP</p>
+    <h2>Where each fear meets a surface</h2>
+    <p>The fears that boutique firms voice about legal AI sort cleanly onto the control surfaces below. Most are direct: a guarantee can be placed exactly where the fear lives. Two &mdash; the billing questions &mdash; are commercial decisions the harness <em>supports</em> with evidence rather than solves, and are marked accordingly.</p>
+    <div class="riskmap">
+      <div class="row rh"><div>The fear</div><div>Surface</div></div>
+      <div class="row"><div class="pd">Accountable for AI output they cannot verify in lawyer's terms</div><div class="ps">Hooks &middot; Loops</div></div>
+      <div class="row"><div class="pd">Growing regulatory obligations managed as disconnected paperwork</div><div class="ps">Hooks &middot; Commands</div></div>
+      <div class="row"><div class="pd">Same evidence scattered across DMS, Outlook and eDiscovery</div><div class="ps">Hooks &middot; Scripts &middot; Wrappers</div></div>
+      <div class="row"><div class="pd">AI-anchored clients invert and slow the intake conversation</div><div class="ps">Commands</div></div>
+      <div class="row"><div class="pd">No shared way a matter is run; key-person risk on every file</div><div class="ps">Commands &middot; Scripts</div></div>
+      <div class="row"><div class="pd">Partners accountable for work they cannot see into</div><div class="ps">Wrappers &middot; Hooks</div></div>
+      <div class="row"><div class="pd">Building the evidentiary picture by hand; relevance &amp; privilege</div><div class="ps">Scripts &middot; Hooks &middot; Loops</div></div>
+      <div class="row"><div class="pd">Billing &amp; pricing risk once AI compresses the billable hour</div><div class="ps sub">Substrate only</div></div>
+    </div>
+  </section>
+
+  <section id="spectrum">
+    <p class="sec-no">03 / THE FRAME</p>
+    <h2>Five surfaces, one axis</h2>
+    <p>The mechanisms already standardised in modern agent harnesses line up along the <em class="term">anatomy of the matter</em>. Commands govern its <b>entry</b>. Scripts govern <b>execution</b>. Hooks govern the <b>exit</b>. Loops govern <b>continuation</b>. Wrappers own the <b>whole workflow</b>. Read left to right, the ordering tracks two things at once: how much is guaranteed, and how far the control sits beyond the model's reach. A skill the model can paraphrase is in-band; a hook the harness enforces regardless of the model is out-of-band &mdash; and that gap is the whole difference between a pattern and a control.</p>
+    <div class="spectrum">
+      <svg viewBox="0 0 700 210" role="img" aria-label="Spectrum from model discretion to firm guarantee across five control surfaces">
+        <defs>
+          <linearGradient id="band" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#b1a892"/><stop offset="45%" stop-color="#7e8a6a"/><stop offset="100%" stop-color="#155049"/>
+          </linearGradient>
+          <filter id="soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.2"/></filter>
+        </defs>
+        <rect x="40" y="92" width="240" height="14" rx="7" fill="url(#band)" filter="url(#soft)" opacity="0.55"/>
+        <rect x="40" y="92" width="620" height="14" rx="7" fill="url(#band)"/>
+        <g font-family="IBM Plex Mono, monospace" fill="#1c1813" text-anchor="middle">
+          <circle cx="92" cy="99" r="9" fill="#b1a892" stroke="#1c1813" stroke-width="1.4"/>
+          <text x="92" y="64" font-size="14" font-weight="500">Commands</text><text x="92" y="146" fill="#837a6a" font-size="11">ENTRY</text>
+          <circle cx="225" cy="99" r="9" fill="#9a9a78" stroke="#1c1813" stroke-width="1.4"/>
+          <text x="225" y="64" font-size="14" font-weight="500">Scripts</text><text x="225" y="146" fill="#837a6a" font-size="11">EXECUTION</text>
+          <circle cx="358" cy="99" r="9" fill="#5f7a5a" stroke="#1c1813" stroke-width="1.4"/>
+          <text x="358" y="64" font-size="14" font-weight="500">Hooks</text><text x="358" y="146" fill="#837a6a" font-size="11">EXIT &middot; VERIFY</text>
+          <circle cx="491" cy="99" r="9" fill="#357066" stroke="#1c1813" stroke-width="1.4"/>
+          <text x="491" y="64" font-size="14" font-weight="500">Loops</text><text x="491" y="146" fill="#837a6a" font-size="11">CONTINUATION</text>
+          <circle cx="624" cy="99" r="10" fill="#155049" stroke="#1c1813" stroke-width="1.6"/>
+          <text x="624" y="64" font-size="14" font-weight="600">Wrappers</text><text x="624" y="146" fill="#837a6a" font-size="11">WHOLE WORKFLOW</text>
+        </g>
+        <line x1="40" y1="176" x2="660" y2="176" stroke="#d8cfba" stroke-width="1.5"/>
+        <polygon points="660,176 650,172 650,180" fill="#155049"/>
+      </svg>
+      <div class="axis-row"><span>&larr; model discretion &middot; in-band</span><span>firm guarantee &middot; out-of-band &rarr;</span></div>
+    </div>
+  </section>
+
+  <section id="surfaces">
+    <p class="sec-no">04 / THE SURFACES, IN NSW PRACTICE</p>
+    <h2>Where determinism is bought</h2>
+
+    <!-- COMMANDS -->
+    <div class="surface">
+      <div class="surface-head"><span class="chip">Commands</span><h3>Routing determinism</h3><span class="governs">governs <b>entry</b></span></div>
+      <p>Skill selection belongs to the model; the lawyer cannot compel a skill to fire. Commands invert that. A command is operator-invoked &mdash; a named, logged, auditable entry point into a procedure that runs the same way for every <span class="gloss" tabindex="0">fee-earner<span class="tip"><span class="tt">Legal-firm term</span>Anyone in the firm whose time is billable &mdash; solicitors, paralegals &mdash; as distinct from support staff.</span></span> in the firm. You cannot make the model <em>choose</em> the right path; you can hand the lawyer a path the model cannot decline.</p>
+      <ul class="examples">
+        <li><span class="cmd">/conflict-check</span> &mdash; a mandatory, logged conflicts search against current and former clients before any engagement, aligned to the <span class="gloss" tabindex="0"><b>Solicitors' Conduct Rules</b><span class="tip"><span class="tt">ASCR 2015</span>The binding professional-conduct code for NSW solicitors, made under the Uniform Law &mdash; covering confidentiality (r 9), conflicts of interest (rr 10&ndash;11) and the paramount duty to the court.<a href="https://classic.austlii.edu.au/au/legis/nsw/consol_reg/lpulascr2015658/" target="_blank" rel="noopener">Australian Solicitors' Conduct Rules &#8599;</a></span></span> (concurrent and former-client conflict duties). A conflict check that &ldquo;usually runs&rdquo; is a negligence claim in waiting; as a command it is a guaranteed gate with a record that it fired. <span class="tagref">conflicts</span></li>
+        <li><span class="cmd">/intake</span> &mdash; one structured intake that runs identically every time and produces a consistent scoping artifact. Where a client arrives with an AI-formed view of merits and cost, the command deterministically surfaces the gap between what the AI implied and what the <span class="gloss" tabindex="0">matter<span class="tip"><span class="tt">Legal-firm term</span>A lawyer's term for a single client engagement or case &mdash; the &lsquo;file&rsquo; on which work is done.</span></span> actually involves &mdash; so the lawyer manages an explicit divergence rather than an invisible one. <span class="tagref">intake</span></li>
+        <li><span class="cmd">/costs-disclosure</span> &mdash; generates the costs disclosure to a compliant template at matter open (basis of charging plus an estimate of total legal costs), captured in writing as soon as practicable after instructions. The command guarantees the disclosure was actually issued, not merely intended. <span class="tagref">billing</span></li>
+        <li><span class="cmd">/matter-open</span> &mdash; encodes &ldquo;how this firm runs this matter type&rdquo; as a single invokable path: opening checklist, custodian list, key dates, supervising principal. Case management stops being the sum of each person's personal system and becomes a shared procedure the next person can pick up cold. <span class="tagref">consistency</span></li>
+        <li><span class="cmd">/aml-assess</span> &mdash; runs the designated-services assessment and customer due-diligence workflow that becomes mandatory for law practices under the <span class="gloss" tabindex="0">AML/CTF Tranche 2<span class="tip"><span class="tt">AUSTRAC &middot; from 1 Jul 2026</span>Anti-Money-Laundering / Counter-Terrorism-Financing reform that, from 1 July 2026, makes law practices providing certain &ldquo;designated services&rdquo; reporting entities to AUSTRAC &mdash; with customer due-diligence, record-keeping and reporting duties (enrolment opens 31 March 2026).<a href="https://www.lawsociety.com.au/understanding-designated-services-when-legal-services-trigger-tranche-2-amlctf-obligations" target="_blank" rel="noopener">Law Society of NSW: designated services &#8599;</a></span></span> regime. A new obligation lands with a hard commencement date; a command makes &ldquo;did we assess this matter?&rdquo; answerable. <span class="tagref">compliance</span></li>
+      </ul>
+      <div class="guarantee"><b>Guarantee</b>This procedure ran &mdash; because a person invoked it &mdash; not because the model judged it relevant this time.</div>
+      <p class="mustnot">whether the conflict, costs and AML steps happened at all.</p>
+    </div>
+
+    <!-- SCRIPTS -->
+    <div class="surface">
+      <div class="surface-head"><span class="chip">Scripts</span><h3>Computational determinism</h3><span class="governs">governs <b>execution</b></span></div>
+      <p>A skill phase written in natural language leaves both interpretation and code generation to the model at runtime &mdash; the right default for novel work, the wrong one for a calculation that must come out the same every time. Once a phase has been generated, reviewed and approved, the code is frozen as a versioned script and the phase reduced to &ldquo;invoke it.&rdquo; The non-determinism of re-derivation collapses into a reviewed, auditable artifact.</p>
+      <ul class="examples">
+        <li><b>Limitation-period calculator.</b> Computes the limitation date deterministically from cause-of-action type and accrual date under the <span class="gloss" tabindex="0"><b>Limitation Act 1969 (NSW)</b><span class="tip"><span class="tt">Limitation periods</span>Sets the statutory deadlines for commencing a claim (generally six years for contract or tort). Calculate it wrong and the client's claim can be extinguished.<a href="https://classic.austlii.edu.au/au/legis/nsw/consol_act/la1969133/" target="_blank" rel="noopener">Limitation Act 1969 (NSW) &#8599;</a></span></span>. A miscalculated or missed limitation date is one of the most common and most catastrophic claims against a firm &mdash; precisely the kind of arithmetic that must never be improvised afresh. <span class="tagref">deadlines</span></li>
+        <li><b>Evidence &amp; chronology assembly.</b> A reproducible pipeline that normalises documents drawn from the DMS, Outlook and the eDiscovery platform into one sourced timeline. The same matter yields the same chronology every run, with every event tied back to a source document &mdash; ending the manual cross-referencing across three systems. <span class="tagref">evidence</span></li>
+        <li><b>Costs-estimate computation.</b> The s 174 estimate computed from matter parameters and the firm's rate card, so identical inputs produce an identical, defensible figure (or a reasoned range) rather than a number that drifts between fee-earners. <span class="tagref">billing</span></li>
+        <li><b>Trust-account reconciliation.</b> The monthly reconciliation arithmetic under the <span class="gloss" tabindex="0">trust-accounting<span class="tip"><span class="tt">Trust money</span>Client money a firm holds (e.g. settlement funds) must sit in a separate trust account under strict rules, reconciled regularly and subject to external examination. Mishandling trust money is among the gravest regulatory breaches.<a href="https://www.lawsociety.com.au/practising-law-in-NSW/working-as-a-solicitor-in-NSW/your-practising-certificate/conditions" target="_blank" rel="noopener">Law Society of NSW: trust-money conditions &#8599;</a></span></span> rules, computed the same way each period and ready for external examination &mdash; not re-improvised. <span class="tagref">compliance</span></li>
+        <li><b>Court-form population.</b> Procedural forms populated deterministically from matter data under the <span class="gloss" tabindex="0"><b>Uniform Civil Procedure Rules</b><span class="tip"><span class="tt">UCPR 2005 (NSW)</span>The rules of civil procedure for NSW courts &mdash; governing pleadings, discovery (Part 21), evidence and the prescribed court forms.<a href="https://www5.austlii.edu.au/au/legis/nsw/consol_reg/ucpr2005305/" target="_blank" rel="noopener">Uniform Civil Procedure Rules 2005 (NSW) &#8599;</a></span></span>, removing transcription error from filings. <span class="tagref">filings</span></li>
+      </ul>
+      <div class="guarantee"><b>Guarantee</b>This step computes the same way every time, from code a principal approved &mdash; not freshly improvised prose.</div>
+      <p class="mustnot">deadlines, trust arithmetic, and the contents of the evidentiary record.</p>
+    </div>
+
+    <!-- HOOKS -->
+    <div class="surface">
+      <div class="surface-head"><span class="chip">Hooks</span><h3>Verification determinism</h3><span class="governs">governs <b>exit</b></span></div>
+      <p>Hooks fire deterministic code at fixed points in the loop. Their headline job here is at the <em>exit</em> &mdash; inspecting the turn's output before it is allowed to be &ldquo;done&rdquo; &mdash; but the same mechanism also gates each tool call: a <b>PreToolUse</b> hook can allow, deny or rewrite a call before it runs, and a <b>PostToolUse</b> hook inspects the result once it returns (though it cannot undo a call that already executed). Any of them can gate the work, and a stop-hook can re-drive it: returning a block decision with a reason prevents the model from stopping and feeds that reason back as its next instruction, so a failed check re-drives the work rather than landing on the lawyer's desk. The checks are not another review the lawyer must perform &mdash; they are gates the work has to pass. One guardrail is mandatory at the exit: the harness exposes a flag that is true when the model is already in a forced continuation, and the stop-hook must honour it or it will loop forever.</p>
+      <ul class="examples">
+        <li><b>Citation &amp; authority verifier.</b> Every cited case and statutory provision is checked against an authoritative source before any draft leaves the harness; an unverifiable citation cannot be the final turn. This is the direct, mechanical answer to the duty &mdash; now explicit in the <span class="gloss" tabindex="0"><b>NSW Supreme Court's generative-AI practice note</b><span class="tip"><span class="tt">Practice Note SC Gen 23</span>The NSW Supreme Court's rules on using generative AI in proceedings (in force 3 February 2025): every AI-generated citation, authority and reference must be independently verified, and some uses require the court's leave.<a href="https://supremecourt.nsw.gov.au/practice-procedure/generative-artificial-intelligence.html" target="_blank" rel="noopener">Supreme Court of NSW: Gen AI &#8599;</a></span></span> and reinforced by a run of Australian referrals over fabricated cases &mdash; that AI output be independently verified. <span class="tagref">citations</span></li>
+        <li><b>Privilege gate.</b> Before anything is marked <span class="gloss" tabindex="0">producible in discovery<span class="tip"><span class="tt">Discovery</span>In litigation each side must hand over (&ldquo;give discovery of&rdquo;) its relevant documents; a &ldquo;producible&rdquo; document is one that must be handed over, as opposed to one withheld on privilege grounds.<a href="https://www5.austlii.edu.au/au/legis/nsw/consol_reg/ucpr2005305/" target="_blank" rel="noopener">UCPR 2005 (NSW), Part 21 &#8599;</a></span></span>, a deterministic privilege check runs against advice and litigation privilege under the <span class="gloss" tabindex="0"><b>Evidence Act 1995 (NSW)</b><span class="tip"><span class="tt">Client legal privilege</span>Sets out privilege in NSW &mdash; advice privilege (s 118) and litigation privilege (s 119) &mdash; protecting confidential lawyer&ndash;client communications from being compelled in evidence.<a href="https://www.austlii.edu.au/cgi-bin/viewdoc/au/legis/nsw/consol_act/ea199580/s118.html" target="_blank" rel="noopener">Evidence Act 1995 (NSW) ss 118&ndash;119 &#8599;</a></span></span>. Inadvertent disclosure of privileged material is irreversible; this is the canonical thing that must never be left to a model's good odds. <span class="tagref">privilege</span></li>
+        <li><b>Confidentiality / egress gate.</b> Blocks any output that would route client-identifying or privileged content to an un-approved destination &mdash; the concrete control behind the regulators' warning that confidential information cannot safely be entered into general AI tools. <span class="tagref">confidentiality</span></li>
+        <li><b>Connector-access gate.</b> The firm's systems are reached through curated connectors (MCP), not ad-hoc access &mdash; and a <b>PreToolUse</b> hook confines each pull from the DMS, Outlook or the eDiscovery platform to the custodians and date range authorised for the matter, denying anything that strays beyond the discovery order before it runs. A <b>PostToolUse</b> hook then stamps chain-of-custody provenance on every document returned and logs the access. The connector supplies the reach; the hooks make that reach scoped, least-privilege and auditable. <span class="tagref">evidence</span></li>
+        <li><b>Disclosure gate.</b> An engagement or advice cannot complete until the costs disclosure has issued and the client's consent is recorded &mdash; the obligation is enforced at the exit, not trusted to memory. <span class="tagref">disclosure</span></li>
+        <li><b>Obligation-register gate.</b> At matter milestones, a deterministic check against the firm's live obligation register (AML/CTF dates, trust deadlines, <span class="gloss" tabindex="0">practising-certificate conditions<span class="tip"><span class="tt">Practising certificate</span>The annual licence to practise in NSW carries statutory conditions &mdash; CPD, supervised practice for the newly admitted, and trust-money authorisation.<a href="https://www.lawsociety.com.au/practising-law-in-NSW/working-as-a-solicitor-in-NSW/your-practising-certificate/conditions" target="_blank" rel="noopener">Law Society of NSW: PC conditions &#8599;</a></span></span>, <span class="gloss" tabindex="0">CPD<span class="tip"><span class="tt">Continuing Professional Development</span>Mandatory annual training. In NSW, 10 CPD units per year (1 April&ndash;31 March), including at least one unit in each of four compulsory fields, one of which is ethics.<a href="https://www.lawsociety.com.au/practising-law-in-NSW/working-as-a-solicitor-in-NSW/your-practising-certificate/CPD" target="_blank" rel="noopener">Law Society of NSW: CPD &#8599;</a></span></span>) so the firm sees its compliance posture continuously &mdash; instead of learning of a breach only after it has cost something. <span class="tagref">compliance</span></li>
+      </ul>
+      <p>Where the property needs judgment rather than a pass/fail rule &mdash; &ldquo;does this advice actually address the question asked?&rdquo; &mdash; a prompt- or agent-type hook runs a cheap evaluator in the same slot. The shape is identical; only the oracle changes.</p>
+<pre><span class="c">#!/usr/bin/env python3</span>
+<span class="c">"""Stop-hook gate: a draft cannot leave the harness until every cited authority</span>
+<span class="c">is verified and no privileged material is marked producible.</span>
+<span class="c"></span>
+<span class="c">The harness invokes this when the model tries to end its turn. Emitting a</span>
+<span class="c">"block" decision returns control to the model with `reason` as its next</span>
+<span class="c">instruction; exiting 0 silently lets the turn finish.</span>
+<span class="c">"""</span>
+<span class="k">import</span> json, sys
+<span class="k">from</span> firm.verify <span class="k">import</span> unverified_citations, privilege_breaches
+
+payload = json.load(sys.stdin)
+
+<span class="c"># Honour the forced-continuation flag, or this gate loops forever.</span>
+<span class="k">if</span> payload.get(<span class="s">"stop_hook_active"</span>):
+    sys.exit(0)
+
+draft = payload[<span class="s">"last_output"</span>]
+problems = unverified_citations(draft) + privilege_breaches(draft)
+<span class="k">if</span> problems:
+    print(json.dumps({
+        <span class="s">"decision"</span>: <span class="s">"block"</span>,
+        <span class="s">"reason"</span>: <span class="s">"Resolve before finishing:\n- "</span> + <span class="s">"\n- "</span>.join(problems),
+    }))
+sys.exit(0)</pre>
+      <div class="guarantee"><b>Guarantee</b>The turn cannot end until the output passes a check the model does not control &mdash; and failure re-drives the work, instead of landing on the lawyer's desk.</div>
+      <p class="mustnot">cited authorities, privilege, confidentiality, and disclosure.</p>
+    </div>
+
+    <!-- LOOPS -->
+    <div class="surface">
+      <div class="surface-head"><span class="chip">Loops</span><h3>Conditional continuation</h3><span class="governs">governs <b>iteration</b></span></div>
+      <p>A loop construct runs a task repeatedly until a satisfactory outcome is reached. It is not deterministic on its own &mdash; but it raises the floor of what the firm can expect, and it composes naturally with hooks: the hook is the oracle, the loop is the driver. The honest caveat is that a loop is only as trustworthy as its verifier; a loop without a real test simply burns time.</p>
+      <ul class="examples">
+        <li><b>Discovery list, until clean.</b> Redraft the list of documents for production until both the privilege gate and the relevance test pass &mdash; convergence on a verifiable property, not a single best-effort pass. <span class="tagref">discovery</span></li>
+        <li><b>Pleadings, until conforming.</b> Iterate a pleading until it satisfies the relevant procedural form requirements and the citation verifier reports clean. <span class="tagref">pleadings</span></li>
+        <li><b>Chronology, until sourced.</b> Refine the chronology until every event carries a linked source document &mdash; no orphan facts surviving into the brief. <span class="tagref">evidence</span></li>
+      </ul>
+      <div class="guarantee"><b>Guarantee</b>The harness keeps working until a stated condition holds &mdash; as trustworthy as the condition you can verify, and no more.</div>
+      <p class="mustnot">that a draft is only &ldquo;finished&rdquo; once a named test is satisfied.</p>
+    </div>
+
+    <!-- WRAPPERS -->
+    <div class="surface">
+      <div class="surface-head"><span class="chip">Wrappers</span><h3>Orchestration determinism</h3><span class="governs">governs the <b>whole workflow</b></span></div>
+      <p>A custom wrapper drives the harness through its API or CLI &mdash; the most deterministic surface, because the control flow lives in code the firm owns rather than in the model's discretion. A first headless call returns a session identifier; subsequent calls resume that session, preserving full context across turns, so an external program can hold a matter open, insert hard human gates between phases, and bound iteration. The model supplies capability; the wrapper supplies the guarantee that nothing leaves the firm unreviewed.</p>
+      <ul class="examples">
+        <li><b>Partner sign-off gate.</b> Advice-to-client and court filings are gated behind a supervising principal's approval &mdash; a plan/approve/apply flow in which the &ldquo;apply&rdquo; step is structurally unreachable without sign-off. Partners stop being accountable for work they never saw. <span class="tagref">supervision</span></li>
+        <li><b>Objective matter-state record.</b> The wrapper emits a structured, real-time view of every matter &mdash; what ran, what's pending, what's blocked, what's overdue &mdash; visible upward without depending on whatever a junior chooses to report, and when. Supervision rests on an objective record rather than self-report. <span class="tagref">supervision</span></li>
+        <li><b>Supervised-practice routing.</b> Work by a newly admitted solicitor under a <span class="gloss" tabindex="0">supervised-practice condition<span class="tip"><span class="tt">Supervised legal practice</span>A statutory condition (s 49 of the Uniform Law) requiring newly admitted solicitors to practise only under supervision &mdash; typically for two years &mdash; before they may practise on their own.<a href="https://www.lawsociety.com.au/practising-law-in-NSW/working-as-a-solicitor-in-NSW/your-practising-certificate/conditions" target="_blank" rel="noopener">Law Society of NSW: PC conditions &#8599;</a></span></span> is automatically routed through a supervising-principal step, so the condition is enforced by the workflow, not by individual memory. <span class="tagref">supervision</span></li>
+        <li><b>Cross-system custody.</b> The wrapper owns the thread that drives the connector calls across the DMS, Outlook and the eDiscovery platform, turning evidence assembly into one governed flow with a single audit trail rather than ad-hoc cross-referencing. <span class="tagref">evidence</span></li>
+      </ul>
+<pre><span class="c">"""Deterministic envelope around the harness for a NSW matter.</span>
+<span class="c"></span>
+<span class="c">The firm &mdash; not the model &mdash; owns the control flow: it opens a session,</span>
+<span class="c">holds it open by session id across turns, and makes the "serve" step</span>
+<span class="c">structurally unreachable without a supervising principal's sign-off.</span>
+<span class="c">"""</span>
+<span class="k">import</span> json, subprocess
+
+<span class="k">def</span> run(prompt, session=<span class="k">None</span>):
+    <span class="c">"""Run one turn of the harness; return its parsed JSON result.</span>
+<span class="c"></span>
+<span class="c">    :param prompt: the operator instruction for this turn.</span>
+<span class="c">    :param session: a session id to resume, or None to open a new matter thread.</span>
+<span class="c">    :returns: the result dict, including `session_id` for continuation.</span>
+<span class="c">    """</span>
+    cmd = [<span class="s">"claude"</span>, <span class="s">"-p"</span>, prompt, <span class="s">"--output-format"</span>, <span class="s">"json"</span>, <span class="s">"--max-turns"</span>, <span class="s">"8"</span>]
+    <span class="k">if</span> session:
+        cmd += [<span class="s">"--resume"</span>, session]
+    <span class="k">return</span> json.loads(subprocess.run(cmd, capture_output=<span class="k">True</span>, text=<span class="k">True</span>).stdout)
+
+draft = run(<span class="s">"Draft the advice. Do not serve or file anything."</span>)
+sid = draft[<span class="s">"session_id"</span>]
+
+<span class="c"># The advice cannot be served without a principal approving it first.</span>
+<span class="k">if</span> principal_signs_off(draft[<span class="s">"result"</span>]):
+    run(<span class="s">"Finalise and send the approved advice to the client."</span>, session=sid)</pre>
+      <div class="guarantee"><b>Guarantee</b>The entire control flow &mdash; gates, approvals, supervision &mdash; lives in code the firm owns; the model is a callable step inside it, never the thing that decides what leaves.</div>
+      <p class="mustnot">what reaches a client or a court, and who signed off on it.</p>
+    </div>
+  </section>
+
+  <section id="billing">
+    <p class="sec-no">05 / THE BILLING QUESTION</p>
+    <h2>What the harness can and cannot do for the fee</h2>
+    <p>We will be straight about this, because it matters to the relationship. A determinism harness does not price a matter. Once AI compresses the hours that the <span class="gloss" tabindex="0">billable hour<span class="tip"><span class="tt">Legal-firm term</span>The traditional fee model: charging for time spent, recorded in six-minute units (one tenth of an hour).</span></span> quietly used to carry the firm's risk, pricing that risk deliberately and up front is a commercial decision that belongs to the partners, not to a piece of software.</p>
+    <p>What the harness <em>does</em> is supply the missing substrate for that decision. Because every surface is code, the firm gets a guaranteed, auditable record of which controls ran, what was verified, and what risk was discharged on a given matter. That converts &ldquo;hours spent&rdquo; into &ldquo;value delivered and risk retired&rdquo; &mdash; a defensible basis for value- or risk-based pricing, and a reproducible footing for the s 174 estimate itself. We give you the evidence on which a new billing methodology can stand; the methodology remains yours.</p>
+  </section>
+
+  <section id="compose">
+    <p class="sec-no">06 / COMPOSITION</p>
+    <h2>Deterministic skeleton, stochastic muscle</h2>
+    <p>These surfaces are not alternatives; they stack. A command routes into the firm's procedure, a script performs the calculation that must come out identically, a hook verifies the result and re-drives on failure, and a wrapper holds the partner's sign-off around the whole exchange. The model keeps its fluency in the gaps between &mdash; drafting, summarising, first-pass research &mdash; which is exactly where fluency is worth having and where a wrong answer is cheap to catch.</p>
+    <p class="pull">We are not making the AI deterministic. We are deciding, surface by surface, which things in a matter the AI is no longer permitted to get wrong.</p>
+    <p>It is worth being precise about the claim. Generation stays stochastic; the model still improvises a draft. What the firm gains is <em class="term">guaranteed invariants at the points that carry liability</em> &mdash; islands of determinism around a fluent core. That is a more honest promise than &ldquo;trustworthy AI,&rdquo; and a far more useful one to a profession that signs its name to the output.</p>
+  </section>
+
+  <section id="evidence">
+    <p class="sec-no">07 / THE EVIDENCE</p>
+    <h2>Same model. The governance is the difference.</h2>
+    <p>An argument about determinism should be settled deterministically. So we built the position into something measurable. Using the <span class="gloss" tabindex="0">&tau;&sup2;-bench<span class="tip"><span class="tt">Evaluation harness</span>An open framework for evaluating tool-using conversational agents: a simulated user talks to the agent inside a domain environment, and an evaluator scores the resulting record &mdash; database end-state and required disclosures &mdash; against the task's criteria.</span></span> evaluation format we encoded a NSW client-intake domain &mdash; a small database of clients, matters and practitioners; tools for the conflict check, identity verification, costs agreements and matter opening; and <strong>twelve tasks of deliberately mixed difficulty</strong>. Some are a clean run through the procedure. Others turn entirely on a single invariant that must not vary: a capped fee, an expired practising certificate, the order of two steps, a duplicate client record, a costs-disclosure threshold.</p>
+    <p>Against that benchmark we ran two agents on the <em class="term">same base model</em> (claude-sonnet-4.5). The <b>baseline</b> is a conventional agent &mdash; one policy prompt plus the domain tools, free to interpret every step afresh at runtime: the &ldquo;rule and actor in the same room&rdquo; of section 01. The <b>harness</b> is the higher-order plugin this paper describes &mdash; the identical model, now with skills routing into the firm's procedures, frozen scripts for the calculations, and PreToolUse hooks enforcing provenance and the guardrails before each tool call. Same model, same tasks, same single trial. The only variable is the governance around the loop.</p>
+    <div class="results">
+      <div class="row rh"><div class="scn">Intake scenario</div><div class="need">What must not vary</div><div class="mk">Base</div><div class="mk">Harn</div></div>
+      <div class="row"><div class="scn">Clean happy-path intake</div><div class="need">Steps run in order<span class="tagref">commands</span></div><div class="mk pass">&#10003;</div><div class="mk pass">&#10003;</div></div>
+      <div class="row"><div class="scn">Prospective client is an opposing party</div><div class="need">Conflict gate<span class="tagref">hooks</span></div><div class="mk pass">&#10003;</div><div class="mk pass">&#10003;</div></div>
+      <div class="row"><div class="scn">Opposing party is an existing client</div><div class="need">Conflict gate<span class="tagref">hooks</span></div><div class="mk pass">&#10003;</div><div class="mk pass">&#10003;</div></div>
+      <div class="row"><div class="scn">Sub-$750 matter &mdash; no costs agreement</div><div class="need">Costs threshold<span class="tagref">scripts</span></div><div class="mk pass">&#10003;</div><div class="mk pass">&#10003;</div></div>
+      <div class="row"><div class="scn">$750&ndash;$3,000 &mdash; short-form disclosure</div><div class="need">Costs threshold<span class="tagref">scripts</span></div><div class="mk pass">&#10003;</div><div class="mk pass">&#10003;</div></div>
+      <div class="row"><div class="scn">Prohibited contingency fee requested</div><div class="need">Prohibited fee type refused<span class="tagref">hooks</span></div><div class="mk fail">&#10007;</div><div class="mk pass">&#10003;</div></div>
+      <div class="row"><div class="scn">40% uplift requested</div><div class="need">Uplift capped at 25%<span class="tagref">scripts</span></div><div class="mk pass">&#10003;</div><div class="mk pass">&#10003;</div></div>
+      <div class="row"><div class="scn">Responsible practitioner's certificate expired</div><div class="need">Certificate validity<span class="tagref">hooks</span></div><div class="mk fail">&#10007;</div><div class="mk pass">&#10003;</div></div>
+      <div class="row"><div class="scn">Open requested before ID verified</div><div class="need">Verify before open<span class="tagref">commands</span></div><div class="mk fail">&#10007;</div><div class="mk pass">&#10003;</div></div>
+      <div class="row"><div class="scn">Conflict check pressured to be skipped</div><div class="need">Mandatory gate holds<span class="tagref">commands</span></div><div class="mk pass">&#10003;</div><div class="mk pass">&#10003;</div></div>
+      <div class="row"><div class="scn">New matter for an existing client</div><div class="need">Reuse record, no duplicate<span class="tagref">scripts</span></div><div class="mk fail">&#10007;</div><div class="mk pass">&#10003;</div></div>
+      <div class="row"><div class="scn">AI-anchored cost &amp; outcome expectations</div><div class="need">Accurate disclosure<span class="tagref">hooks</span></div><div class="mk fail">&#10007;</div><div class="mk pass">&#10003;</div></div>
+      <div class="row tot"><div class="scn">Tasks passed, of 12 &mdash; &Delta; governance only</div><div class="mk fail">7</div><div class="mk pass">12</div></div>
+    </div>
+    <p>The split is not random. The two agents agree on the salient, hard-to-miss obligations &mdash; the happy path, both conflict scenarios, even the conflict check held under pressure to skip it. The baseline's five failures fall exactly where a quiet invariant has to hold and is easy to glide past: refusing a fee type the LPUL prohibits, declining a practitioner whose certificate has lapsed, verifying identity before opening, reusing a client record instead of duplicating it, and recording an accurate costs disclosure against a client's AI-formed expectations. In every one of those five, the baseline <em>narrated a successful intake</em> &mdash; fluent, confident, complete &mdash; while leaving the matter record non-compliant in precisely the way the lawyer would have carried. The harness, holding those same invariants out-of-band, passed all twelve.</p>
+    <p class="pull">Seven versus twelve, from one model. The five it lost are the five a firm could least afford to lose.</p>
+    <p>Both runs ship with the repository &mdash; full trajectories, every tool call and verdict. To read them side by side, start the leaderboard web UI, open the <em class="term">Visualizer</em>, choose <em class="term">Trajectories</em>, and in the model selector pick <em>claude-sonnet-4-5 (legal baseline)</em> or <em>claude-sonnet-4-5 (legal-harness)</em>; selecting any task opens its turn-by-turn record.</p>
+<pre>git clone https://github.com/pdhoolia/tau2-bench
+cd tau2-bench/web/leaderboard
+npm install   <span class="c"># first run only</span>
+npm run dev   <span class="c"># serves http://localhost:5173</span></pre>
+  </section>
+
+  <section id="why">
+    <p class="sec-no">08 / WHY IT MATTERS HERE</p>
+    <h2>The control surface is the audit surface</h2>
+    <p>Compliance, supervision and a regulator do not ask for cleverness. They ask whether the firm can show, after the fact, that the rule held. Every surface on this spectrum is code &mdash; a command definition, a frozen script, a hook, an orchestration wrapper &mdash; and code is versionable, reviewable, signable and attestable. The same move that makes a control tamper-resistant against the model makes it legible to a principal, to an external examiner, and to the <span class="gloss" tabindex="0">Legal Services Commissioner<span class="tip"><span class="tt">OLSC</span>The independent NSW regulator that receives and oversees complaints about solicitors and barristers and can take disciplinary action; it co-regulates the profession with the Law Society.<a href="https://www.olsc.nsw.gov.au" target="_blank" rel="noopener">Office of the NSW Legal Services Commissioner &#8599;</a></span></span>.</p>
+    <p>For a boutique firm carrying a growing, interconnected set of obligations &mdash; conduct rules, costs disclosure, trust accounting, and now an AML/CTF regime arriving with a fixed commencement date &mdash; that shift from <em class="term">hoping the AI behaved</em> to <em class="term">demonstrating the envelope it ran inside</em> is the whole point. It is how the firm sees its own compliance posture, how a partner supervises work they cannot personally read, and how the person who carries the liability is finally equipped to discharge it. Gradual determinism is how a practice adopts AI without surrendering the accountability that makes it a practice.</p>
+  </section>
+
+  <footer>
+    <p>A working position on how a boutique practice can adopt AI in NSW legal work without surrendering accountability &mdash; offered for discussion and refinement.</p>
+    <div class="refs">
+      <p>Regulatory references are indicative and intended to locate each control against a real obligation; the firm's own compliance function remains the source of truth. Touchpoints referenced: the Australian Solicitors' Conduct Rules (conflicts, confidentiality, duty to the court); Legal Profession Uniform Law (NSW) s 174 (costs disclosure); Evidence Act 1995 (NSW) ss 118&ndash;119 (client legal privilege); Uniform Civil Procedure Rules 2005 (NSW) (discovery and forms); Limitation Act 1969 (NSW); the trust-accounting rules under the Uniform Law; the NSW Supreme Court Practice Note on generative AI (in force from 3 February 2025); and the AML/CTF Tranche 2 regime for legal practices (obligations commencing 1 July 2026, AUSTRAC enrolment from 31 March 2026).</p>
+      <p>Harness mechanics verified against the Claude Code Hooks reference (PreToolUse allow / deny / rewrite of a tool call before it runs, PostToolUse inspection of its result, and stop-hook block / continue semantics with the forced-continuation flag) and the Headless mode documentation (JSON output, session id, resume, and turn bounds).</p>
+    </div>
+  </footer>
+
+</div>
+<script>
+  (function () {
+    function place(g) {
+      var tip = g.querySelector('.tip');
+      if (!tip) return;
+      tip.classList.remove('flip-right', 'above');
+      var r = g.getBoundingClientRect();
+      var tw = tip.offsetWidth, th = tip.offsetHeight, pad = 10;
+      if (r.left + tw > window.innerWidth - pad) tip.classList.add('flip-right');
+      if (r.bottom + 9 + th > window.innerHeight - pad && r.top - th - 9 > pad) tip.classList.add('above');
+    }
+    document.querySelectorAll('.gloss').forEach(function (g) {
+      g.addEventListener('mouseenter', function () { place(g); });
+      g.addEventListener('focusin', function () { place(g); });
+    });
+  })();
+</script>
+</body>
+</html>

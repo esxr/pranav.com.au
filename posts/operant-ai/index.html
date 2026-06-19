@@ -307,56 +307,38 @@
     border-radius: 4px;
   }
 
-  /* CALL: dial ring pulses, arcs radiate, ring morphs into document */
-  @keyframes call-dial-pulse {
-    0% { r: 36; stroke-width: 3; opacity: 0.9; }
-    15% { r: 40; stroke-width: 4; opacity: 1; }
-    30% { r: 36; stroke-width: 3; opacity: 0.9; }
-    45% { r: 38; stroke-width: 3.5; opacity: 1; }
-    50% { r: 36; opacity: 0.9; }
-    55% { r: 32; opacity: 0.7; }
-    65% { r: 0; opacity: 0; }
-    100% { r: 0; opacity: 0; }
-  }
-  @keyframes call-arc1 {
-    0% { opacity: 0; stroke-dashoffset: 50; }
-    8% { opacity: 0.6; }
-    25% { opacity: 0; stroke-dashoffset: 0; }
-    100% { opacity: 0; }
-  }
-  @keyframes call-arc2 {
-    0%, 8% { opacity: 0; stroke-dashoffset: 50; }
-    16% { opacity: 0.5; }
-    33% { opacity: 0; stroke-dashoffset: 0; }
-    100% { opacity: 0; }
-  }
-  @keyframes call-arc3 {
-    0%, 16% { opacity: 0; stroke-dashoffset: 50; }
-    24% { opacity: 0.35; }
-    40% { opacity: 0; stroke-dashoffset: 0; }
-    100% { opacity: 0; }
-  }
-  @keyframes call-phone-icon {
+  /* CALL: person on phone with speech bubble, morphs into document */
+  @keyframes call-person-fade {
     0% { opacity: 1; }
     50% { opacity: 1; }
-    60% { opacity: 0; transform: scale(0.5); }
-    100% { opacity: 0; transform: scale(0.5); }
+    58% { opacity: 0; }
+    100% { opacity: 0; }
   }
+  @keyframes call-bubble {
+    0%, 8% { opacity: 0; transform: scale(0.8); }
+    14% { opacity: 1; transform: scale(1); }
+    50% { opacity: 1; }
+    58% { opacity: 0; }
+    100% { opacity: 0; }
+  }
+  @keyframes call-bubble-line1 { 0%, 14% { opacity: 0; } 20% { opacity: 1; } 50% { opacity: 1; } 58% { opacity: 0; } 100% { opacity: 0; } }
+  @keyframes call-bubble-line2 { 0%, 20% { opacity: 0; } 26% { opacity: 1; } 50% { opacity: 1; } 58% { opacity: 0; } 100% { opacity: 0; } }
+  @keyframes call-bubble-line3 { 0%, 26% { opacity: 0; } 32% { opacity: 1; } 50% { opacity: 1; } 58% { opacity: 0; } 100% { opacity: 0; } }
   @keyframes call-morph-doc {
     0%, 55% { opacity: 0; transform: scale(0.3); }
-    70% { opacity: 1; transform: scale(1); }
+    65% { opacity: 1; transform: scale(1); }
     100% { opacity: 1; transform: scale(1); }
   }
-  @keyframes call-doc-line1 { 0%, 68% { width: 0; opacity: 0; } 75% { opacity: 1; } 100% { opacity: 1; } }
-  @keyframes call-doc-line2 { 0%, 73% { width: 0; opacity: 0; } 80% { opacity: 1; } 100% { opacity: 1; } }
-  @keyframes call-doc-line3 { 0%, 78% { width: 0; opacity: 0; } 85% { opacity: 1; } 100% { opacity: 1; } }
-  @keyframes call-doc-line4 { 0%, 83% { width: 0; opacity: 0; } 90% { opacity: 1; } 100% { opacity: 1; } }
-  .anim-call-dial { animation: call-dial-pulse 7s ease-in-out infinite; transform-origin: center; }
-  .anim-call-arc1 { animation: call-arc1 7s ease-out infinite; stroke-dasharray: 50; }
-  .anim-call-arc2 { animation: call-arc2 7s ease-out infinite; stroke-dasharray: 50; }
-  .anim-call-arc3 { animation: call-arc3 7s ease-out infinite; stroke-dasharray: 50; }
-  .anim-call-person { animation: call-phone-icon 7s ease-in-out infinite; transform-origin: 130px 80px; }
-  .anim-call-morph-doc { animation: call-morph-doc 7s ease-out infinite; transform-origin: 130px 80px; }
+  @keyframes call-doc-line1 { 0%, 63% { opacity: 0; } 70% { opacity: 1; } 100% { opacity: 1; } }
+  @keyframes call-doc-line2 { 0%, 68% { opacity: 0; } 75% { opacity: 1; } 100% { opacity: 1; } }
+  @keyframes call-doc-line3 { 0%, 73% { opacity: 0; } 80% { opacity: 1; } 100% { opacity: 1; } }
+  @keyframes call-doc-line4 { 0%, 78% { opacity: 0; } 85% { opacity: 1; } 100% { opacity: 1; } }
+  .anim-call-person { animation: call-person-fade 7s ease-in-out infinite; }
+  .anim-call-bubble { animation: call-bubble 7s ease-out infinite; transform-origin: 200px 50px; }
+  .anim-call-bline1 { animation: call-bubble-line1 7s ease-out infinite; }
+  .anim-call-bline2 { animation: call-bubble-line2 7s ease-out infinite; }
+  .anim-call-bline3 { animation: call-bubble-line3 7s ease-out infinite; }
+  .anim-call-morph-doc { animation: call-morph-doc 7s ease-out infinite; transform-origin: 200px 80px; }
   .anim-call-line1 { animation: call-doc-line1 7s ease-out infinite; }
   .anim-call-line2 { animation: call-doc-line2 7s ease-out infinite; }
   .anim-call-line3 { animation: call-doc-line3 7s ease-out infinite; }
@@ -388,7 +370,7 @@
   .anim-spec-check3 { animation: spec-check3 8s ease infinite; }
   .anim-spec-check4 { animation: spec-check4 8s ease infinite; }
 
-  /* BUILD: terminal with code lines, blocker, phone, resume */
+  /* BUILD: terminal → blocked → person-on-phone + clarification → resume */
   @keyframes build-line1 { 0%, 3% { opacity: 0; } 6% { opacity: 1; } 100% { opacity: 1; } }
   @keyframes build-line2 { 0%, 8% { opacity: 0; } 11% { opacity: 1; } 100% { opacity: 1; } }
   @keyframes build-line3 { 0%, 13% { opacity: 0; } 16% { opacity: 1; } 100% { opacity: 1; } }
@@ -402,61 +384,76 @@
   @keyframes build-err-flash {
     0%, 28% { fill: transparent; }
     31% { fill: rgba(224,64,64,0.12); }
-    60% { fill: rgba(224,64,64,0.12); }
-    63% { fill: transparent; }
+    62% { fill: rgba(224,64,64,0.12); }
+    65% { fill: transparent; }
     100% { fill: transparent; }
   }
-  @keyframes build-blocked-badge {
-    0%, 33% { opacity: 0; transform: translateY(4px); }
-    36% { opacity: 1; transform: translateY(0); }
-    58% { opacity: 1; transform: translateY(0); }
-    61% { opacity: 0; transform: translateY(-4px); }
+  /* Terminal slides left, clarification panel slides in from right */
+  @keyframes build-terminal-shift {
+    0%, 30% { transform: translateX(0); }
+    35% { transform: translateX(-160px); }
+    62% { transform: translateX(-160px); }
+    67% { transform: translateX(0); }
+    100% { transform: translateX(0); }
+  }
+  @keyframes build-clarify-in {
+    0%, 30% { opacity: 0; transform: translateX(80px); }
+    35% { opacity: 1; transform: translateX(0); }
+    62% { opacity: 1; transform: translateX(0); }
+    67% { opacity: 0; transform: translateX(80px); }
     100% { opacity: 0; }
   }
-  @keyframes build-phone-ring {
-    0%, 36% { opacity: 0; }
-    39% { opacity: 1; }
-    42% { transform: rotate(-6deg); }
-    44% { transform: rotate(6deg); }
-    46% { transform: rotate(-4deg); }
-    48% { transform: rotate(0deg); }
-    56% { opacity: 1; }
-    59% { opacity: 0; }
+  /* Person on phone appears during clarification */
+  @keyframes build-person {
+    0%, 32% { opacity: 0; }
+    36% { opacity: 1; }
+    60% { opacity: 1; }
+    65% { opacity: 0; }
     100% { opacity: 0; }
   }
-  @keyframes build-answer {
-    0%, 50% { opacity: 0; }
-    53% { opacity: 1; }
-    58% { opacity: 1; }
-    61% { opacity: 0; }
+  /* Requirement list: item struck through in red, new item added in green */
+  @keyframes build-req-strike {
+    0%, 38% { opacity: 0; }
+    42% { opacity: 1; }
+    60% { opacity: 1; }
+    65% { opacity: 0; }
+    100% { opacity: 0; }
+  }
+  @keyframes build-req-add {
+    0%, 46% { opacity: 0; transform: translateY(4px); }
+    50% { opacity: 1; transform: translateY(0); }
+    60% { opacity: 1; }
+    65% { opacity: 0; }
     100% { opacity: 0; }
   }
   @keyframes build-fix-line {
-    0%, 61% { opacity: 0; }
-    64% { opacity: 1; fill: #1d6e54; }
-    100% { opacity: 1; fill: #1d6e54; }
+    0%, 67% { opacity: 0; }
+    70% { opacity: 1; }
+    100% { opacity: 1; }
   }
-  @keyframes build-line7 { 0%, 66% { opacity: 0; } 69% { opacity: 1; } 100% { opacity: 1; } }
-  @keyframes build-line8 { 0%, 71% { opacity: 0; } 74% { opacity: 1; } 100% { opacity: 1; } }
-  @keyframes build-line9 { 0%, 76% { opacity: 0; } 79% { opacity: 1; } 100% { opacity: 1; } }
+  @keyframes build-line7 { 0%, 72% { opacity: 0; } 75% { opacity: 1; } 100% { opacity: 1; } }
+  @keyframes build-line8 { 0%, 77% { opacity: 0; } 80% { opacity: 1; } 100% { opacity: 1; } }
+  @keyframes build-line9 { 0%, 82% { opacity: 0; } 85% { opacity: 1; } 100% { opacity: 1; } }
   @keyframes build-cursor-blink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
   }
-  .anim-build-l1 { animation: build-line1 10s ease infinite; }
-  .anim-build-l2 { animation: build-line2 10s ease infinite; }
-  .anim-build-l3 { animation: build-line3 10s ease infinite; }
-  .anim-build-l4 { animation: build-line4 10s ease infinite; }
-  .anim-build-l5 { animation: build-line5 10s ease infinite; }
-  .anim-build-err { animation: build-err-line 10s ease infinite; }
-  .anim-build-err-bg { animation: build-err-flash 10s ease infinite; }
-  .anim-build-blocked { animation: build-blocked-badge 10s ease infinite; }
-  .anim-build-phone { animation: build-phone-ring 10s ease-in-out infinite; transform-origin: center; }
-  .anim-build-answer { animation: build-answer 10s ease infinite; }
-  .anim-build-fix { animation: build-fix-line 10s ease infinite; }
-  .anim-build-l7 { animation: build-line7 10s ease infinite; }
-  .anim-build-l8 { animation: build-line8 10s ease infinite; }
-  .anim-build-l9 { animation: build-line9 10s ease infinite; }
+  .anim-build-l1 { animation: build-line1 12s ease infinite; }
+  .anim-build-l2 { animation: build-line2 12s ease infinite; }
+  .anim-build-l3 { animation: build-line3 12s ease infinite; }
+  .anim-build-l4 { animation: build-line4 12s ease infinite; }
+  .anim-build-l5 { animation: build-line5 12s ease infinite; }
+  .anim-build-err { animation: build-err-line 12s ease infinite; }
+  .anim-build-err-bg { animation: build-err-flash 12s ease infinite; }
+  .anim-build-terminal { animation: build-terminal-shift 12s ease infinite; }
+  .anim-build-clarify { animation: build-clarify-in 12s ease infinite; }
+  .anim-build-person { animation: build-person 12s ease infinite; }
+  .anim-build-strike { animation: build-req-strike 12s ease infinite; }
+  .anim-build-add { animation: build-req-add 12s ease infinite; }
+  .anim-build-fix { animation: build-fix-line 12s ease infinite; }
+  .anim-build-l7 { animation: build-line7 12s ease infinite; }
+  .anim-build-l8 { animation: build-line8 12s ease infinite; }
+  .anim-build-l9 { animation: build-line9 12s ease infinite; }
   .anim-build-cursor { animation: build-cursor-blink 0.8s step-end infinite; }
 
   /* VERIFY: split view — checklist left, screenshots right */
@@ -818,40 +815,49 @@
 
     <div class="ledger" aria-label="Pipeline phases">
       <div class="ledger-row gate"><span class="phase">CALL</span><span class="what"><strong>You describe the feature.</strong> A short voice call captures intent; the system asks only the questions that change the design.
-        <svg class="step-anim" viewBox="0 0 260 150" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <!-- Pulsing dial ring -->
-          <circle class="anim-call-dial" cx="130" cy="75" r="36" fill="none" stroke="#d4581f" stroke-width="3"/>
-          <!-- Sound arcs radiating outward -->
-          <path class="anim-call-arc1" d="M 175 45 A 55 55 0 0 1 175 105" fill="none" stroke="#d4581f" stroke-width="2" stroke-linecap="round"/>
-          <path class="anim-call-arc2" d="M 190 35 A 72 72 0 0 1 190 115" fill="none" stroke="#d4581f" stroke-width="1.5" stroke-linecap="round"/>
-          <path class="anim-call-arc3" d="M 205 25 A 90 90 0 0 1 205 125" fill="none" stroke="#d4581f" stroke-width="1" stroke-linecap="round"/>
-          <path class="anim-call-arc1" d="M 85 105 A 55 55 0 0 1 85 45" fill="none" stroke="#d4581f" stroke-width="2" stroke-linecap="round"/>
-          <path class="anim-call-arc2" d="M 70 115 A 72 72 0 0 1 70 35" fill="none" stroke="#d4581f" stroke-width="1.5" stroke-linecap="round"/>
-          <path class="anim-call-arc3" d="M 55 125 A 90 90 0 0 1 55 25" fill="none" stroke="#d4581f" stroke-width="1" stroke-linecap="round"/>
-          <!-- Person on phone inside ring (fades out) -->
+        <svg class="step-anim" viewBox="0 0 360 150" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <!-- Person on phone (left side, large) -->
           <g class="anim-call-person">
             <!-- Head -->
-            <circle cx="130" cy="62" r="10" fill="#d4581f" opacity="0.2" stroke="#d4581f" stroke-width="1.5"/>
+            <circle cx="80" cy="50" r="18" fill="#d4581f" opacity="0.12" stroke="#d4581f" stroke-width="1.8"/>
             <!-- Body/shoulders -->
-            <path d="M 112 100 Q 112 85 130 82 Q 148 85 148 100" fill="#d4581f" opacity="0.15" stroke="#d4581f" stroke-width="1.5" stroke-linecap="round"/>
-            <!-- Phone held to ear -->
-            <rect x="140" y="54" width="8" height="16" rx="2.5" fill="#d4581f" opacity="0.7"/>
+            <path d="M 50 105 Q 50 82 80 78 Q 110 82 110 105" fill="#d4581f" opacity="0.08" stroke="#d4581f" stroke-width="1.8" stroke-linecap="round"/>
+            <!-- Phone held to ear (bigger) -->
+            <rect x="97" y="38" width="12" height="24" rx="3.5" fill="#d4581f" opacity="0.6" stroke="#d4581f" stroke-width="1"/>
             <!-- Small sound waves from phone -->
-            <path d="M 152 58 Q 156 62 152 66" fill="none" stroke="#d4581f" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
-            <path d="M 155 55 Q 161 62 155 69" fill="none" stroke="#d4581f" stroke-width="0.8" stroke-linecap="round" opacity="0.3"/>
+            <path d="M 113 44 Q 118 50 113 56" fill="none" stroke="#d4581f" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+            <path d="M 117 40 Q 124 50 117 60" fill="none" stroke="#d4581f" stroke-width="1" stroke-linecap="round" opacity="0.25"/>
           </g>
-          <!-- Document that morphs in (replaces ring) -->
-          <g class="anim-call-morph-doc">
-            <rect x="100" y="42" width="60" height="72" rx="4" fill="white" stroke="#38566c" stroke-width="1.8"/>
+
+          <!-- Speech bubble (appears with text lines) -->
+          <g class="anim-call-bubble" opacity="0">
+            <rect x="135" y="18" width="140" height="70" rx="8" fill="white" stroke="#ccd5cf" stroke-width="1.5"/>
+            <!-- Bubble tail pointing to person -->
+            <polygon points="135,50 122,55 135,60" fill="white" stroke="#ccd5cf" stroke-width="1.5" stroke-linejoin="round"/>
+            <rect x="134" y="51" width="4" height="8" fill="white"/>
+            <!-- Text lines inside bubble -->
+            <rect class="anim-call-bline1" x="148" y="32" width="100" height="4" rx="2" fill="#38566c" opacity="0"/>
+            <rect class="anim-call-bline2" x="148" y="44" width="80" height="4" rx="2" fill="#ccd5cf" opacity="0"/>
+            <rect class="anim-call-bline3" x="148" y="56" width="110" height="4" rx="2" fill="#ccd5cf" opacity="0"/>
+            <text x="148" y="76" font-family="'IBM Plex Mono', monospace" font-size="6" fill="#7c8a90" opacity="0.6">capturing intent...</text>
+          </g>
+
+          <!-- Document that morphs in (replaces person + bubble) -->
+          <g class="anim-call-morph-doc" opacity="0">
+            <rect x="120" y="16" width="90" height="110" rx="5" fill="white" stroke="#38566c" stroke-width="1.8"/>
             <!-- Corner fold -->
-            <path d="M 148 42 L 160 42 L 160 54 Z" fill="#e9ede8" stroke="#38566c" stroke-width="0.8"/>
-            <!-- Text lines fade in sequentially -->
-            <rect class="anim-call-line1" x="110" y="56" width="40" height="3.5" rx="1.5" fill="#38566c" opacity="0"/>
-            <rect class="anim-call-line2" x="110" y="65" width="34" height="3.5" rx="1.5" fill="#ccd5cf" opacity="0"/>
-            <rect class="anim-call-line3" x="110" y="74" width="38" height="3.5" rx="1.5" fill="#ccd5cf" opacity="0"/>
-            <rect class="anim-call-line4" x="110" y="83" width="28" height="3.5" rx="1.5" fill="#ccd5cf" opacity="0"/>
-            <!-- Checkmark on document -->
-            <text class="anim-call-line4" x="146" y="106" font-size="14" fill="#1d6e54" opacity="0">&#10003;</text>
+            <path d="M 192 16 L 210 16 L 210 34 Z" fill="#e9ede8" stroke="#38566c" stroke-width="0.8"/>
+            <!-- Document title bar -->
+            <rect class="anim-call-line1" x="134" y="30" width="60" height="5" rx="2" fill="#38566c" opacity="0"/>
+            <line class="anim-call-line1" x1="134" y1="42" x2="196" y2="42" stroke="#ccd5cf" stroke-width="0.8" opacity="0"/>
+            <!-- Text lines -->
+            <rect class="anim-call-line2" x="134" y="50" width="55" height="4" rx="1.5" fill="#ccd5cf" opacity="0"/>
+            <rect class="anim-call-line2" x="134" y="60" width="45" height="4" rx="1.5" fill="#ccd5cf" opacity="0"/>
+            <rect class="anim-call-line3" x="134" y="70" width="58" height="4" rx="1.5" fill="#ccd5cf" opacity="0"/>
+            <rect class="anim-call-line3" x="134" y="80" width="40" height="4" rx="1.5" fill="#ccd5cf" opacity="0"/>
+            <rect class="anim-call-line4" x="134" y="90" width="50" height="4" rx="1.5" fill="#ccd5cf" opacity="0"/>
+            <!-- Checkmark -->
+            <text class="anim-call-line4" x="192" y="116" font-size="16" fill="#1d6e54" opacity="0">&#10003;</text>
           </g>
         </svg>
       </span></div>
@@ -882,87 +888,121 @@
       </span></div>
 
       <div class="ledger-row"><span class="phase">BUILD</span><span class="what">A multi-agent build implements against the approved spec. <strong>You hear nothing unless it is blocked</strong> — and then it calls, gets its answer, and continues.
-        <svg class="step-anim" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <!-- Terminal window -->
-          <rect x="20" y="8" width="300" height="184" rx="6" fill="#1a2330" stroke="#38566c" stroke-width="1.2"/>
-          <!-- Title bar -->
-          <rect x="20" y="8" width="300" height="18" rx="6" fill="#2a3a4a"/>
-          <rect x="20" y="20" width="300" height="6" fill="#2a3a4a"/>
-          <circle cx="34" cy="17" r="3.5" fill="#e04040" opacity="0.7"/>
-          <circle cx="46" cy="17" r="3.5" fill="#e0a030" opacity="0.7"/>
-          <circle cx="58" cy="17" r="3.5" fill="#40a840" opacity="0.7"/>
-          <text x="170" y="19" font-family="'IBM Plex Mono', monospace" font-size="7" fill="#7c8a90" text-anchor="middle">BUILD PIPELINE</text>
-          <!-- Code lines (green, streaming in) -->
-          <g class="anim-build-l1" opacity="0">
-            <text x="30" y="42" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#7c8a90">$</text>
-            <rect x="42" y="35" width="85" height="3" rx="1" fill="#3d8c5c"/>
-            <rect x="42" y="41" width="55" height="3" rx="1" fill="#5a9e72"/>
+        <svg class="step-anim" viewBox="0 0 480 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <clipPath id="build-clip"><rect x="0" y="0" width="480" height="200"/></clipPath>
+          <g clip-path="url(#build-clip)">
+
+          <!-- Terminal group (slides left when blocked) -->
+          <g class="anim-build-terminal">
+            <rect x="20" y="8" width="300" height="184" rx="6" fill="#1a2330" stroke="#38566c" stroke-width="1.2"/>
+            <!-- Title bar -->
+            <rect x="20" y="8" width="300" height="18" rx="6" fill="#2a3a4a"/>
+            <rect x="20" y="20" width="300" height="6" fill="#2a3a4a"/>
+            <circle cx="34" cy="17" r="3.5" fill="#e04040" opacity="0.7"/>
+            <circle cx="46" cy="17" r="3.5" fill="#e0a030" opacity="0.7"/>
+            <circle cx="58" cy="17" r="3.5" fill="#40a840" opacity="0.7"/>
+            <text x="170" y="19" font-family="'IBM Plex Mono', monospace" font-size="7" fill="#7c8a90" text-anchor="middle">BUILD PIPELINE</text>
+            <!-- Code lines -->
+            <g class="anim-build-l1" opacity="0">
+              <text x="30" y="42" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#7c8a90">$</text>
+              <rect x="42" y="35" width="85" height="3" rx="1" fill="#3d8c5c"/>
+              <rect x="42" y="41" width="55" height="3" rx="1" fill="#5a9e72"/>
+            </g>
+            <g class="anim-build-l2" opacity="0">
+              <text x="30" y="58" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#7c8a90">$</text>
+              <rect x="42" y="51" width="110" height="3" rx="1" fill="#3d8c5c"/>
+              <rect x="42" y="57" width="70" height="3" rx="1" fill="#5a9e72"/>
+            </g>
+            <g class="anim-build-l3" opacity="0">
+              <text x="30" y="74" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#7c8a90">$</text>
+              <rect x="42" y="67" width="95" height="3" rx="1" fill="#3d8c5c"/>
+              <rect x="42" y="73" width="60" height="3" rx="1" fill="#5a9e72"/>
+            </g>
+            <g class="anim-build-l4" opacity="0">
+              <text x="30" y="90" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#7c8a90">$</text>
+              <rect x="42" y="83" width="80" height="3" rx="1" fill="#3d8c5c"/>
+              <rect x="42" y="89" width="100" height="3" rx="1" fill="#5a9e72"/>
+            </g>
+            <g class="anim-build-l5" opacity="0">
+              <text x="30" y="106" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#7c8a90">$</text>
+              <rect x="42" y="99" width="120" height="3" rx="1" fill="#3d8c5c"/>
+              <rect x="42" y="105" width="65" height="3" rx="1" fill="#5a9e72"/>
+            </g>
+            <!-- Error line -->
+            <rect class="anim-build-err-bg" x="24" y="113" width="292" height="18" rx="2" fill="transparent"/>
+            <g class="anim-build-err" opacity="0">
+              <text x="30" y="126" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#e04040">!</text>
+              <rect x="42" y="119" width="130" height="3" rx="1" fill="#e04040"/>
+              <rect x="42" y="125" width="80" height="3" rx="1" fill="#e04040" opacity="0.6"/>
+            </g>
+            <!-- Fixed line (green, replaces red after clarification) -->
+            <g class="anim-build-fix" opacity="0">
+              <text x="30" y="126" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#1d6e54">&#10003;</text>
+              <rect x="42" y="119" width="130" height="3" rx="1" fill="#1d6e54"/>
+              <rect x="42" y="125" width="80" height="3" rx="1" fill="#1d6e54" opacity="0.6"/>
+            </g>
+            <!-- Resumed lines -->
+            <g class="anim-build-l7" opacity="0">
+              <text x="30" y="142" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#7c8a90">$</text>
+              <rect x="42" y="135" width="90" height="3" rx="1" fill="#3d8c5c"/>
+              <rect x="42" y="141" width="75" height="3" rx="1" fill="#5a9e72"/>
+            </g>
+            <g class="anim-build-l8" opacity="0">
+              <text x="30" y="158" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#7c8a90">$</text>
+              <rect x="42" y="151" width="105" height="3" rx="1" fill="#3d8c5c"/>
+              <rect x="42" y="157" width="68" height="3" rx="1" fill="#5a9e72"/>
+            </g>
+            <g class="anim-build-l9" opacity="0">
+              <text x="30" y="174" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#7c8a90">$</text>
+              <rect x="42" y="167" width="115" height="3" rx="1" fill="#3d8c5c"/>
+              <rect x="42" y="173" width="50" height="3" rx="1" fill="#5a9e72"/>
+            </g>
+            <!-- Blinking cursor -->
+            <rect class="anim-build-cursor" x="42" y="180" width="7" height="2" rx="0.5" fill="#3d8c5c"/>
           </g>
-          <g class="anim-build-l2" opacity="0">
-            <text x="30" y="58" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#7c8a90">$</text>
-            <rect x="42" y="51" width="110" height="3" rx="1" fill="#3d8c5c"/>
-            <rect x="42" y="57" width="70" height="3" rx="1" fill="#5a9e72"/>
+
+          <!-- Clarification panel (slides in from right when blocked) -->
+          <g class="anim-build-clarify" opacity="0">
+            <rect x="330" y="8" width="140" height="184" rx="6" fill="#fbfcfa" stroke="#ccd5cf" stroke-width="1.2"/>
+            <!-- Panel header -->
+            <text x="400" y="28" font-family="'IBM Plex Mono', monospace" font-size="7.5" fill="#38566c" text-anchor="middle" font-weight="600">REQUIREMENT CLARIFICATION</text>
+            <line x1="340" y1="35" x2="460" y2="35" stroke="#ccd5cf" stroke-width="0.8"/>
+
+            <!-- Person on phone -->
+            <g class="anim-build-person">
+              <circle cx="400" cy="56" r="10" fill="#d4581f" opacity="0.15" stroke="#d4581f" stroke-width="1.2"/>
+              <path d="M 385 82 Q 385 70 400 68 Q 415 70 415 82" fill="#d4581f" opacity="0.1" stroke="#d4581f" stroke-width="1.2" stroke-linecap="round"/>
+              <rect x="410" y="49" width="6" height="13" rx="2" fill="#d4581f" opacity="0.6"/>
+              <path d="M 419 52 Q 422 56 419 60" fill="none" stroke="#d4581f" stroke-width="0.8" stroke-linecap="round" opacity="0.4"/>
+            </g>
+
+            <!-- Requirement list -->
+            <text x="345" y="102" font-family="'IBM Plex Mono', monospace" font-size="6.5" fill="#7c8a90">REQUIREMENTS</text>
+            <!-- Existing item 1 (stays) -->
+            <rect x="345" y="108" width="110" height="14" rx="2" fill="#e9ede8"/>
+            <text x="351" y="118" font-family="'IBM Plex Mono', monospace" font-size="6.5" fill="#44525c">Credit on payment</text>
+
+            <!-- Removed item (red strikethrough) -->
+            <g class="anim-build-strike" opacity="0">
+              <rect x="345" y="126" width="110" height="14" rx="2" fill="rgba(224,64,64,0.08)"/>
+              <text x="351" y="136" font-family="'IBM Plex Mono', monospace" font-size="6.5" fill="#e04040" text-decoration="line-through">Auto-apply credits</text>
+              <line x1="351" y1="134" x2="435" y2="134" stroke="#e04040" stroke-width="0.8"/>
+              <text x="447" y="136" font-family="'IBM Plex Mono', monospace" font-size="7" fill="#e04040">&#10005;</text>
+            </g>
+
+            <!-- Added item (green) -->
+            <g class="anim-build-add" opacity="0">
+              <rect x="345" y="144" width="110" height="14" rx="2" fill="rgba(29,110,84,0.08)"/>
+              <text x="351" y="154" font-family="'IBM Plex Mono', monospace" font-size="6.5" fill="#1d6e54">On first payment only</text>
+              <text x="447" y="154" font-family="'IBM Plex Mono', monospace" font-size="7" fill="#1d6e54">+</text>
+            </g>
+
+            <!-- Existing item 2 (stays) -->
+            <rect x="345" y="162" width="110" height="14" rx="2" fill="#e9ede8"/>
+            <text x="351" y="172" font-family="'IBM Plex Mono', monospace" font-size="6.5" fill="#44525c">Team leaderboard</text>
           </g>
-          <g class="anim-build-l3" opacity="0">
-            <text x="30" y="74" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#7c8a90">$</text>
-            <rect x="42" y="67" width="95" height="3" rx="1" fill="#3d8c5c"/>
-            <rect x="42" y="73" width="60" height="3" rx="1" fill="#5a9e72"/>
+
           </g>
-          <g class="anim-build-l4" opacity="0">
-            <text x="30" y="90" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#7c8a90">$</text>
-            <rect x="42" y="83" width="80" height="3" rx="1" fill="#3d8c5c"/>
-            <rect x="42" y="89" width="100" height="3" rx="1" fill="#5a9e72"/>
-          </g>
-          <g class="anim-build-l5" opacity="0">
-            <text x="30" y="106" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#7c8a90">$</text>
-            <rect x="42" y="99" width="120" height="3" rx="1" fill="#3d8c5c"/>
-            <rect x="42" y="105" width="65" height="3" rx="1" fill="#5a9e72"/>
-          </g>
-          <!-- Error line (turns red) -->
-          <rect class="anim-build-err-bg" x="24" y="113" width="292" height="18" rx="2" fill="transparent"/>
-          <g class="anim-build-err" opacity="0">
-            <text x="30" y="126" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#e04040">!</text>
-            <rect x="42" y="119" width="130" height="3" rx="1" fill="#e04040"/>
-            <rect x="42" y="125" width="80" height="3" rx="1" fill="#e04040" opacity="0.6"/>
-          </g>
-          <!-- BLOCKED badge -->
-          <g class="anim-build-blocked" opacity="0">
-            <rect x="200" y="115" width="70" height="16" rx="3" fill="#e04040"/>
-            <text x="235" y="126" font-family="'IBM Plex Mono', monospace" font-size="7.5" fill="white" text-anchor="middle" font-weight="600">BLOCKED</text>
-          </g>
-          <!-- Phone ringing icon -->
-          <g class="anim-build-phone" opacity="0">
-            <rect x="280" y="113" width="26" height="18" rx="3" fill="#d4581f" opacity="0.15" stroke="#d4581f" stroke-width="1"/>
-            <text x="293" y="126" font-size="10" text-anchor="middle" fill="#d4581f">&#9742;</text>
-          </g>
-          <!-- Answer line -->
-          <g class="anim-build-answer" opacity="0">
-            <text x="200" y="126" font-family="'IBM Plex Mono', monospace" font-size="7" fill="#ccd5cf">answer received</text>
-          </g>
-          <!-- Fixed line (green, replaces red) -->
-          <g class="anim-build-fix" opacity="0">
-            <text x="30" y="126" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#1d6e54">&#10003;</text>
-            <rect x="42" y="119" width="130" height="3" rx="1" fill="#1d6e54"/>
-            <rect x="42" y="125" width="80" height="3" rx="1" fill="#1d6e54" opacity="0.6"/>
-          </g>
-          <!-- Resumed lines -->
-          <g class="anim-build-l7" opacity="0">
-            <text x="30" y="142" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#7c8a90">$</text>
-            <rect x="42" y="135" width="90" height="3" rx="1" fill="#3d8c5c"/>
-            <rect x="42" y="141" width="75" height="3" rx="1" fill="#5a9e72"/>
-          </g>
-          <g class="anim-build-l8" opacity="0">
-            <text x="30" y="158" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#7c8a90">$</text>
-            <rect x="42" y="151" width="105" height="3" rx="1" fill="#3d8c5c"/>
-            <rect x="42" y="157" width="68" height="3" rx="1" fill="#5a9e72"/>
-          </g>
-          <g class="anim-build-l9" opacity="0">
-            <text x="30" y="174" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#7c8a90">$</text>
-            <rect x="42" y="167" width="115" height="3" rx="1" fill="#3d8c5c"/>
-            <rect x="42" y="173" width="50" height="3" rx="1" fill="#5a9e72"/>
-          </g>
-          <!-- Blinking cursor -->
-          <rect class="anim-build-cursor" x="42" y="180" width="7" height="2" rx="0.5" fill="#3d8c5c"/>
         </svg>
       </span></div>
 

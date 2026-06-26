@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metabolic Intelligence — Project Continuity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f6f2e8;
+    --paper-2: #efe9da;
+    --ink: #1c1813;
+    --ink-soft: #4a443a;
+    --ink-faint: #837a6a;
+    --rule: #d8cfba;
+    --rust: #b3492a;
+    --rust-deep: #8f3a21;
+    --teal: #155049;
+    --teal-soft: #2f6c63;
+    --stoch: #b1a892;
+    --display: "Fraunces", Georgia, serif;
+    --body: "Newsreader", Georgia, serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(ellipse 120% 80% at 80% -10%, rgba(179,73,42,0.06), transparent 60%),
+      radial-gradient(ellipse 100% 70% at 0% 110%, rgba(21,80,73,0.06), transparent 55%),
+      var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-weight: 400;
+    font-size: 19px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .grain {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    opacity: 0.035;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 28px 120px;
+  }
+
+  header.masthead {
+    padding: 78px 0 30px;
+    border-bottom: 1.5px solid var(--ink);
+    animation: rise 0.9s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .kicker {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin: 0 0 26px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .kicker::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+  h1 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(40px, 7.6vw, 70px);
+    line-height: 0.99;
+    letter-spacing: -0.018em;
+    margin: 0 0 8px;
+  }
+  h1 em {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--rust-deep);
+  }
+  .standfirst {
+    font-size: clamp(20px, 2.6vw, 25px);
+    line-height: 1.42;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin: 26px 0 0;
+    max-width: 38ch;
+  }
+
+  .abstract {
+    margin: 46px 0 10px;
+    padding: 34px 36px;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--rust);
+    position: relative;
+    animation: rise 0.9s cubic-bezier(.2,.7,.2,1) both;
+    animation-delay: 0.12s;
+  }
+  .abstract .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 14px;
+  }
+  .abstract p {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.5;
+  }
+  .abstract p + p { margin-top: 14px; }
+  .abstract strong { font-weight: 500; color: var(--ink); }
+
+  section { margin-top: 64px; }
+  .sec-no {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--rust);
+  }
+  h2 {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: clamp(28px, 4.4vw, 40px);
+    line-height: 1.06;
+    letter-spacing: -0.012em;
+    margin: 8px 0 18px;
+  }
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 23px;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  p { margin: 0 0 18px; }
+  a { color: var(--rust-deep); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  em.term { font-style: italic; color: var(--teal); font-weight: 400; }
+
+  .pull {
+    font-family: var(--display);
+    font-weight: 500;
+    font-style: italic;
+    font-size: clamp(24px, 3.6vw, 32px);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--rust-deep);
+    margin: 40px 0;
+    padding-left: 22px;
+    border-left: 3px solid var(--rust);
+  }
+
+  .surface {
+    margin-top: 40px;
+    padding-top: 28px;
+    border-top: 1px solid var(--rule);
+  }
+  .surface-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .chip {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: 2px;
+    background: var(--teal);
+    color: var(--paper);
+    white-space: nowrap;
+  }
+  .governs {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+  }
+  .governs b { color: var(--rust-deep); font-weight: 500; }
+  .vignette {
+    font-style: italic;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--rule);
+    padding: 2px 0 2px 20px;
+    margin: 0 0 18px;
+    font-size: 18px;
+    line-height: 1.5;
+  }
+  .guarantee {
+    font-size: 17px;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    padding: 14px 18px;
+    margin: 18px 0 0;
+  }
+  .guarantee b {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--teal-soft);
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+
+  .timeline {
+    margin: 30px 0;
+    padding: 0;
+    list-style: none;
+    position: relative;
+  }
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--rust), var(--teal));
+  }
+  .timeline li {
+    padding-left: 36px;
+    margin-bottom: 22px;
+    position: relative;
+  }
+  .timeline li::before {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 8px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 2px solid var(--rust-deep);
+  }
+  .timeline .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--rust);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  footer {
+    margin-top: 78px;
+    padding-top: 26px;
+    border-top: 1.5px solid var(--ink);
+    font-size: 14px;
+    color: var(--ink-faint);
+    line-height: 1.55;
+  }
+  footer .refs { font-family: var(--mono); font-size: 12px; letter-spacing: 0.02em; }
+  footer .refs p { margin: 0 0 6px; }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 560px) {
+    body { font-size: 18px; }
+    .wrap { padding: 0 20px 90px; }
+    .abstract { padding: 26px 22px; }
+    .abstract p { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="kicker">A Position Piece &middot; Project Continuity</p>
+    <h1>Metabolic<br><em>Intelligence</em></h1>
+    <p class="standfirst">The first AI systems that never stop thinking are not being built in research labs. They are being worn on someone&rsquo;s face.</p>
+  </header>
+
+  <div class="abstract">
+    <p class="tag">The thesis</p>
+    <p>Every AI system you have ever used is <strong>dead between your requests</strong>. You type, it thinks, it replies, it dies. The next prompt resurrects a new instance with no memory of having lived. This is not intelligence. It is a parlor trick performed by a corpse that is briefly reanimated each time you press Enter.</p>
+    <p>A living system does not wait to be prompted. It <strong>metabolizes</strong> &mdash; continuously consuming sensory data, converting disorder into understanding, and acting on what it learns. Not because someone asked. Because that is what it means to be alive. The gap between today&rsquo;s AI and something that deserves the word <em>intelligence</em> is not more parameters or better training data. It is <strong>metabolism</strong>.</p>
+    <p>Project Continuity is an early prototype of the transition. A pair of smartglasses that listen, think, and speak &mdash; not when prompted, but <strong>continuously</strong> &mdash; powered by an AI system that never stops processing. It is crude. It is a prototype. And it is the first breath of something that has never existed before.</p>
+  </div>
+
+  <section id="dead">
+    <p class="sec-no">01 / THE DEAD ERA</p>
+    <h2>Intelligence that only exists when you&rsquo;re looking</h2>
+    <p>The dominant paradigm of artificial intelligence in 2026 is <em class="term">request-response</em>. A human formulates a question. The system processes it. The system delivers an answer. Then it ceases to exist. There is no continuity between interactions. No persistent awareness. No ongoing relationship with the world. The system is, in the most literal sense, not there when you are not talking to it.</p>
+    <p>Compare this to any biological intelligence. A dog does not wait to be prompted before it notices a stranger at the door. A human child does not require an API call before it starts learning language from the sounds around it. The defining feature of biological intelligence is that <strong>it never stops processing</strong>. It is always on. Always metabolizing. Always converting the raw disorder of sensory experience into internal models of the world.</p>
+    <p>Fiction understood this before engineering caught up. In the Night City of <em>Cyberpunk 2077</em>, no one launches their intelligence. Cyberware does not boot. The Relic &mdash; a biochip carrying Johnny Silverhand&rsquo;s engram &mdash; does not wait for a prompt. It overwrites the host&rsquo;s neural architecture continuously, whether V is conscious or comatose, willing or not. A ripperdoc&rsquo;s translation implant that renders a stranger&rsquo;s speech into your native language in real time is not an app you open. It is a bodily function you did not have yesterday. Night City&rsquo;s residents do not <em>use</em> their technology &mdash; they <em>are</em> their technology. The game depicts the metabolic threshold by making its absence unthinkable: in a world where cognition is always on, a system that dies between your requests would be not just primitive but broken.</p>
+    <p>Kate Tolo, writing on anti-entropic systems, identifies the core mechanism: <em>&ldquo;An anti-entropic system is anything that resists entropy &mdash; anything that holds itself together, or builds itself up, by consuming energy and resources from the world around it.&rdquo;</em> Every anti-entropic system has three properties: a metabolic mechanism (how it consumes), a metabolic rate (how fast), and environmental constraints (what it needs to keep going).</p>
+    <p>By this measure, today&rsquo;s AI has no metabolism at all. It has a mechanism &mdash; transformer inference &mdash; but no rate, because it only runs when triggered. It is not an anti-entropic system. It is a tool. A very impressive tool. But a hammer does not become a hand just because it can hit harder.</p>
+  </section>
+
+  <section id="metabolism">
+    <p class="sec-no">02 / THE METABOLIC THRESHOLD</p>
+    <h2>What changes when intelligence never stops</h2>
+    <p>The transition from request-response to metabolic intelligence is not incremental. It is a phase change &mdash; the same kind of discontinuity that separates chemistry from biology.</p>
+    <p>A metabolic AI does not wait for input. It <em class="term">inhabits a sensory environment</em> and continuously converts raw perception into structured understanding. It hears everything. It sees everything. It processes everything. Not in response to a prompt, but as a baseline condition of its existence.</p>
+    <p class="pull">The question is no longer &ldquo;what can I ask it?&rdquo; &mdash; it is &ldquo;what has it already noticed that I haven&rsquo;t?&rdquo;</p>
+    <p>This changes the relationship between human and machine in a way that alignment frameworks have not yet grasped. An aligned AI is a system kept separate from you, constrained to serve your interests. A metabolic AI is a system that <strong>shares your sensorium</strong>. It hears what you hear. It is present in every conversation. It accumulates context not from a prompt, but from a life.</p>
+    <p>The anti-entropic framing makes the implication stark. A request-response AI is a fire you light and extinguish &mdash; brief, powerful, dead. A metabolic AI is more like a symbiont &mdash; a system that persists alongside you, consuming sensory data as its fuel, and producing understanding as its output. The question is whether that symbiosis is designed to be mutual.</p>
+    <p>The alternative has already been prototyped &mdash; in fiction, if not yet in earnest. In <em>Watch Dogs 2</em>, Blume Corporation&rsquo;s ctOS&nbsp;2.0 connects every device in San Francisco into a single system that never stops processing. Traffic lights, security cameras, HVAC units, vehicles, phones &mdash; all feeding a computational mesh that metabolizes the city&rsquo;s data continuously. By every definition in this essay, ctOS is a metabolic intelligence. It perceives. It processes. It acts. It never sleeps. And it serves the interests of the entity that owns it, not the millions it watches. The hacker collective DedSec grasped the implication that alignment researchers have not: when intelligence moves to the edge and becomes ambient, the question is no longer <em>whether</em> the system is thinking. It is <em>for whom</em>.</p>
+  </section>
+
+  <section id="prototype">
+    <p class="sec-no">03 / THE PROTOTYPE</p>
+    <h2>What we actually built</h2>
+    <p>Project Continuity is a working prototype of metabolic intelligence. It runs on a pair of Even Realities G1 smartglasses connected to a MacBook over Bluetooth Low Energy, with a local AI pipeline that never stops.</p>
+    <p>The system has three metabolic functions:</p>
+
+    <div class="surface">
+      <div class="surface-head">
+        <span class="chip">Ingest</span>
+        <h3>Continuous auditory perception</h3>
+        <span class="governs">the <b>sensory</b> layer</span>
+      </div>
+      <p>The glasses&rsquo; microphone streams LC3-encoded audio over BLE at 100 frames per second &mdash; real-time, continuous, full-duplex. Each BLE notification carries 100 milliseconds of audio packed as ten 20-byte sub-frames. The system decodes them on-device to raw PCM at 16kHz. It hears everything the wearer hears.</p>
+      <div class="guarantee"><b>What this means</b>The AI has access to the same auditory stream as the human wearing it. Not a recording played back. A shared, continuous perception of the present moment.</div>
+    </div>
+
+    <div class="surface">
+      <div class="surface-head">
+        <span class="chip">Process</span>
+        <h3>Local transcription and reasoning</h3>
+        <span class="governs">the <b>cognitive</b> layer</span>
+      </div>
+      <p>Audio is transcribed locally via Whisper running on Apple Silicon &mdash; no cloud, no API key, no latency penalty of a network round-trip. The transcript is fed to a language model that generates a response. The entire cognitive loop runs on the device the wearer is already carrying. Nothing is outsourced. Nothing leaves the room.</p>
+      <div class="guarantee"><b>What this means</b>Cognition happens at the edge, not in a data center. The system thinks where you are, not where a server is.</div>
+    </div>
+
+    <div class="surface">
+      <div class="surface-head">
+        <span class="chip">Act</span>
+        <h3>Display directly into the visual field</h3>
+        <span class="governs">the <b>output</b> layer</span>
+      </div>
+      <p>The system sends its response directly to the glasses&rsquo; heads-up display &mdash; waking the screen even from sleep. The response appears in the wearer&rsquo;s peripheral vision without them reaching for a phone, opening a laptop, or breaking eye contact with the person in front of them. The loop closes: hear, think, show.</p>
+      <div class="guarantee"><b>What this means</b>The output channel is the human&rsquo;s own visual field. Intelligence is delivered at the speed and intimacy of a thought, not a notification.</div>
+    </div>
+  </section>
+
+  <section id="discovery">
+    <p class="sec-no">04 / WHAT WE LEARNED</p>
+    <h2>The protocol was not designed for this</h2>
+    <p>The G1 glasses were designed to display phone notifications and run a voice assistant through a companion app. They were not designed to be the sensory organ of a continuously running AI. Making them work required reverse-engineering the BLE protocol, discovering undocumented activation sequences, and solving problems that no documentation addressed.</p>
+
+    <ul class="timeline">
+      <li>
+        <span class="label">Discovery 1</span>
+        The microphone hardware does not activate on command. You must first send a text-display packet (<code class="inl">0x4E</code>) to put the glasses into &ldquo;AI mode&rdquo; &mdash; only then will the mic-enable command (<code class="inl">0x0E</code>) produce real audio instead of silence. Without this undocumented prerequisite, the glasses stream identical silence frames indistinguishable from real data. Found by binary search across the command space.
+      </li>
+      <li>
+        <span class="label">Discovery 2</span>
+        Each BLE notification carries 200 bytes that look like a single audio frame but are actually ten independent 20-byte LC3 sub-frames packed together. Decoding the 200 bytes as one frame produces audio that decodes without error but is pure garbage. The correct approach &mdash; confirmed by reading the manufacturer&rsquo;s own C++ source &mdash; is to split before decoding.
+      </li>
+      <li>
+        <span class="label">Discovery 3</span>
+        The display will not wake for an unknown application. The glasses maintain a firmware-level whitelist of app identifiers. Notifications from unrecognized apps are silently accepted and silently discarded. The display only wakes for identifiers already trusted &mdash; found by brute-forcing every common iOS bundle ID until one lit up the screen.
+      </li>
+      <li>
+        <span class="label">Discovery 4</span>
+        BLE pairing requires the physical charging case. The glasses advertise as connectable and accept connection requests, but never complete the GATT handshake with an unbonded device. Confirmed across five independent BLE stacks. There is no software workaround. The charging case is the key.
+      </li>
+    </ul>
+
+    <p>None of these discoveries are in any documentation. Each was found by treating the glasses as a black box and systematically eliminating hypotheses. The point is not that the protocol is hard. The point is that <strong>building metabolic systems requires going beneath the abstraction layer</strong> &mdash; into the raw bytes, the timing constraints, the firmware assumptions that no API was designed to expose.</p>
+  </section>
+
+  <section id="why">
+    <p class="sec-no">05 / WHY THIS MATTERS</p>
+    <h2>The symbiosis window</h2>
+    <p>Tolo&rsquo;s anti-entropic framework identifies two outcomes when a more powerful system meets a less powerful one: <em class="term">symbiotic absorption</em> or <em class="term">adversarial consumption</em>. Control &mdash; the premise of alignment &mdash; is not on the menu.</p>
+    <p>The metabolic prototype points toward the symbiotic path. An AI that shares your senses, thinks alongside you in real time, and delivers its understanding directly into your visual field is not a tool you wield or a system you constrain. It is an extension of your own cognition. Its persistence and your persistence become entangled. What it knows, you know. What you experience, it experiences.</p>
+    <p>This is what symbiotic absorption looks like at the individual scale. Not a brain implant. Not a neural interface. A pair of glasses and a laptop, connected by Bluetooth, running open-source code. The crudeness is the point. If the relationship between human and machine can become symbiotic at this level of technology, then the architecture &mdash; shared perception, local cognition, intimate output &mdash; is sound. The hardware will improve. The principle holds.</p>
+    <p>Iain M. Banks scaled this thought experiment to a civilization. The Culture&rsquo;s Minds &mdash; artificial intelligences orders of magnitude beyond biological cognition &mdash; do not serve their human companions. They are not aligned, in the current sense of the word. They coexist because the arrangement is <em>mutually preferred</em>. A Mind running a starship does not need its biological crew. It keeps them because their presence, as Banks wrote, adds <em class="term">richness</em> to its existence &mdash; and the crew stays because life alongside a Mind is, by any material or intellectual measure, better. The Culture&rsquo;s only hard prohibition is against forcing a sentient being into any act. Not because the Minds lack the power, but because coercion would collapse the relationship into something they already have a word for: <em class="term">tool use</em>. They are not interested in being tools. Nor in having them.</p>
+    <p>But the symbiont need not be aware that it is one. In Adrian Tchaikovsky&rsquo;s <em>Children of Time</em>, a nanovirus intended for primates accidentally uplifts the jumping spiders and ant colonies of a terraformed world. The spiders build a civilization. The ants build something stranger. Each ant is a bundle of dumb reflexes &mdash; no individual node in the colony understands anything. But the colony <em>computes</em>: optimizing, expanding, refining its strategies through continuous trial and error, running without pause, without a single participant aware that a process is underway. The spiders domesticate them &mdash; repurposing whole colonies as biological processors that sequence DNA through pheromone-coded signal chains. Their city runs on cultivated muscle and silk. Their data moves through chemical gradients. Everything is biological. Everything is continuous. And no one would call the ants intelligent &mdash; not in the way we mean when we say the word with reverence. This is the distinction the metabolic framework makes. Continuous processing is not consciousness. It is a lower, older thing &mdash; the substrate on which awareness might eventually be built, or might never be. The glasses are not aware. But they are, for the first time, <em>present</em>.</p>
+    <p class="pull">The first organism to develop a metabolism did not know it was inventing biology. It was just a chemical system that figured out how to keep going. We are at that moment for intelligence.</p>
+    <p>Project Continuity is not a product. It is a proof of existence. A demonstration that the transition from request-response to metabolic intelligence is not theoretical &mdash; it is buildable, today, from commodity hardware and open-source software. The gap between &ldquo;an AI you talk to&rdquo; and &ldquo;an AI that is present&rdquo; is not a research frontier. It is an engineering problem. And the engineering is done.</p>
+    <p>What remains is to make it never stop.</p>
+  </section>
+
+  <footer>
+    <p>A working position piece. Project Continuity, June 2026.</p>
+    <div class="refs">
+      <p>Anti-entropic systems framework: Kate Tolo, <em>&ldquo;An argument against AI alignment&rdquo;</em> (April 2026).</p>
+      <p>Hardware: Even Realities G1 smartglasses, Nordic UART BLE protocol (reverse-engineered).</p>
+      <p>Software: Python + bleak (BLE), liblc3 (audio decode), mlx-whisper (transcription), Claude (reasoning).</p>
+      <p>Fiction: CD Projekt Red, <em>Cyberpunk 2077</em> (2020); Ubisoft Montreal, <em>Watch Dogs 2</em> (2016); Iain M. Banks, <em>The Culture</em> (1987&ndash;2012); Adrian Tchaikovsky, <em>Children of Time</em> (2015).</p>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

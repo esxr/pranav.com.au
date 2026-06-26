@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Operant — a proposal for Lyra</title>
+<meta name="description" content="Operant is the delegation layer for software delivery: a deterministic harness that runs the work end to end, proves every change with evidence, and chases each person for the one call only they can make." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+  :root{
+    --porcelain:#ECEDEA;
+    --panel:#FBFBF9;
+    --slate:#1F262D;
+    --slate-2:#39424B;
+    --muted:#5C646C;
+    --faint:#888F96;
+    --line:#D6D8D3;
+    --line-soft:#E3E4DF;
+    --signal:#DE560E;
+    --signal-deep:#B5430A;
+    --verified:#1C9356;
+    --verified-deep:#136B3F;
+    --console:#161B20;
+    --console-2:#1F252C;
+    --console-ink:#E7E8E4;
+    --console-muted:#979DA4;
+    --maxw:1080px;
+    --radius:13px;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--porcelain);color:var(--slate);
+    font-family:"IBM Plex Sans",system-ui,sans-serif;
+    font-size:17px;line-height:1.62;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  }
+  ::selection{background:rgba(222,86,14,.16)}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  em{font-style:italic}
+
+  /* ---------- status strip ---------- */
+  .status{position:sticky;top:0;z-index:40;background:var(--console);color:var(--console-ink);
+    border-bottom:1px solid #000;font-family:"IBM Plex Mono",monospace;font-size:12.5px;letter-spacing:.02em}
+  .status .wrap{display:flex;align-items:center;gap:18px;height:42px;overflow:hidden;white-space:nowrap}
+  .status .seg{display:flex;align-items:center;gap:8px;color:var(--console-muted)}
+  .status .seg b{color:var(--console-ink);font-weight:500}
+  .status .brand{color:#fff;font-weight:600;letter-spacing:.07em}
+  .status .sep{color:#3a3f48}
+  .status .tag{color:var(--signal);font-style:italic;font-family:"Newsreader",serif;font-size:14px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--verified);animation:pulse 2.4s ease-out infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(28,147,86,.55)}70%{box-shadow:0 0 0 7px rgba(28,147,86,0)}100%{box-shadow:0 0 0 0 rgba(28,147,86,0)}}
+  .status .next{color:var(--signal)}
+  .status .hidelate{margin-left:auto}
+  @media(max-width:760px){.status .hidelate{display:none}.status .wrap{gap:12px}}
+
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--signal);font-weight:500}
+  .label{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+
+  /* ---------- hero ---------- */
+  .hero{padding:62px 0 28px}
+  .hero .eyebrow{margin-bottom:22px}
+  h1{font-family:"Newsreader",Georgia,serif;font-weight:600;font-size:clamp(35px,6.2vw,64px);line-height:1.04;letter-spacing:-.015em;margin:0 0 22px;max-width:17ch}
+  h1 .hl{color:var(--signal);font-style:italic}
+  .lede{font-size:clamp(18px,2.4vw,21px);color:var(--muted);max-width:56ch;margin:0}
+  .hero-grid{display:grid;grid-template-columns:1.25fr .9fr;gap:48px;align-items:center}
+  @media(max-width:860px){.hero-grid{grid-template-columns:1fr;gap:36px}}
+
+  /* ---------- signature loop ---------- */
+  .loop{position:relative;width:300px;height:300px;margin:0 auto;max-width:100%}
+  .loop .ring{position:absolute;inset:18px;border:1px dashed var(--line);border-radius:50%}
+  .loop .ring.r2{inset:46px;border-color:var(--line-soft)}
+  .node{position:absolute;transform:translate(-50%,-50%);background:var(--panel);border:1px solid var(--line);
+    border-radius:999px;padding:7px 12px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--slate);
+    box-shadow:0 4px 14px rgba(20,22,28,.06);white-space:nowrap}
+  .node.you{border-color:var(--signal);color:var(--signal-deep);font-weight:600}
+  .node.ok{border-color:var(--verified);color:var(--verified-deep);font-weight:600}
+  .node.core{left:50%;top:50%;background:var(--console);color:#fff;border-color:#000;font-weight:600;letter-spacing:.04em;padding:11px 16px;box-shadow:0 8px 26px rgba(20,22,28,.22)}
+  .node.n1{left:50%;top:6%}
+  .node.n2{left:92%;top:62%}
+  .node.n3{left:8%;top:62%}
+  .pinger{position:absolute;left:0;top:0;width:11px;height:11px;border-radius:50%;background:var(--signal);
+    box-shadow:0 0 0 4px rgba(222,86,14,.16);offset-path:path('M150,30 A120,120 0 1,1 149.9,30 Z');
+    offset-distance:0%;animation:travel 6s linear infinite}
+  @keyframes travel{to{offset-distance:100%}}
+  @media(prefers-reduced-motion:reduce){.pinger{animation:none;offset-distance:8%}.dot{animation:none}}
+
+  section{padding:30px 0}
+  .rule{height:1px;background:var(--line);max-width:var(--maxw);margin:0 auto}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+  .sec-head .num{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--signal)}
+  h2{font-family:"Newsreader",Georgia,serif;font-weight:600;font-size:clamp(26px,3.7vw,35px);letter-spacing:-.01em;line-height:1.1;margin:6px 0 16px;max-width:25ch}
+  h3{font-family:"Newsreader",Georgia,serif;font-weight:600;font-size:21px;letter-spacing:-.005em;margin:0 0 8px}
+  p{margin:0 0 16px}
+  p.body{max-width:62ch}
+  .muted{color:var(--muted)}
+
+  .abstract{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:30px 32px}
+  .abstract .label{margin-bottom:14px}
+  .abstract p{font-size:18.5px;max-width:64ch}
+  .abstract p:last-child{margin-bottom:0}
+
+  .feature{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:start;padding:26px 0}
+  .feature + .feature{border-top:1px solid var(--line-soft)}
+  .fnum{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--signal);padding-top:5px}
+  .fnum.v{color:var(--verified)}
+  @media(max-width:680px){.feature{grid-template-columns:1fr;gap:12px}.fnum{padding-top:0}}
+  .anec{border-left:2px solid var(--signal);padding:2px 0 2px 16px;margin:0 0 14px;color:var(--slate);font-size:16px}
+  .anec.v{border-color:var(--verified)}
+  .anec .who{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:6px}
+
+  .band{background:var(--console);color:var(--console-ink);margin:24px 0;border-top:1px solid #000;border-bottom:1px solid #000}
+  .band .wrap{padding:54px 28px}
+  .band h2{color:#fff}
+  .band p{color:var(--console-muted);max-width:62ch}
+  .band .term{color:#f0b08a;border-bottom-color:rgba(240,176,138,.45)}
+  .band .term:hover,.band .term.open{color:#fff}
+  .term-row{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:26px}
+  @media(max-width:680px){.term-row{grid-template-columns:1fr}}
+  .chip{background:var(--console-2);border:1px solid #2a313a;border-radius:12px;padding:18px 20px}
+  .chip h3{color:#fff;font-size:16px;margin-bottom:6px}
+  .chip p{margin:0;font-size:14.5px;color:#a6abb2}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:30px}
+  @media(max-width:740px){.cols{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px 26px}
+  .card h3{margin-bottom:10px}
+  .card p{margin-bottom:0;color:var(--muted);font-size:15.5px}
+  .three{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:22px 0 6px}
+  @media(max-width:780px){.three{grid-template-columns:1fr}}
+  .layer{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px}
+  .layer .mk{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--signal)}
+  .layer h3{font-size:18px;margin:8px 0 8px}
+  .layer p{margin:0;color:var(--muted);font-size:14.5px}
+
+  /* traction */
+  .traction{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--panel)}
+  @media(max-width:680px){.traction{grid-template-columns:1fr}}
+  .tcell{padding:22px 24px;border-right:1px solid var(--line-soft)}
+  .tcell:last-child{border-right:0}
+  @media(max-width:680px){.tcell{border-right:0;border-bottom:1px solid var(--line-soft)}.tcell:last-child{border-bottom:0}}
+  .tcell .big{font-family:"Newsreader",serif;font-weight:600;font-size:34px;line-height:1;color:var(--verified-deep);letter-spacing:-.01em}
+  .tcell .cap{margin-top:9px;font-size:14px;color:var(--muted)}
+
+  .roi{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:22px 0 8px}
+  @media(max-width:680px){.roi{grid-template-columns:1fr}}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px}
+  .stat .big{font-family:"Newsreader",serif;font-weight:600;font-size:38px;line-height:1;color:var(--signal);letter-spacing:-.01em}
+  .stat .cap{margin-top:10px;font-size:14px;color:var(--muted)}
+  .stat .cap b{color:var(--slate);font-weight:600}
+
+  .cta{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:34px 34px;margin-top:8px}
+  .cta h2{margin-top:0}
+  .ask{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 4px}
+  .pill{font-family:"IBM Plex Mono",monospace;font-size:13px;border:1px solid var(--line);border-radius:999px;padding:8px 14px;color:var(--slate);background:var(--porcelain)}
+  .pill b{color:var(--signal)}
+  .pull{font-family:"Newsreader",serif;font-style:italic;font-size:clamp(20px,2.6vw,25px);line-height:1.35;color:var(--slate);max-width:30ch;margin:6px 0 0;border-left:2px solid var(--signal);padding-left:18px}
+
+  footer{padding:40px 0 64px;color:var(--faint);font-size:13px}
+  footer .mono{color:var(--muted)}
+  footer a{color:var(--signal-deep);text-decoration:none;border-bottom:1px solid rgba(181,67,10,.35)}
+
+  .term{position:relative;border-bottom:1px dotted var(--signal);color:inherit;cursor:help;font-weight:500;
+    background:none;border-left:0;border-right:0;border-top:0;padding:0;font:inherit}
+  .term:focus-visible{outline:2px solid var(--signal);outline-offset:2px;border-radius:2px}
+  .tip{visibility:hidden;opacity:0;position:absolute;z-index:60;left:0;top:calc(100% + 10px);width:max-content;max-width:min(300px,82vw);
+    background:var(--slate);color:#fff;font-family:"IBM Plex Sans",sans-serif;font-weight:400;font-size:13.5px;line-height:1.5;
+    letter-spacing:0;text-transform:none;padding:13px 15px;border-radius:11px;box-shadow:0 12px 34px rgba(16,18,24,.28);
+    transition:opacity .14s ease,transform .14s ease;transform:translateY(-4px);pointer-events:none}
+  .tip::before{content:"";position:absolute;left:14px;top:-6px;width:12px;height:12px;background:var(--slate);transform:rotate(45deg);border-radius:2px}
+  .tip a{color:#ffb38a;text-decoration:none;border-bottom:1px solid rgba(255,179,138,.4);white-space:nowrap}
+  .tip a:hover{color:#fff}
+  .tip .ref{display:block;margin-top:9px;font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+  .term:hover .tip,.term:focus-within .tip,.term.open .tip{visibility:visible;opacity:1;transform:translateY(0);pointer-events:auto}
+  .tip.right{left:auto;right:0}
+  .tip.right::before{left:auto;right:14px}
+</style>
+</head>
+<body>
+
+<!-- ===================== STATUS STRIP ===================== -->
+<div class="status">
+  <div class="wrap">
+    <span class="brand">OPERANT</span>
+    <span class="sep">/</span>
+    <span class="tag">delivery, delegated</span>
+    <span class="seg hidelate"><span class="dot"></span><b>loop active</b></span>
+    <span class="seg hidelate">waiting on: <b>you</b></span>
+    <span class="seg hidelate">next <span class="next">→ read the pitch ↓</span></span>
+  </div>
+</div>
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">A proposal for Lyra · and for the people backing what comes next</div>
+    <div class="hero-grid">
+      <div>
+        <h1>Stop driving the agent. Delegate the delivery — and let it <span class="hl">chase the humans.</span></h1>
+        <p class="lede">Operant is the delegation layer for software delivery: a deterministic harness that runs the work end to end, proves every change with evidence, and chases each person for the one call only they can make — through their own browser and devices, not a sealed-off cloud.</p>
+      </div>
+      <div>
+        <div class="loop" aria-hidden="true">
+          <div class="ring"></div>
+          <div class="ring r2"></div>
+          <div class="node core">OPERANT</div>
+          <div class="node n1 you">you · approve</div>
+          <div class="node n2 ok">verified ✓</div>
+          <div class="node n3">reviewer</div>
+          <div class="pinger"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="rule"></div>
+
+<!-- ===================== ELEVATOR / ABSTRACT ===================== -->
+<section>
+  <div class="wrap">
+    <div class="abstract">
+      <div class="label">The pitch in one breath</div>
+      <p>Today, a person drives the model. You open a session, you remember where each thread left off, you nudge it forward — and when you look away, it stalls. Operant flips that arrangement. It runs many <span class="term" tabindex="0" role="button">loops<span class="tip">A single ongoing task the harness is working through — a feature, a fix, a deploy — with its own state and its own next step. A person typically has several open at once.</span></span> at once, holds one durable source of truth for where everything stands, proves each change before it reaches you, and actively chases the right person for the one decision only they can make.</p>
+      <p>Delegation here is not a smarter model — it is a contract. The harness commits to a process, shows its work, and respects your attention. Because it operates through the user's <em>real</em> browser and devices, it can do the messy, authenticated, real-world work that stops other agents cold. For a firm like Lyra — whose <span class="term" tabindex="0" role="button">forward-deployed engineers<span class="tip">Engineers placed inside a client's team to build alongside them, on the delivery firm's contract. At Lyra, each typically carries two or three client projects at once.</span></span> each carry two or three projects at once — that is the difference between an assistant you babysit and a teammate that keeps the whole portfolio moving.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== THE INVERSION ===================== -->
+<section>
+  <div class="wrap">
+    <div class="sec-head"><span class="num">§ 01</span><span class="label">The idea</span></div>
+    <h2>The agent stops waiting to be told, and starts asking to be unblocked.</h2>
+    <p class="body">Every capable coding agent today shares one assumption: a human sits at the centre, holding the plan in their head and pushing each thread forward. That works for one task. It collapses across six. The moment your attention moves, the threads you left mid-flight go quiet and wait — politely, indefinitely — for you to come back and notice.</p>
+    <p class="body">Operant moves the centre of gravity. You set the plan, the people, and the rules once. After that, the harness owns the choreography: it knows which loops are running, which are blocked, and who holds the key to each one — and it goes and gets them. The work no longer waits on your memory. It waits on a system whose entire job is to not let it wait.</p>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ===================== CAPABILITIES ===================== -->
+<section>
+  <div class="wrap">
+    <div class="sec-head"><span class="num">§ 02</span><span class="label">What makes it different</span></div>
+    <h2>Six things vanilla agents don't do — told through the moments that demand them.</h2>
+
+    <!-- 1 -->
+    <div class="feature">
+      <div class="fnum">01</div>
+      <div>
+        <h3>It chases you — and means it.</h3>
+        <p class="anec"><span class="who">4:00 pm · six threads open</span>You kick off six loops across three clients, then drop into a call. A standard agent fires one desktop ping; you miss it; an hour later nothing has moved. Operant treats "waiting on a human" as an active state, not a dead end — it keeps reaching out until the block is cleared.</p>
+        <p class="body muted">Underneath the manners is machinery: <span class="term" tabindex="0" role="button">decision gates<span class="tip">Points in the pipeline where the harness needs a human call before it proceeds. Each gate routes across channels and escalates on a timer, so a missed message is retried and re-routed rather than silently dropped.</span></span> with multi-channel routing and timeout escalation. A single ignored notification is not coordination; persistence is.</p>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="feature">
+      <div class="fnum">02</div>
+      <div>
+        <h3>A pipeline, not a prompt.</h3>
+        <p class="anec"><span class="who">Monday · a brand-new window</span>You open a fresh session and type four words: <span class="mono">read status, then continue</span>. It picks up exactly where Friday left off — every plan, every dependency, every "next."</p>
+        <p class="body muted">The harness runs on a <span class="term" tabindex="0" role="button">deterministic state machine<span class="tip">A hardcoded process engine with defined states and transitions, written in ordinary code — not improvised by the model. Strip the AI out and a complete, file-based, crash-resumable delivery pipeline still remains.</span></span> with file-based, crash-resumable state. Coordination lives in a durable, governed record with explicit "next" markers — not trapped inside one conversation that dies when the window closes.</p>
+      </div>
+    </div>
+
+    <!-- 3 — verification pillar -->
+    <div class="feature">
+      <div class="fnum v">03</div>
+      <div>
+        <h3>Every change arrives with proof.</h3>
+        <p class="anec v"><span class="who">The thing you actually approve</span>You don't get "I think it's done." You get the change, the evidence it works — a passing check, a screenshot of the working screen — and a one-tap approval. What reaches you is already verified.</p>
+        <p class="body muted">Delivery is run by a small team of scoped agents — a builder, a maintainer, and a <span class="term" tabindex="0" role="button">verifier<span class="tip">A dedicated checking role (and visual auditors) that inspects the work and produces evidence before anything is surfaced for sign-off — so the human reviews proof, not promises.</span></span> that audits the result and attaches the evidence. For a delivery firm, that verified-by-default posture is the quality bar travelling with every project.</p>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="feature">
+      <div class="fnum">04</div>
+      <div>
+        <h3>Every loop in its own sealed lane.</h3>
+        <p class="anec"><span class="who">Two clients · two rulebooks</span>Client A lets the agent push freely to a sandbox branch. Client B requires a human to approve every edit. Both run at once, and neither can touch the other's environment, credentials, or repo.</p>
+        <p class="body muted">Each session is independently configured: its own permissions, branch rules, <span class="term" tabindex="0" role="button">git hooks<span class="tip">Automated checks that run at points in a code workflow — before a commit, before a push — to enforce rules like tests passing. Operant uses them to make a project's policy self-enforcing.</span></span>, and guardrails, packaged so the rules travel with the project and enforce themselves.</p>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="feature">
+      <div class="fnum">05</div>
+      <div>
+        <h3>Your machines are the platform — not someone's cloud.</h3>
+        <p class="anec"><span class="who">The contract clause</span>A client forbids source and credentials from leaving managed devices. A cloud-hosted agent is a non-starter before the first line of code. Operant runs the context on the laptop the engineer already uses.</p>
+        <p class="body muted">Context, credentials and profiles live on the user's own machine, with a common layer shared cleanly between local and cloud execution. The result is a <span class="term" tabindex="0" role="button">low-egress<span class="tip">An architecture where sensitive data stays on the user's device and as little as possible crosses the network boundary — easier to reconcile with strict client security and data-residency terms.</span></span> posture a hosted sandbox can't easily meet.</p>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="feature">
+      <div class="fnum">06</div>
+      <div>
+        <h3>It compounds across the team.</h3>
+        <p class="anec"><span class="who">Taught once, known everywhere</span>One engineer walks the harness through a client's quirky deploy ritual on Tuesday. By Thursday, every seat at the firm performs it the same way — without being told.</p>
+        <p class="body muted">Hard-won procedure gets <span class="term" tabindex="0" role="button">codified<span class="tip">The flywheel: a workaround proven once becomes reusable procedure and accumulated delivery memory, shared across seats — so the system gets better the more the team uses it, a moat that grows with adoption.</span></span> into shared memory. Adoption becomes a flywheel rather than a flat cost.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CONSOLE BAND: REAL BROWSER ===================== -->
+<div class="band">
+  <div class="wrap">
+    <div class="eyebrow" style="color:#f0b08a">the difference no incumbent will copy</div>
+    <h2>The real browser, acting as the real you.</h2>
+    <p style="margin-bottom:10px">Ask any standard agent to <em>log into a client dashboard as you</em>, and you hit a wall. It spins up a throwaway <span class="term" tabindex="0" role="button">headless browser<span class="tip">A browser with no visible window, driven by automation. Convenient for machines, but invisible to the operator and easy for websites to detect and block.<span class="ref"><a href="https://developer.mozilla.org/en-US/docs/Glossary/Headless_browser" target="_blank" rel="noopener">MDN · Headless browser ↗</a></span></span></span> you can't see; the site flags its <span class="term" tabindex="0" role="button">user agent<span class="tip">A signature every browser sends identifying what it is. Automation tools send a tell-tale one, and many sites block it outright.<span class="ref"><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent" target="_blank" rel="noopener">MDN · User-Agent ↗</a></span></span></span> as a bot; a <span class="term" tabindex="0" role="button">CAPTCHA<span class="tip">The "prove you're human" challenge — designed specifically to stop the kind of automated browser most agents drive.</span></span> appears; and even when it doesn't, the agent often refuses outright. The real, authenticated web stays out of reach.</p>
+    <p>Operant takes a different route. Instead of driving a foreign browser, it connects over a <span class="term" tabindex="0" role="button">debug port<span class="tip">A control channel a real Chrome can expose (the Chrome DevTools Protocol) that lets a program operate the actual browser you already use — your windows, your logged-in sessions — rather than a separate automated one.<span class="ref"><a href="https://chromedevtools.github.io/devtools-protocol/" target="_blank" rel="noopener">Chrome DevTools Protocol ↗</a></span></span></span> to the everyday Chrome the engineer already uses — their profiles, their live sessions — through a purpose-built <span class="term" tabindex="0" role="button">connector<span class="tip">A small adapter (built on the Model Context Protocol) that gives the harness a controlled, well-defined way to use the real browser — here, the team's own "mybrowser" integration.<span class="ref"><a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">Model Context Protocol ↗</a></span></span></span> we call <span class="mono">mybrowser</span>. To the website, it is simply a person at their own machine. And when a moment genuinely needs a human — a card check, a one-time login — the operator <em>sees the window</em> and steps in, because the work is happening in a browser they can actually watch.</p>
+
+    <div class="term-row">
+      <div class="chip"><h3>The site sees a human</h3><p>No tell-tale automation signature, no bot wall, no CAPTCHA dead-end. Authenticated, profile-bound sites that block every other agent simply work.</p></div>
+      <div class="chip"><h3>The human stays in the loop</h3><p>Because the real browser is visible, live authentication and edge cases become a quick hand-off — not a hard stop that kills the run.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MOAT ===================== -->
+<section>
+  <div class="wrap">
+    <div class="sec-head"><span class="num">§ 03</span><span class="label">Why this is defensible</span></div>
+    <h2>The labs build engines. We build the harness.</h2>
+    <p class="body" style="margin-bottom:8px">The fair question deserves a direct answer: why won't a frontier lab simply absorb this, or any team clone it? Because the value comes from deep, non-AI infrastructure the model operates <em>within</em> — three layers of it that are product engineering, not prompting.</p>
+    <div class="three">
+      <div class="layer"><div class="mk">layer 01</div><h3>Process</h3><p>A hardcoded, deterministic pipeline with file-based state, multi-channel gates, timeout escalation and crash-resumable recovery. Remove the AI and a complete delivery process remains.</p></div>
+      <div class="layer"><div class="mk">layer 02</div><h3>Interface</h3><p>Operating a user's real machine and browser, on their devices, as them. It can't be retrofitted onto a cloud IDE or a chat window — it has to be the architecture from the ground up.</p></div>
+      <div class="layer"><div class="mk">layer 03</div><h3>Orchestration</h3><p>Scoped agents that build, maintain and verify, with handoff protocols and evidence — plus delivery memory that compounds per seat. The model improving only makes this layer stronger.</p></div>
+    </div>
+    <p class="body muted" style="margin-top:16px">And for the specific ground we're proposing to Lyra, two more reasons compound: gluing an agent tightly to a firm's own fleet of laptops, profiles and client quirks is high-touch, low-margin work a platform vendor is structurally disinclined to do — while operating a user's own logged-in browser sits in a grey zone a giant is reluctant to officially bless. A focused company can own both, deliberately and responsibly.</p>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ===================== TRACTION ===================== -->
+<section>
+  <div class="wrap">
+    <div class="sec-head"><span class="num">§ 04</span><span class="label">Already real</span></div>
+    <h2>This isn't a concept deck. It's in paid production.</h2>
+    <div class="traction">
+      <div class="tcell"><div class="big">4 paying</div><div class="cap">companies running real delivery through the harness</div></div>
+      <div class="tcell"><div class="big">$60K</div><div class="cap">first enterprise pilot, with active trials alongside it</div></div>
+      <div class="tcell"><div class="big">live</div><div class="cap">working pipeline, verified outcomes, real customers — not slideware</div></div>
+    </div>
+    <p class="body muted" style="margin-top:16px">A working pipeline plus an assembled, paying audience is the foundation Lyra would be building on — not a promise of one.</p>
+  </div>
+</section>
+
+<!-- ===================== LYRA ROI ===================== -->
+<section>
+  <div class="wrap">
+    <div class="sec-head"><span class="num">§ 05</span><span class="label">The case for Lyra, per seat</span></div>
+    <h2>Why a productivity tool, priced per engineer, pays for itself.</h2>
+    <p class="body">Lyra's engineers don't run one project at a time — most carry two or three concurrently, and the cost of that context-switching is exactly what a coordinator is built to absorb. The harness keeps every thread alive while attention moves, which is where the compounding gain comes from.</p>
+    <div class="roi">
+      <div class="stat"><div class="big">2–3×</div><div class="cap">projects carried per engineer, <b>simultaneously</b> — the load Operant is designed to coordinate</div></div>
+      <div class="stat"><div class="big">↑ throughput</div><div class="cap">from loops that <b>never stall</b> on a missed ping and sessions that resume in four words</div></div>
+      <div class="stat"><div class="big">per seat</div><div class="cap">priced against the engineer's time, not infrastructure — <b>the math is the salary, not the server</b></div></div>
+    </div>
+    <p class="body muted" style="margin-top:18px">We'll set the precise figure together against Lyra's own baselines during the partnership — but even a conservative reduction in idle, blocked, and re-orientation time, multiplied across a multi-project workload and a full roster, clears a per-seat price comfortably.</p>
+  </div>
+</section>
+
+<!-- ===================== FAT-HEAD / SCALABILITY ===================== -->
+<section>
+  <div class="wrap">
+    <div class="sec-head"><span class="num">§ 06</span><span class="label">Answering the hard question</span></div>
+    <h2>Fifty diverse projects. Does it really work out of the box?</h2>
+    <p class="body">The honest concern is configuration at scale: a portfolio of fifty projects is wildly diverse, and no tool works identically across all of them untouched. Our answer is to refuse to boil the ocean and instead win the <span class="term" tabindex="0" role="button">fat heads<span class="tip">The handful of use cases that account for the bulk of real work — as opposed to the long tail of rare, bespoke ones. Cover the fat heads well and you cover most projects without custom engineering each time.</span></span> — the few capabilities almost every project actually needs.</p>
+    <div class="cols" style="margin:22px 0 8px">
+      <div class="card"><h3>Fat head one — the web</h3><p>Effectively every company ships a website and a web product. One generic, workspace-aware integration of the real browser — contextualised per project, no per-site engineering — covers the dominant case on day one.</p></div>
+      <div class="card"><h3>Fat head two — mobile</h3><p>Most have a mobile app. A second integration drives an Android or iOS simulator, or a real device, the same standardised way — so mobile flows are in scope without a bespoke rig per project.</p></div>
+    </div>
+    <p class="body muted">Start from the thin model wrapper — the model supplies the compute and intelligence — and bake in two or three standard connectors that handle browser and device generically. What remains per project is <em>configuration, not engineering</em>: declaring permissions, profiles and rules, not building new plumbing. That is the difference between a tool that scales across a portfolio and one that needs a specialist for every engagement.</p>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ===================== CTA ===================== -->
+<section>
+  <div class="wrap">
+    <div class="cta">
+      <div class="eyebrow" style="margin-bottom:14px">The ask</div>
+      <h2>A design partnership, not a procurement form.</h2>
+      <p class="body">We don't want to drop a tool over the wall and hope. We want a small, real engagement: a handful of seats, two or three live Lyra projects, and a short window to tune the harness against the actual portfolio — the genuine browser flows, the genuine client rules. We learn your nooks; you get engineers who stop babysitting agents and start shipping through them.</p>
+      <div class="ask">
+        <span class="pill"><b>5–10</b> seats to start</span>
+        <span class="pill"><b>2–3</b> live projects</span>
+        <span class="pill">browser + mobile <b>baked in</b></span>
+        <span class="pill">tuned to <b>Lyra's</b> real work</span>
+      </div>
+      <p class="pull">The destination isn't a faster delivery team. It's one where human attention is spent on judgment — and everything downstream of a decision simply happens.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="mono">OPERANT · delivery, delegated — the delegation layer for software delivery</div>
+    <div style="margin-top:6px">Prepared for Lyra. Hover or tap any underlined term for a plain-language note and reference. &nbsp;·&nbsp; <a href="https://operantlabs.com" target="_blank" rel="noopener">operantlabs.com</a></div>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var terms = Array.prototype.slice.call(document.querySelectorAll('.term'));
+    function closeAll(except){ terms.forEach(function(t){ if(t!==except) t.classList.remove('open'); }); }
+    terms.forEach(function(t){
+      t.addEventListener('click', function(e){
+        e.stopPropagation();
+        var willOpen = !t.classList.contains('open');
+        closeAll(t);
+        t.classList.toggle('open', willOpen);
+        var tip = t.querySelector('.tip');
+        if(tip && willOpen){
+          tip.classList.remove('right');
+          var r = tip.getBoundingClientRect();
+          if(r.right > window.innerWidth - 12) tip.classList.add('right');
+        }
+      });
+      t.addEventListener('keydown', function(e){
+        if(e.key==='Enter'||e.key===' '){ e.preventDefault(); t.click(); }
+        if(e.key==='Escape'){ t.classList.remove('open'); t.blur(); }
+      });
+    });
+    document.addEventListener('click', function(){ closeAll(null); });
+  })();
+</script>
+</body>
+</html>

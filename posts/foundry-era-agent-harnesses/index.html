@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Foundry Era — Toward an SAP of Agent Harnesses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f7f2e7;
+    --paper-2:#f1ead9;
+    --ink:#211e18;
+    --ink-soft:#4a4439;
+    --ink-faint:#7c7464;
+    --brass:#a9801f;
+    --brass-bright:#c39a37;
+    --brass-deep:#7d5e15;
+    --teal:#1f5d59;
+    --teal-bright:#2c7d77;
+    --rule:#d8cdb4;
+    --card:#fbf8f0;
+    --shadow:0 1px 2px rgba(40,32,12,.06), 0 8px 26px rgba(40,32,12,.07);
+    --maxw:860px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #fbf6ea 0%, rgba(251,246,234,0) 60%),
+      var(--paper);
+    color:var(--ink);
+    font-family:"Source Serif 4", Georgia, "Times New Roman", serif;
+    font-size:18px;
+    line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 26px}
+  .band{width:100%; }
+  .band-tint{background:linear-gradient(180deg,var(--paper-2),var(--paper));border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+
+  /* ---------- type ---------- */
+  h1,h2,h3,h4{font-family:"Fraunces", Georgia, serif; font-weight:600; line-height:1.12; color:var(--ink); letter-spacing:-.01em}
+  .kicker{font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.26em; text-transform:uppercase; color:var(--brass-deep)}
+  .label{font-family:"IBM Plex Mono",monospace; font-size:11.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-faint)}
+  em.term-i{font-style:italic}
+
+  /* ---------- masthead ---------- */
+  .masthead{padding:64px 0 30px}
+  .masthead .kicker{margin-bottom:20px}
+  .masthead h1{font-size:clamp(38px,6.4vw,68px); font-weight:600; margin:0 0 .25em}
+  .masthead h1 .gold{color:var(--brass-deep)}
+  .masthead .deck{font-size:clamp(19px,2.4vw,23px); color:var(--ink-soft); font-weight:400; max-width:40ch; line-height:1.4}
+  .byline{display:flex; flex-wrap:wrap; gap:10px 22px; align-items:center; margin-top:30px; padding-top:18px; border-top:2px solid var(--brass); }
+  .byline .label{color:var(--ink-soft)}
+  .byline .sep{color:var(--rule)}
+
+  /* ---------- abstract ---------- */
+  .abstract{
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-left:4px solid var(--brass);
+    box-shadow:var(--shadow);
+    border-radius:3px;
+    padding:30px 34px;
+    margin:6px 0 12px;
+  }
+  .abstract .label{margin-bottom:12px; display:block}
+  .abstract p{margin:0; font-size:20px; line-height:1.56}
+  .abstract p + p{margin-top:14px}
+  .abstract .drop{color:var(--brass-deep)}
+
+  section{padding:46px 0}
+  section > .wrap > .kicker{display:block; margin-bottom:14px}
+  h2{font-size:clamp(27px,3.6vw,38px); margin:0 0 .5em}
+  h3{font-size:clamp(20px,2.5vw,25px); margin:1.6em 0 .4em}
+  p{margin:0 0 1.05em}
+  .lede{font-size:20px; color:var(--ink-soft)}
+  a.ref{color:var(--teal); text-decoration:none; border-bottom:1px solid rgba(31,93,89,.32)}
+  a.ref:hover{border-bottom-color:var(--teal)}
+
+  hr.brass{border:0; height:0; border-top:2px solid var(--brass); width:64px; margin:0 0 26px; opacity:.85}
+
+  /* ---------- tooltips ---------- */
+  .t{
+    position:relative;
+    color:var(--teal);
+    border-bottom:1px dotted var(--teal-bright);
+    cursor:help;
+    font-style:normal;
+  }
+  .t:focus{outline:2px solid var(--teal-bright); outline-offset:2px; border-radius:2px}
+  .t > .tip{
+    position:absolute;
+    left:50%;
+    top:1.7em;
+    transform:translateX(-50%) translateY(5px);
+    width:min(330px,82vw);
+    background:#241f17;
+    color:#f3ecdb;
+    font-family:"Source Serif 4",serif;
+    font-style:normal;
+    font-size:14.5px;
+    line-height:1.5;
+    letter-spacing:0;
+    padding:13px 15px 13px;
+    border-radius:8px;
+    border:1px solid #3a3122;
+    box-shadow:0 14px 34px rgba(20,15,4,.34);
+    opacity:0; visibility:hidden; pointer-events:none;
+    transition:opacity .16s ease, transform .16s ease, visibility 0s linear .16s;
+    z-index:60;
+    text-align:left;
+  }
+  .t > .tip::before{ /* hover bridge */
+    content:""; position:absolute; left:0; right:0; top:-12px; height:12px;
+  }
+  .t > .tip::after{ /* arrow */
+    content:""; position:absolute; left:50%; top:-6px; transform:translateX(-50%) rotate(45deg);
+    width:11px; height:11px; background:#241f17; border-left:1px solid #3a3122; border-top:1px solid #3a3122;
+  }
+  .t:hover > .tip, .t:focus > .tip, .t:focus-within > .tip{
+    opacity:1; visibility:visible; pointer-events:auto;
+    transform:translateX(-50%) translateY(0);
+    transition:opacity .16s ease, transform .16s ease, visibility 0s;
+  }
+  .tip .tip-term{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--brass-bright); display:block; margin-bottom:5px}
+  .tip a{color:#e9c976; text-decoration:none; border-bottom:1px solid rgba(233,201,118,.4); white-space:nowrap}
+  .tip a:hover{border-bottom-color:#e9c976}
+  .tip .tip-link{margin-top:8px; display:block; font-family:"IBM Plex Mono",monospace; font-size:11.5px; letter-spacing:.04em}
+
+  /* ---------- timeline ---------- */
+  .tl{margin:8px 0 0; padding:0; list-style:none; position:relative}
+  .tl::before{content:""; position:absolute; left:13px; top:6px; bottom:6px; width:2px; background:linear-gradient(180deg,var(--brass),var(--rule))}
+  .tl li{position:relative; padding:0 0 22px 46px}
+  .tl li:last-child{padding-bottom:2px}
+  .tl li .dot{position:absolute; left:6px; top:3px; width:16px; height:16px; border-radius:50%; background:var(--paper); border:2px solid var(--brass); }
+  .tl li.now .dot{background:var(--teal); border-color:var(--teal); box-shadow:0 0 0 4px rgba(31,93,89,.16)}
+  .tl li .step-h{font-family:"Fraunces",serif; font-weight:600; font-size:18.5px; color:var(--ink)}
+  .tl li.now .step-h{color:var(--teal)}
+  .tl li p{margin:.2em 0 0; font-size:16.5px; color:var(--ink-soft); line-height:1.5}
+  .nowtag{display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.18em; text-transform:uppercase; color:#fff; background:var(--teal); padding:2px 8px; border-radius:20px; margin-left:8px; vertical-align:middle}
+
+  /* ---------- parallel mapping cards ---------- */
+  .map-grid{display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--rule); border:1px solid var(--rule); border-radius:6px; overflow:hidden; margin-top:10px}
+  .map-grid .mh{background:var(--paper-2); padding:12px 16px; font-family:"IBM Plex Mono",monospace; font-size:11.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--brass-deep)}
+  .map-grid .mc{background:var(--card); padding:13px 16px; font-size:16px; color:var(--ink-soft); line-height:1.42}
+  .map-grid .mc strong{color:var(--ink); font-weight:600; font-family:"Fraunces",serif}
+
+  /* ---------- stack diagram ---------- */
+  .stack{margin:18px 0 4px}
+  .layer{border:1px solid var(--rule); border-radius:8px; margin-bottom:12px; padding:20px 24px; background:var(--card); box-shadow:var(--shadow); position:relative; overflow:hidden}
+  .layer::before{content:""; position:absolute; left:0; top:0; bottom:0; width:5px}
+  .layer.l-foundry::before{background:var(--brass)}
+  .layer.l-domain::before{background:var(--teal)}
+  .layer.l-base::before{background:var(--ink-soft)}
+  .layer .lk{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; margin-bottom:6px}
+  .layer.l-foundry .lk{color:var(--brass-deep)}
+  .layer.l-domain .lk{color:var(--teal)}
+  .layer.l-base .lk{color:var(--ink-faint)}
+  .layer h4{font-size:21px; margin:0 0 .35em}
+  .layer p{margin:0; font-size:16.5px; color:var(--ink-soft); line-height:1.5}
+  .chips{display:flex; flex-wrap:wrap; gap:7px; margin-top:13px}
+  .chip{font-family:"IBM Plex Mono",monospace; font-size:11.5px; letter-spacing:.03em; background:var(--paper-2); border:1px solid var(--rule); color:var(--ink-soft); padding:4px 10px; border-radius:20px}
+  .stack-arrow{text-align:center; color:var(--brass); font-size:18px; line-height:1; margin:-6px 0 6px; font-family:"IBM Plex Mono",monospace}
+
+  /* ---------- anatomy ---------- */
+  .anat{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:14px}
+  .anat .ac{background:var(--card); border:1px solid var(--rule); border-radius:7px; padding:18px 20px; box-shadow:var(--shadow)}
+  .anat .ac .label{display:block; margin-bottom:7px; color:var(--brass-deep)}
+  .anat .ac h4{margin:0 0 .35em; font-size:18.5px}
+  .anat .ac p{margin:0; font-size:15.5px; color:var(--ink-soft); line-height:1.5}
+
+  /* ---------- use cases ---------- */
+  .case{background:var(--card); border:1px solid var(--rule); border-radius:8px; box-shadow:var(--shadow); padding:26px 30px; margin:18px 0}
+  .case .casehead{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:8px}
+  .case .num{font-family:"Fraunces",serif; font-weight:600; font-size:30px; color:var(--brass); line-height:1}
+  .case h3{margin:0; font-size:22px}
+  .case .vert{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--teal); margin-left:auto}
+  .case .anec{border-left:3px solid var(--rule); padding-left:16px; margin:4px 0 14px; color:var(--ink-soft); font-style:italic}
+  .case p:last-child{margin-bottom:0}
+
+  blockquote.pull{font-family:"Fraunces",serif; font-weight:500; font-size:clamp(22px,3.2vw,30px); line-height:1.3; color:var(--ink); border:0; margin:14px 0; padding:0; max-width:24ch}
+  blockquote.pull .gold{color:var(--brass-deep)}
+
+  .closing{padding:54px 0 70px}
+  .colophon{border-top:2px solid var(--brass); margin-top:30px; padding-top:18px; color:var(--ink-faint); font-size:14px; font-family:"IBM Plex Mono",monospace; letter-spacing:.03em; line-height:1.7}
+
+  @media (max-width:680px){
+    body{font-size:17px}
+    .map-grid{grid-template-columns:1fr}
+    .map-grid .mh:nth-of-type(2){border-top:1px solid var(--rule)}
+    .anat{grid-template-columns:1fr}
+    .abstract{padding:24px 22px}
+    .case{padding:22px 20px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ MASTHEAD ============ -->
+<header class="masthead">
+  <div class="wrap">
+    <span class="kicker">Position Note · Agentic Platforms</span>
+    <h1>The Foundry Era,<br>and the coming <span class="gold">SAP of agent harnesses</span></h1>
+    <p class="deck">Enterprise software has run this arc before. Agentic AI is running it again — faster, and with higher stakes.</p>
+    <div class="byline">
+      <span class="label">A working thesis from the platform team</span>
+      <span class="sep">·</span>
+      <span class="label">For an architecture &amp; strategy audience</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============ ABSTRACT ============ -->
+<div class="wrap">
+  <div class="abstract">
+    <span class="label">The pitch, in one breath</span>
+    <p><span class="drop">For thirty years</span>, enterprise software repeated a single arc: bespoke builds gave way to platforms, platforms hardened into standards, and standards crystallised into packaged industry solutions that a foundry tailored to each customer. We argue that agentic AI is sprinting through the same arc — only compressed into a handful of years.</p>
+    <p>We have already moved from agent frameworks, to bespoke agents, to open standards such as <span class="t" tabindex="0">MCP<span class="tip"><span class="tip-term">Model Context Protocol</span>An open standard for connecting AI agents to tools, data, and services through a common interface — the agent world's equivalent of a universal driver layer.<a class="tip-link" href="https://modelcontextprotocol.io" target="_blank" rel="noopener">modelcontextprotocol.io ↗</a></span></span>, <span class="t" tabindex="0">Agent Skills<span class="tip"><span class="tip-term">Agent Skills</span>Packaged, reusable units of know-how — instructions, scripts, and resources — that an agent can load on demand to perform a specialised task.<a class="tip-link" href="https://www.anthropic.com/news/skills" target="_blank" rel="noopener">anthropic.com/news/skills ↗</a></span></span>, and <span class="t" tabindex="0">Plugins<span class="tip"><span class="tip-term">Plugins</span>Bundled extensions (commands, agents, skills, hooks, connectors) that add a coherent capability set to a harness in one install.<a class="tip-link" href="https://docs.claude.com/en/docs/claude-code" target="_blank" rel="noopener">docs.claude.com ↗</a></span></span>, to the <span class="t" tabindex="0">agent harness<span class="tip"><span class="tip-term">Agent Harness</span>The runtime that wraps a model with everything it needs to act safely and usefully: context management, memory, tool access, planning, permissions, verification, and observability. Claude Code, Codex, and Cursor are harnesses.</span></span> itself. Today we build domain-specific harnesses one vertical at a time. The next step is unmistakable.</p>
+    <p>We should build a <strong>packaged layer of industry harnesses</strong> and a <strong>foundry to customise them</strong> — the SAP moment for agent harnesses. This note traces the arc, names exactly where we stand, and sketches what we ought to build next.</p>
+  </div>
+</div>
+
+<!-- ============ THE PATTERN ============ -->
+<section>
+  <div class="wrap">
+    <span class="kicker">I · The pattern we have seen before</span>
+    <h2>Enterprise software already ran this race</h2>
+    <hr class="brass">
+    <p class="lede">Strip away the vocabulary and the last three decades of enterprise computing tell a single, repeatable story. It is worth retelling, because it is about to repeat.</p>
+
+    <ul class="tl">
+      <li><span class="dot"></span>
+        <div class="step-h">Bespoke builds, one app at a time</div>
+        <p>Teams hand-built applications in standard Java, each project re-implementing the same plumbing — sessions, persistence, transactions, security.</p>
+      </li>
+      <li><span class="dot"></span>
+        <div class="step-h">The reuse instinct</div>
+        <p>Design patterns, modularity, and the sheer waste of rebuilding horizontals pointed to an obvious need: a common platform underneath the apps.</p>
+      </li>
+      <li><span class="dot"></span>
+        <div class="step-h">A standard appears</div>
+        <p>That need produced <span class="t" tabindex="0">Enterprise Java<span class="tip"><span class="tip-term">J2EE / Jakarta EE</span>A standardised set of specifications for building server-side enterprise applications — defining the common services every business app needs so vendors could compete on implementation, not interface.<a class="tip-link" href="https://jakarta.ee" target="_blank" rel="noopener">jakarta.ee ↗</a></span></span> — a shared contract for the horizontals every business application needs.</p>
+      </li>
+      <li><span class="dot"></span>
+        <div class="step-h">A race of platforms</div>
+        <p>Vendors raced to ship compliant application servers — WebSphere, WebLogic, and their peers — competing on the same standard. Developers now built on top of a server, not from bare metal.</p>
+      </li>
+      <li><span class="dot"></span>
+        <div class="step-h">Industry models emerge</div>
+        <p>Builders noticed that players within an industry share process and entity models. Banks resemble banks; insurers resemble insurers. Industry model frameworks codified that commonality.</p>
+      </li>
+      <li><span class="dot"></span>
+        <div class="step-h">Packaged applications &amp; the foundry</div>
+        <p>The endgame: packaged vertical solutions — the <span class="t" tabindex="0">ERP<span class="tip"><span class="tip-term">ERP — e.g. SAP</span>Enterprise Resource Planning: pre-built, deeply configurable business software covering finance, supply chain, HR and more. You buy the package and a consulting foundry tailors it to your enterprise rather than coding it from scratch.<a class="tip-link" href="https://en.wikipedia.org/wiki/Enterprise_resource_planning" target="_blank" rel="noopener">en.wikipedia.org ↗</a></span></span> wave led by SAP and its kin. The work shifted from <em>building</em> bespoke apps to <em>deploying and configuring</em> a package for one enterprise's needs.</p>
+      </li>
+    </ul>
+
+    <blockquote class="pull">The value migrated upward — from <span class="gold">code</span>, to platform, to standard, to <span class="gold">package &amp; foundry</span>.</blockquote>
+  </div>
+</section>
+
+<!-- ============ THE ARC RE-RUN ============ -->
+<section class="band band-tint">
+  <div class="wrap">
+    <span class="kicker">II · The same arc, re-run for agents</span>
+    <h2>Now watch it happen again</h2>
+    <hr class="brass">
+    <p class="lede">The agentic stack is climbing the identical ladder. The rungs even rhyme — and we are most of the way up.</p>
+
+    <ul class="tl">
+      <li><span class="dot"></span>
+        <div class="step-h">Agent frameworks</div>
+        <p>LangChain, CrewAI, watsonx Orchestrate, the OpenAI and Claude Agent SDKs — all centred on common LLM APIs, no-code/low-code/SDK builders, and shared <span class="t" tabindex="0">observability<span class="tip"><span class="tip-term">Observability</span>The ability to see <em>inside</em> a running agent — its traces, tool calls, token costs, and decision steps — so you can debug, evaluate, and govern it.<a class="tip-link" href="https://opentelemetry.io" target="_blank" rel="noopener">opentelemetry.io ↗</a></span></span> stacks.</p>
+      </li>
+      <li><span class="dot"></span>
+        <div class="step-h">Bespoke agents</div>
+        <p>Engineers assemble agents by declaring four things: an LLM, prompt instructions, tools, and an agentic pattern such as <span class="t" tabindex="0">ReAct<span class="tip"><span class="tip-term">ReAct</span>Reason + Act: the agent interleaves chain-of-thought reasoning with tool actions, observing results before deciding its next move.<a class="tip-link" href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">arxiv.org/abs/2210.03629 ↗</a></span></span> or <span class="t" tabindex="0">Plan-Act<span class="tip"><span class="tip-term">Plan-and-Act</span>The agent drafts a full plan first, then executes (and re-plans) — trading some flexibility for foresight and reliability on multi-step tasks.<a class="tip-link" href="https://arxiv.org/abs/2305.04091" target="_blank" rel="noopener">arxiv.org/abs/2305.04091 ↗</a></span></span>.</p>
+      </li>
+      <li><span class="dot"></span>
+        <div class="step-h">The standardisation pressure — and a coding leap</div>
+        <p>Shared patterns and shared pains call for an "AI-OS." At the same time, agents grow dramatically better at writing and running code, so <span class="t" tabindex="0">CodeAct / PTC<span class="tip"><span class="tip-term">CodeAct / Programmatic Tool Calling</span>Instead of emitting one tool call at a time, the agent writes executable code that orchestrates tools in a loop — composing, filtering, and chaining them as a program.<a class="tip-link" href="https://arxiv.org/abs/2402.01030" target="_blank" rel="noopener">arxiv.org/abs/2402.01030 ↗</a></span></span> joins ReAct and Plan-Act as a first-class pattern.</p>
+      </li>
+      <li><span class="dot"></span>
+        <div class="step-h">Open standards arrive</div>
+        <p>MCP, Agent Skills, and Plugins become the shared contracts — the J2EE-grade interfaces of the agentic era.</p>
+      </li>
+      <li><span class="dot"></span>
+        <div class="step-h">The agent harness is born</div>
+        <p>Claude Code, Codex, and Cursor emerge as harnesses: they speak the standards <em>and</em> provide the AI-OS horizontals — context, memory, tools, planning, permissions, verification, observability, human approval, and failure recovery.</p>
+      </li>
+      <li class="now"><span class="dot"></span>
+        <div class="step-h">Domain-specific harnesses, built case by case<span class="nowtag">we are here</span></div>
+        <p>Engineers ship vertical capability as domain plugins. Each plugin turns a general harness into a higher-order, domain-specific one. The work is real — and it is bespoke, repeated vertical by vertical, client by client.</p>
+      </li>
+      <li><span class="dot"></span>
+        <div class="step-h">The foundry era</div>
+        <p>The endgame we are arguing toward: packaged industry harnesses, plus a foundry that customises them for a specific customer's environment, data, and policy. The SAP of agent harnesses.</p>
+      </li>
+    </ul>
+
+    <div class="map-grid" style="margin-top:34px">
+      <div class="mh">Enterprise software</div>
+      <div class="mh">Agentic AI</div>
+      <div class="mc"><strong>Standard Java</strong> · bespoke apps</div>
+      <div class="mc"><strong>LLM APIs &amp; SDKs</strong> · bespoke agents</div>
+      <div class="mc"><strong>J2EE</strong> · the horizontal standard</div>
+      <div class="mc"><strong>MCP, Skills, Plugins</strong> · the horizontal standards</div>
+      <div class="mc"><strong>WebSphere / WebLogic</strong> · app servers</div>
+      <div class="mc"><strong>Claude Code / Codex / Cursor</strong> · agent harnesses</div>
+      <div class="mc"><strong>Industry model frameworks</strong></div>
+      <div class="mc"><strong>Domain plugins</strong> → domain harnesses</div>
+      <div class="mc"><strong>SAP &amp; the ERP foundry</strong></div>
+      <div class="mc"><strong>Packaged industry harnesses + foundry</strong></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHERE WE STAND ============ -->
+<section>
+  <div class="wrap">
+    <span class="kicker">III · Where we stand today</span>
+    <h2>The bespoke domain-harness era</h2>
+    <hr class="brass">
+    <p>We are firmly in the "industry model frameworks" rung, doing genuinely impressive work — and doing it the hard way. When a college needs an agent for course materials, or a law firm needs one for matter intake, we assemble a domain harness by hand: we pick the tools, write the domain instructions, wire the memory, design the evaluations, and tune the guardrails. Then the next client in the same vertical arrives, and we discover we are rebuilding eighty percent of the same thing.</p>
+    <p>This is precisely the moment, in the enterprise story, where the waste of rebuilding horizontals became impossible to ignore — except now the "horizontals" are not sessions and transactions. They are domain ontologies, golden trajectories, evaluation suites, policy guardrails, and the slow-won procedural memory of how work is actually done in a vertical. Rebuilding those per client is the expensive part. It is also the part most amenable to packaging.</p>
+    <blockquote class="pull">The bespoke era is not a failure. It is the <span class="gold">data-gathering</span> phase of the packaged era.</blockquote>
+  </div>
+</section>
+
+<!-- ============ THE VISION ============ -->
+<section class="band band-tint">
+  <div class="wrap">
+    <span class="kicker">IV · The vision</span>
+    <h2>A foundry for agent harnesses</h2>
+    <hr class="brass">
+    <p class="lede">Picture the agentic platform as three stacked layers. The bottom is general; the middle is vertical; the top is where a customer becomes a deployment.</p>
+
+    <div class="stack">
+      <div class="layer l-foundry">
+        <div class="lk">Layer 3 · The Foundry</div>
+        <h4>Customisation for one enterprise</h4>
+        <p>The implementation layer — the SAP-consultant equivalent. It takes a packaged domain harness and binds it to a specific customer: their data sources and identity, their policies and risk posture, their brand and house style, their environment. Crucially, the foundry is where the harness <em>learns this customer</em> — accruing procedural memory and client-specific evaluations rather than discarding them at the end of an engagement.</p>
+        <div class="chips"><span class="chip">tenant config</span><span class="chip">data &amp; identity binding</span><span class="chip">policy &amp; guardrail tuning</span><span class="chip">client eval sets</span><span class="chip">codification flywheel</span></div>
+      </div>
+
+      <div class="stack-arrow">▲ configures</div>
+
+      <div class="layer l-domain">
+        <div class="lk">Layer 2 · Domain Harness Packages</div>
+        <h4>Industry verticals, packaged</h4>
+        <p>Pre-built harnesses for a vertical — course-material generation, legal operations, claims adjudication, clinical documentation, financial analytics. Each ships not as raw code but as a coherent package: the tools that vertical needs, the ontology it reasons over, the skills and plans for its common tasks, the guardrails its regulators expect, and a benchmark suite that knows what "good" looks like in that domain.</p>
+        <div class="chips"><span class="chip">domain tools</span><span class="chip">ontology / entity model</span><span class="chip">skills &amp; plans</span><span class="chip">golden trajectories</span><span class="chip">domain eval harness</span><span class="chip">compliance guardrails</span></div>
+      </div>
+
+      <div class="stack-arrow">▲ extends</div>
+
+      <div class="layer l-base">
+        <div class="lk">Layer 1 · The Base Harness (AI-OS)</div>
+        <h4>The horizontals every agent needs</h4>
+        <p>The standard, vertical-agnostic runtime — what Claude Code and its peers already provide. It is the WebSphere of this story: stable, governed, and the same underneath every vertical built on top.</p>
+        <div class="chips"><span class="chip">context management</span><span class="chip">memory systems</span><span class="chip">tool access</span><span class="chip">planning &amp; orchestration</span><span class="chip">permission controls</span><span class="chip">verification &amp; testing</span><span class="chip">observability</span><span class="chip">human approval</span><span class="chip">failure recovery</span></div>
+      </div>
+    </div>
+
+    <p style="margin-top:24px">The shape of the business changes with the layers. Layer 1 is a platform play. Layer 2 is a product catalogue — you build a vertical once and sell it many times. Layer 3 is a foundry: repeatable, tooled customisation that turns a package into a running system for a named customer. SAP did not get large by writing software for one company. It got large by packaging a vertical and industrialising the customisation.</p>
+  </div>
+</section>
+
+<!-- ============ IMPLEMENTATION ============ -->
+<section>
+  <div class="wrap">
+    <span class="kicker">V · Building it</span>
+    <h2>What a domain harness package actually contains</h2>
+    <hr class="brass">
+    <p>If Layer 2 is the leverage, then "what goes in a package" is the question that decides whether this vision is real. A domain harness package is the codified answer to "how is this kind of work done well?" — expressed in artefacts a harness can load.</p>
+
+    <div class="anat">
+      <div class="ac"><span class="label">01 · Tools</span><h4>The verbs of the vertical</h4><p>Connectors and tool definitions the domain depends on — the LMS for a college, the matter system for a firm — exposed over MCP so they swap cleanly per client.</p></div>
+      <div class="ac"><span class="label">02 · Ontology</span><h4>The nouns of the vertical</h4><p>The entity and process model — the agentic descendant of the industry model framework. It gives the agent a shared, structured world to reason over instead of free text.</p></div>
+      <div class="ac"><span class="label">03 · Skills &amp; Plans</span><h4>Codified procedure</h4><p>Reusable skills and planning templates for the vertical's recurring tasks, so the harness does not rediscover the workflow on every run.</p></div>
+      <div class="ac"><span class="label">04 · Golden Trajectories</span><h4>Worked examples that pass</h4><p>Reference runs of real tasks, end to end, that define correct behaviour — the package's regression memory and the seed for evaluation.</p></div>
+      <div class="ac"><span class="label">05 · Evaluation Harness</span><h4>A domain's definition of "good"</h4><p>Graded question sets — simple, complex, and deliberately ambiguous — plus complexity-hotspot detection, so quality is measured, not asserted, before anything ships.</p></div>
+      <div class="ac"><span class="label">06 · Guardrails</span><h4>The vertical's non-negotiables</h4><p>Policy, compliance, and safety constraints baked in — the determinism a regulated domain demands, expressed as enforceable controls rather than hopeful prompts.</p></div>
+    </div>
+
+    <h3>And what the foundry does with it</h3>
+    <p>The foundry is the part we under-appreciate, because in the enterprise world it was "just consulting." In the agentic world it can be far more leveraged, because much of it is tooled. A foundry engagement binds a package to a customer along a few predictable seams: <strong>data &amp; identity</strong> (point the tools at this customer's systems, under their auth), <strong>policy</strong> (tune guardrails to their risk posture and jurisdiction), and <strong>voice</strong> (their house style and brand). Then it does the thing bespoke engagements throw away — it <em>keeps the learning</em>.</p>
+
+    <h3>The codification flywheel</h3>
+    <p>Every engagement produces something durable: corrections become new golden trajectories; a tricky case becomes a new eval; a repeated manual step becomes a new skill. Fed back into the package, this is a <span class="t" tabindex="0">codification flywheel<span class="tip"><span class="tip-term">Codification Flywheel</span>A loop in which the results of real work — corrections, edge cases, repeated procedures — are captured as reusable assets (skills, evals, trajectories) that make the next engagement faster and better.</span></span> — each customer makes the vertical package smarter, and the next deployment starts further ahead. It is the agentic answer to SAP's accumulated industry know-how, except the know-how is executable.</p>
+    <p>Two horizontals make this safe at enterprise scale, and they are exactly the ones a serious base harness already cares about. First, <strong>governed tool access</strong> inside a constrained, ideally <span class="t" tabindex="0">zero-egress<span class="tip"><span class="tip-term">Zero-Egress Sandbox</span>An execution environment that can use approved tools and data but cannot send data out to the open internet — so sensitive enterprise information never leaves the perimeter.</span></span> sandbox, so a course college's student records or a firm's privileged files never leave the perimeter. Second, <strong>observability</strong> over every trajectory, so each customer deployment is auditable, debuggable, and improvable — the raw material the flywheel runs on.</p>
+  </div>
+</section>
+
+<!-- ============ USE CASES ============ -->
+<section class="band band-tint">
+  <div class="wrap">
+    <span class="kicker">VI · Why this matters — four motivations</span>
+    <h2>The vision, told through the work</h2>
+    <hr class="brass">
+    <p class="lede">Each of these is a vertical we already meet as a bespoke build. Each is a Layer-2 package waiting to be packaged.</p>
+
+    <div class="case">
+      <div class="casehead"><span class="num">01</span><h3>Course materials for a vocational college</h3><span class="vert">Education · VET</span></div>
+      <p class="anec">"We built a beautiful course-material generator for one college — book-reader layout, rendered mathematics, a concept glossary, citation tokens, reusable chapter templates. Then the second college called."</p>
+      <p>The second college wanted the same engine pointed at its own units of competency, its own assessment rules, its own brand. Almost nothing about the <em>generation</em> changed; almost everything about the <em>binding</em> did. That gap is the argument in miniature. As a Layer-2 package, the generator carries the domain ontology (qualifications, units, learning outcomes), the skills (build a chapter, render a worked example, attach citations), and an eval harness that checks pedagogical soundness. The foundry binds it to one college in days, not a quarter — and every correction a teacher makes flows back as a golden trajectory the next college inherits.</p>
+    </div>
+
+    <div class="case">
+      <div class="casehead"><span class="num">02</span><h3>A legal operations agent</h3><span class="vert">Legal · Regulated</span></div>
+      <p class="anec">"A practice wanted an agent for matter work, but the first question was not 'can it draft?' It was 'can you prove what it did, and stop it doing what it must not?'"</p>
+      <p>Law is where guardrails stop being a feature and become the product. A legal Layer-2 package would govern the <em>determinism spectrum</em> directly — some steps free-form, others strictly constrained — with the harness enforcing which is which. Privilege boundaries, citation discipline, and jurisdictional rules ship inside the package; the foundry tunes them to the firm's jurisdiction and risk appetite. The bespoke version of this is months of careful, repeated work. The packaged version makes that work an asset rather than a recurring cost.</p>
+    </div>
+
+    <div class="case">
+      <div class="casehead"><span class="num">03</span><h3>A governed enterprise data agent</h3><span class="vert">Analytics · Sovereign</span></div>
+      <p class="anec">"They loved the analytics agent in the demo. Then procurement asked where the data went, and the demo had no answer."</p>
+      <p>For sovereign and regulated buyers, the deployment story <em>is</em> the value story. A data-analytics package leans hardest on the base harness: zero-egress execution, full trajectory observability, and tool access governed down to the column. The vertical contribution is the analytical ontology and the query patterns; the foundry contribution is binding it to the customer's lakehouse under their identity, inside their perimeter, with an audit trail their regulator will accept. Nobody wins this with a bespoke prototype. You win it with a package whose answer to "where does the data go?" is already written.</p>
+    </div>
+
+    <div class="case">
+      <div class="casehead"><span class="num">04</span><h3>Clinical documentation</h3><span class="vert">Healthcare</span></div>
+      <p class="anec">"The model could write the note. The hard part was every constraint that surrounds the note."</p>
+      <p>Clinical work is dense with ontology (problems, medications, codes) and unforgiving on guardrails. It is the clearest case for packaging, because the cost of getting the horizontals wrong is measured in patient safety, and no single hospital should re-derive those horizontals alone. A clinical Layer-2 package concentrates that hard-won safety once; the foundry adapts it to one health system's workflows. The flywheel — each de-identified correction sharpening the shared package — is how the vertical gets safer over time instead of merely larger.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CLOSING ============ -->
+<section class="closing">
+  <div class="wrap">
+    <span class="kicker">VII · The through-line</span>
+    <h2>Build the package, industrialise the foundry</h2>
+    <hr class="brass">
+    <p>The lesson of enterprise software is not that bespoke work is bad — it is that bespoke work is a phase. The teams that thrived were the ones who recognised the phase for what it was, harvested the commonality, and moved the value up the stack: from code, to platform, to standard, to package and foundry. The base harnesses are here. The standards are here. The bespoke domain harnesses are being built, by us, right now.</p>
+    <p>Our argument is simply that we should build them <em>as if</em> the foundry era has already begun — capturing every vertical as a package, every correction as codified memory, every engagement as a deposit in a flywheel rather than a sandcastle washed away at sign-off. Do that, and the SAP of agent harnesses is not a moonshot. It is the natural next rung, and the climb has already started.</p>
+    <blockquote class="pull">The next platform giant in AI will not write an agent for every customer. It will <span class="gold">package the vertical</span> and <span class="gold">industrialise the customisation</span>.</blockquote>
+
+    <div class="colophon">
+      Position Note · The Foundry Era<br>
+      Layer 1 base harness → Layer 2 domain packages → Layer 3 foundry<br>
+      Hover any underlined term for a definition and reference.
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

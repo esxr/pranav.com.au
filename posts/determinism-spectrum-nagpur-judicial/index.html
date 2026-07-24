@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Governing the Determinism Spectrum in the Collector's Court — A Governed AI Harness for Quasi-Judicial Work in Nagpur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Spectral:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&family=Tiro+Devanagari+Marathi:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f8f4e9;
+    --paper-2: #f0e8d5;
+    --ink: #1a1e2c;
+    --ink-soft: #3e4358;
+    --ink-faint: #80796a;
+    --rule: #ddd2b8;
+    --saffron: #b05e10;
+    --saffron-deep: #8c4a0b;
+    --indigo: #2b3a67;
+    --indigo-soft: #47567f;
+    --stoch: #b3ab94;
+    --display: "Playfair Display", Georgia, serif;
+    --body: "Spectral", Georgia, serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --dev: "Tiro Devanagari Marathi", serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(ellipse 120% 80% at 80% -10%, rgba(176,94,16,0.07), transparent 60%),
+      radial-gradient(ellipse 100% 70% at 0% 110%, rgba(43,58,103,0.07), transparent 55%),
+      var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 19px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+  .grain {
+    pointer-events: none; position: fixed; inset: 0; z-index: 9999;
+    opacity: 0.035; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 0 28px 120px; }
+
+  header.masthead { padding: 78px 0 30px; border-bottom: 1.5px solid var(--ink); animation: rise 0.9s cubic-bezier(.2,.7,.2,1) both; }
+  .kicker {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--saffron); margin: 0 0 26px; display: flex; align-items: center; gap: 14px;
+  }
+  .kicker::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+  .kicker .dev-note { font-family: var(--dev); text-transform: none; letter-spacing: 0.08em; color: var(--indigo-soft); }
+  h1 { font-family: var(--display); font-weight: 600; font-size: clamp(36px, 6.6vw, 60px); line-height: 1.04; letter-spacing: -0.015em; margin: 0; }
+  h1 em { font-style: italic; font-weight: 500; color: var(--saffron-deep); }
+  .standfirst { font-size: clamp(20px, 2.6vw, 25px); line-height: 1.42; color: var(--ink-soft); font-style: italic; margin: 24px 0 0; max-width: 42ch; }
+
+  .abstract {
+    margin: 46px 0 10px; padding: 34px 36px; background: var(--paper-2);
+    border: 1px solid var(--rule); border-left: 4px solid var(--saffron); position: relative;
+    animation: rise 0.9s cubic-bezier(.2,.7,.2,1) both; animation-delay: 0.12s;
+  }
+  .abstract .tag { font-family: var(--mono); font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--ink-faint); margin: 0 0 14px; }
+  .abstract p { margin: 0; font-size: 20px; line-height: 1.5; }
+  .abstract p + p { margin-top: 14px; }
+  .abstract strong { font-weight: 500; color: var(--ink); }
+
+  section { margin-top: 64px; }
+  .sec-no { font-family: var(--mono); font-size: 12px; letter-spacing: 0.2em; color: var(--saffron); }
+  h2 { font-family: var(--display); font-weight: 500; font-size: clamp(27px, 4.2vw, 38px); line-height: 1.08; letter-spacing: -0.012em; margin: 8px 0 18px; }
+  h3 { font-family: var(--display); font-weight: 600; font-size: 23px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  p { margin: 0 0 18px; }
+  a { color: var(--saffron-deep); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  em.term { font-style: italic; color: var(--indigo); font-weight: 400; }
+
+  /* spectrum */
+  .spectrum { margin: 30px 0 8px; }
+  .spectrum svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .axis-row { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint); margin-top: 10px; }
+  .axis-row span:first-child { color: var(--stoch); }
+  .axis-row span:last-child { color: var(--indigo); }
+
+  /* risk map + module map */
+  .riskmap { margin: 26px 0 0; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+  .riskmap .row { display: grid; grid-template-columns: 1fr 170px; gap: 0; border-top: 1px solid var(--rule); }
+  .riskmap .row:first-child { border-top: none; }
+  .riskmap .row > div { padding: 13px 14px; }
+  .riskmap .rh { background: var(--ink); color: var(--paper); font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; }
+  .riskmap .rh > div { padding: 11px 14px; }
+  .riskmap .pd { font-size: 16px; line-height: 1.4; border-right: 1px solid var(--rule); }
+  .riskmap .pd .mno { font-family: var(--mono); font-size: 12px; color: var(--saffron-deep); margin-right: 8px; }
+  .riskmap .ps { font-family: var(--mono); font-size: 12px; color: var(--indigo); line-height: 1.45; letter-spacing: 0.02em; }
+  .riskmap .ps.sub { color: var(--ink-faint); }
+  .riskmap .row:nth-child(even) { background: rgba(255,255,255,0.32); }
+
+  /* surfaces */
+  .surface { margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--rule); }
+  .surface-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; }
+  .chip { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; padding: 4px 9px; border-radius: 2px; background: var(--indigo); color: var(--paper); white-space: nowrap; }
+  .governs { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); letter-spacing: 0.04em; }
+  .governs b { color: var(--saffron-deep); font-weight: 500; }
+
+  .examples { margin: 16px 0 4px; padding: 0; list-style: none; }
+  .examples li { padding: 13px 0 13px 22px; border-left: 2px solid var(--rule); margin-bottom: 12px; }
+  .examples li:hover { border-left-color: var(--saffron); }
+  .examples .cmd { font-family: var(--mono); font-size: 0.84em; color: var(--saffron-deep); font-weight: 500; }
+  .examples b { font-weight: 500; color: var(--ink); }
+  .examples .tagref { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); display: inline-block; margin-left: 4px; padding: 1px 6px; border: 1px solid var(--rule); border-radius: 2px; vertical-align: middle; }
+
+  .guarantee { font-size: 17px; background: var(--paper-2); border: 1px solid var(--rule); padding: 14px 18px; margin: 18px 0 0; }
+  .guarantee b { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--indigo-soft); display: block; margin-bottom: 5px; font-weight: 500; }
+  .mustnot { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.04em; color: var(--saffron-deep); margin-top: 14px; }
+  .mustnot::before { content: "▸ must not be stochastic: "; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.12em; }
+
+  pre { font-family: var(--mono); font-size: 13px; line-height: 1.6; background: #1d2030; color: #e8e3d2; padding: 22px 24px; border-radius: 4px; overflow-x: auto; margin: 22px 0; border: 1px solid #323852; }
+  pre .c { color: #8d9a86; font-style: italic; }
+  pre .k { color: #dd9a5f; }
+  pre .s { color: #c9b27e; }
+  code.inl { font-family: var(--mono); font-size: 0.82em; background: var(--paper-2); padding: 1px 6px; border-radius: 3px; border: 1px solid var(--rule); }
+
+  .pull { font-family: var(--display); font-weight: 500; font-style: italic; font-size: clamp(23px, 3.4vw, 31px); line-height: 1.22; letter-spacing: -0.01em; color: var(--saffron-deep); margin: 40px 0; padding-left: 22px; border-left: 3px solid var(--saffron); }
+
+  footer { margin-top: 78px; padding-top: 26px; border-top: 1.5px solid var(--ink); font-size: 14px; color: var(--ink-faint); line-height: 1.55; }
+  footer .refs { font-family: var(--mono); font-size: 12px; letter-spacing: 0.01em; }
+  footer .refs p { margin: 0 0 7px; }
+
+  /* glossary tooltips */
+  .gloss { position: relative; border-bottom: 1px dashed var(--indigo-soft); cursor: help; }
+  .gloss:focus-visible { outline: 2px solid var(--indigo-soft); outline-offset: 2px; border-radius: 1px; }
+  .tip {
+    position: absolute; z-index: 60; top: calc(100% + 9px); left: 0;
+    width: min(322px, 80vw);
+    background: #1f2233; color: #ebe6d6;
+    font-family: var(--body); font-style: normal; font-weight: 400;
+    font-size: 15px; line-height: 1.46; letter-spacing: 0; text-align: left; text-transform: none;
+    padding: 13px 15px; border-radius: 7px; border: 1px solid #383e58;
+    box-shadow: 0 14px 36px rgba(14,16,28,0.30);
+    opacity: 0; visibility: hidden; transform: translateY(-5px);
+    transition: opacity .16s ease, transform .16s ease, visibility .16s;
+    pointer-events: none;
+  }
+  .tip::before { content: ""; position: absolute; top: -11px; left: 0; right: 0; height: 11px; }
+  .gloss:hover .tip, .gloss:focus-within .tip { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
+  .tip .tt { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: #ada78e; margin-bottom: 6px; }
+  .tip a { display: inline-block; margin-top: 10px; font-family: var(--mono); font-size: 11px; letter-spacing: .04em; color: #eba76b; text-decoration: none; border-bottom: 1px solid rgba(235,167,107,.42); }
+  .tip a:hover { color: #f5c390; border-bottom-color: #f5c390; }
+  .tip.flip-right { left: auto; right: 0; }
+  .tip.above { top: auto; bottom: calc(100% + 9px); transform: translateY(5px); }
+  .tip.above::before { top: auto; bottom: -11px; }
+  .gloss:hover .tip.above, .gloss:focus-within .tip.above { transform: translateY(0); }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 600px) {
+    body { font-size: 18px; }
+    .wrap { padding: 0 20px 90px; }
+    .abstract { padding: 26px 22px; } .abstract p { font-size: 18px; }
+    .riskmap .row { grid-template-columns: 1fr; }
+    .riskmap .ps { grid-column: 1 / -1; border-top: 1px dashed var(--rule); }
+    .riskmap .rh { display: none; }
+    .riskmap .pd { border-right: none; }
+  }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="kicker">A Position Piece &middot; A Governed AI Harness for the Collector's Court <span class="dev-note">अपील &middot; सुनावणी &middot; आदेश</span></p>
+    <h1>Governing the Determinism Spectrum <em>in the Collector's Court</em></h1>
+    <p class="standfirst">The officer signs the order in their own hand and answers for every line of it. Our job is to make deterministic the parts of that order that must never be left to chance.</p>
+  </header>
+
+  <div class="abstract">
+    <p class="tag">The pitch, in one breath</p>
+    <p>The Additional Collector, Nagpur decides land-dispute appeals as a <span class="gloss" tabindex="0">quasi-judicial<span class="tip"><span class="tt">Quasi-judicial authority</span>A revenue officer deciding appeals is not a court, but must act like one: give notice, hear both sides, weigh the record, and pass a reasoned order. Those orders face revision, and writ scrutiny by the High Court.</span></span> authority &mdash; roughly 1,500 live files, in three languages, every order exposed to <span class="gloss" tabindex="0">revision<span class="tip"><span class="tt">MLRC &sect; 257</span>Above the appeal under &sect; 247 sits the revisional jurisdiction: a superior revenue authority may call for and examine the record of any inquiry or proceedings to satisfy itself of the legality or propriety of a decision.<a href="https://www.indiacode.nic.in/handle/123456789/15974?locale=en" target="_blank" rel="noopener">Maharashtra Land Revenue Code, 1966 &#8599;</a></span></span> and writ scrutiny. An AI platform can digitise the record, summarise the file, and draft the order &mdash; but the officer who signs it remains accountable for output they have no realistic way to re-verify page by page. A confidence score of <code class="inl">0.85</code> is built for engineers, not for how a deciding officer reasons about a record.</p>
+    <p>The answer is not a better confidence score. It is <strong>deciding, deliberately, which parts of the appellate workflow must not be stochastic</strong> &mdash; the cited provision of the <span class="gloss" tabindex="0">MLRC<span class="tip"><span class="tt">Maharashtra Land Revenue Code, 1966</span>The statute governing revenue administration in Maharashtra &mdash; record of rights, mutations (&sect; 150), appeals (&sect; 247), revision (&sect; 257) and review. The law the Additional Collector's orders must live inside.<a href="https://www.indiacode.nic.in/handle/123456789/15974?locale=en" target="_blank" rel="noopener">India Code: MLRC, 1966 &#8599;</a></span></span>, the completeness of the record, the service of notice, the reasons behind the order, the signature that issues it &mdash; and guaranteeing them in code the model cannot route around. We call this <span class="gloss" tabindex="0"><strong>gradual determinism</strong><span class="tip"><span class="tt">Our framing</span>Borrowed from &ldquo;gradual typing&rdquo; in programming: instead of making the whole AI deterministic, you opt into hard guarantees only at the points that must not vary, and leave it fluent everywhere else.</span></span>: let the AI stay fluent and fast where it earns its keep &mdash; reading a 687-page bundle, summarising, drafting &mdash; and pin down the handful of things that, if wrong, vitiate orders and end careers. The result is a <strong>domain harness for the Collectorate</strong> in which &ldquo;the AI assists, the officer decides&rdquo; is not a policy statement but a property of the system.</p>
+  </div>
+
+  <section id="premise">
+    <p class="sec-no">01 / THE PREMISE</p>
+    <h2>A safeguard the model can skip is not a safeguard</h2>
+    <p>India already has its case study. In late 2024 the Bengaluru bench of a tax tribunal recalled its own order after it was found to rest on judgments that did not exist; in 2025 the Bombay High Court quashed a &#8377;27.91-crore assessment because the deciding authority had relied on three fabricated decisions; and the Supreme Court has since held that citing AI-generated authorities without verification is professional misconduct. Note what these have in common: the failures happened <em>inside adjudication</em> &mdash; tribunals and revenue authorities, not careless juniors. An AI that <em>usually</em> cites a real provision, <em>usually</em> links a finding to the record, and <em>usually</em> respects the hearing procedure is not a safeguard for a quasi-judicial office &mdash; it is a ground of appeal with good odds. When the rule and the actor share a room, the actor wins; a model can paraphrase a checklist, decide a verification was unnecessary this time, or fabricate a citation that reads perfectly in two languages.</p>
+    <p>The Nagpur pilot's own safety posture says the right words: <em>&ldquo;AI shall not independently decide any case. AI shall not issue orders. Every final decision shall remain with the competent authority.&rdquo;</em> This paper is about the difference between saying that and <strong>making it structurally true</strong>. A deterministic check is also the opposite of another review for the officer to perform: <strong>the harness runs the verification, and refuses to finish until it passes.</strong> The re-do is removed, not relocated onto the person who was already carrying the responsibility.</p>
+  </section>
+
+  <section id="map">
+    <p class="sec-no">02 / THE RISK MAP</p>
+    <h2>Where each friction meets a surface</h2>
+    <p>The frictions of the Additional Collector's office &mdash; the ones the pilot proposal documents slide by slide &mdash; sort cleanly onto the control surfaces below. Most are direct: a guarantee can be placed exactly where the friction lives. One &mdash; the officer's judicial discretion &mdash; is deliberately <em>not</em> a surface at all, and is marked accordingly.</p>
+    <div class="riskmap">
+      <div class="row rh"><div>The friction &middot; the fear</div><div>Surface</div></div>
+      <div class="row"><div class="pd">Officer signs orders built on AI summaries they cannot re-verify page by page</div><div class="ps">Hooks &middot; Loops</div></div>
+      <div class="row"><div class="pd">Fabricated or out-of-force citations surviving into a signed order</div><div class="ps">Hooks</div></div>
+      <div class="row"><div class="pd">Missing mandatory records discovered at the hearing, not before</div><div class="ps">Commands &middot; Scripts</div></div>
+      <div class="row"><div class="pd">Petitions, maps and prior orders scattered across bulky trilingual paper files</div><div class="ps">Scripts &middot; Hooks</div></div>
+      <div class="row"><div class="pd">Cause-lists and hearing prep re-assembled by hand before each sitting</div><div class="ps">Commands &middot; Scripts</div></div>
+      <div class="row"><div class="pd">Every officer in the chain re-reads the file from scratch; no shared brief</div><div class="ps">Commands &middot; Scripts</div></div>
+      <div class="row"><div class="pd">Orders typed from a clean sheet; formats drift between clerks and benches</div><div class="ps">Scripts &middot; Hooks</div></div>
+      <div class="row"><div class="pd">Every order faces revision and writ scrutiny; the office must show the rule held</div><div class="ps">Wrappers &middot; Hooks</div></div>
+      <div class="row"><div class="pd">How the officer weighs evidence and decides the appeal</div><div class="ps sub">Not a surface &mdash; stays human</div></div>
+    </div>
+  </section>
+
+  <section id="spectrum">
+    <p class="sec-no">03 / THE FRAME</p>
+    <h2>Five surfaces, one axis</h2>
+    <p>The mechanisms already standardised in modern agent harnesses line up along the <em class="term">anatomy of the appeal</em>. Commands govern its <b>entry</b>. Scripts govern <b>execution</b>. Hooks govern the <b>exit</b>. Loops govern <b>continuation</b>. Wrappers own the <b>whole workflow</b>. Read left to right, the ordering tracks two things at once: how much is guaranteed, and how far the control sits beyond the model's reach. A skill the model can paraphrase is in-band; a hook the harness enforces regardless of the model is out-of-band &mdash; and that gap is the whole difference between a pattern and a control.</p>
+    <div class="spectrum">
+      <svg viewBox="0 0 700 210" role="img" aria-label="Spectrum from model discretion to office guarantee across five control surfaces">
+        <defs>
+          <linearGradient id="band" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#b3ab94"/><stop offset="45%" stop-color="#7d6f66"/><stop offset="100%" stop-color="#2b3a67"/>
+          </linearGradient>
+          <filter id="soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.2"/></filter>
+        </defs>
+        <rect x="40" y="92" width="240" height="14" rx="7" fill="url(#band)" filter="url(#soft)" opacity="0.55"/>
+        <rect x="40" y="92" width="620" height="14" rx="7" fill="url(#band)"/>
+        <g font-family="IBM Plex Mono, monospace" fill="#1a1e2c" text-anchor="middle">
+          <circle cx="92" cy="99" r="9" fill="#b3ab94" stroke="#1a1e2c" stroke-width="1.4"/>
+          <text x="92" y="64" font-size="14" font-weight="500">Commands</text><text x="92" y="146" fill="#80796a" font-size="11">ENTRY</text>
+          <circle cx="225" cy="99" r="9" fill="#a08c6a" stroke="#1a1e2c" stroke-width="1.4"/>
+          <text x="225" y="64" font-size="14" font-weight="500">Scripts</text><text x="225" y="146" fill="#80796a" font-size="11">EXECUTION</text>
+          <circle cx="358" cy="99" r="9" fill="#6f6260" stroke="#1a1e2c" stroke-width="1.4"/>
+          <text x="358" y="64" font-size="14" font-weight="500">Hooks</text><text x="358" y="146" fill="#80796a" font-size="11">EXIT &middot; VERIFY</text>
+          <circle cx="491" cy="99" r="9" fill="#4a4f74" stroke="#1a1e2c" stroke-width="1.4"/>
+          <text x="491" y="64" font-size="14" font-weight="500">Loops</text><text x="491" y="146" fill="#80796a" font-size="11">CONTINUATION</text>
+          <circle cx="624" cy="99" r="10" fill="#2b3a67" stroke="#1a1e2c" stroke-width="1.6"/>
+          <text x="624" y="64" font-size="14" font-weight="600">Wrappers</text><text x="624" y="146" fill="#80796a" font-size="11">WHOLE WORKFLOW</text>
+        </g>
+        <line x1="40" y1="176" x2="660" y2="176" stroke="#ddd2b8" stroke-width="1.5"/>
+        <polygon points="660,176 650,172 650,180" fill="#2b3a67"/>
+      </svg>
+      <div class="axis-row"><span>&larr; model discretion &middot; in-band</span><span>office guarantee &middot; out-of-band &rarr;</span></div>
+    </div>
+  </section>
+
+  <section id="surfaces">
+    <p class="sec-no">04 / THE SURFACES, IN THE COLLECTORATE</p>
+    <h2>Where determinism is bought</h2>
+
+    <!-- COMMANDS -->
+    <div class="surface">
+      <div class="surface-head"><span class="chip">Commands</span><h3>Routing determinism</h3><span class="governs">governs <b>entry</b></span></div>
+      <p>Skill selection belongs to the model; a clerk cannot compel a skill to fire. Commands invert that. A command is operator-invoked &mdash; a named, logged, auditable entry point into a procedure that runs the same way for every clerk, every bench assistant, every officer in the chain. You cannot make the model <em>choose</em> the right path; you can hand the office a path the model cannot decline.</p>
+      <ul class="examples">
+        <li><span class="cmd">/register-appeal</span> &mdash; registers a new appeal under <span class="gloss" tabindex="0"><b>MLRC &sect; 247</b><span class="tip"><span class="tt">Appeals</span>Section 247 provides the appeal against orders of subordinate revenue officers &mdash; the Tahsildar, Naib Tahsildar and SDO &mdash; to the appellate authority; alongside it sit revision (&sect; 257) and review. The jurisdictional doorway to every file in this pilot.<a href="https://www.indiacode.nic.in/handle/123456789/15974?locale=en" target="_blank" rel="noopener">Maharashtra Land Revenue Code, 1966 &#8599;</a></span></span> with structured metadata &mdash; parties, village, survey number, impugned order, the officer who passed it &mdash; and computes the limitation position at the door rather than at the first hearing. A registration that &ldquo;usually captures everything&rdquo; is a defective file in waiting; as a command it is a guaranteed gate with a record that it fired. <span class="tagref">registration</span></li>
+        <li><span class="cmd">/scrutiny</span> &mdash; runs the case-type checklist deterministically: the <span class="gloss" tabindex="0">7/12 extract<span class="tip"><span class="tt">&#2360;&#2366;&#2340;&#2348;&#2366;&#2352;&#2366; &middot; village forms VII &amp; XII</span>The record-of-rights extract for a land parcel &mdash; occupants, tenure, crops &mdash; maintained under the MLRC and the Record of Rights rules. The single most-demanded document in any revenue appeal, and the first thing found missing.</span></span>, the <span class="gloss" tabindex="0">mutation extract<span class="tip"><span class="tt">MLRC &sect; 150</span>The register of mutations records changes in rights over land; disputed entries go to the register of disputed cases. Appeals against mutation entries are a staple of the Additional Collector's docket.<a href="https://www.indiacode.nic.in/handle/123456789/15974?locale=en" target="_blank" rel="noopener">MLRC, 1966, &sect; 150 &#8599;</a></span></span>, the map, the certified copy of the impugned order, the lower record &mdash; and issues a deficiency memo the same day, not at the hearing three months later. <span class="tagref">deficiency</span></li>
+        <li><span class="cmd">/cause-list</span> &mdash; assembles the day's cause-list from the case database: party readiness, pending notices, prior order-sheets &mdash; one invocation replacing the manual re-assembly before each sitting. <span class="tagref">hearings</span></li>
+        <li><span class="cmd">/hearing-record</span> &mdash; the structured capture of a hearing: recording or upload, type (<span class="gloss" tabindex="0">Roznama<span class="tip"><span class="tt">&#2352;&#2379;&#2332;&#2344;&#2366;&#2350;&#2366; &middot; order sheet</span>The running diary of a revenue case &mdash; each hearing's date, appearances, what transpired, and the interim directions. The procedural backbone an appellate or revisional authority reads first.</span></span> / party statement / officer note), participants, hearing date &mdash; routed to the right slot in the file every time, in the same shape, by every member of the hearing staff. <span class="tagref">roznama</span></li>
+        <li><span class="cmd">/case-brief</span> &mdash; generates the officer-ready brief before a hearing from the indexed record &mdash; so the third officer to touch the file inherits a structured brief instead of re-reading 687 pages from scratch. The prose is the model's; that a brief exists, in the office's format, before every hearing, is the command's. <span class="tagref">preparation</span></li>
+      </ul>
+      <div class="guarantee"><b>Guarantee</b>This procedure ran &mdash; because a person invoked it &mdash; not because the model judged it relevant this time.</div>
+      <p class="mustnot">whether registration, scrutiny and the hearing record happened at all.</p>
+    </div>
+
+    <!-- SCRIPTS -->
+    <div class="surface">
+      <div class="surface-head"><span class="chip">Scripts</span><h3>Computational determinism</h3><span class="governs">governs <b>execution</b></span></div>
+      <p>A workflow phase written in natural language leaves both interpretation and code generation to the model at runtime &mdash; the right default for novel work, the wrong one for a calculation that must come out the same for every appellant. Once a phase has been generated, reviewed and approved, the code is frozen as a versioned script and the phase reduced to &ldquo;invoke it.&rdquo; The non-determinism of re-derivation collapses into a reviewed, auditable artifact.</p>
+      <ul class="examples">
+        <li><b>Limitation arithmetic.</b> The appeal window computed deterministically from the date of the impugned order, with the time spent obtaining the certified copy excluded the same way every time. Whether an appeal is in time decides jurisdiction; it is precisely the arithmetic that must never be improvised afresh per file. <span class="tagref">limitation</span></li>
+        <li><b>Deficiency checklist per case type.</b> Which records are mandatory for a mutation appeal versus a partition or demarcation matter is a frozen, versioned table &mdash; not a judgment call the model re-makes per file. The AI reads documents; the <em>list</em> of what must exist is code. <span class="tagref">deficiency</span></li>
+        <li><b>Digitisation &amp; indexing pipeline.</b> Scanning, OCR and indexing of Marathi, Hindi and English records as a reproducible pipeline: the same 687-page file yields the same indexed record on every run, with every extracted event tied to its page. Corrections are new versions, not silent drift. <span class="tagref">record</span></li>
+        <li><b>Pendency &amp; dashboard metrics.</b> Cases this month, pending review, long-pending, reserved orders &mdash; computed by query, not narrated by a model. A dashboard the Collector reads must never be a hallucination surface. <span class="tagref">pendency</span></li>
+        <li><b>Bilingual order templates.</b> The skeleton of a final order &mdash; cause title, parties, procedural history from the Roznama, operative-part scaffolding &mdash; populated deterministically from case metadata in Marathi and English, removing transcription error from the very documents that get appealed. <span class="tagref">orders</span></li>
+      </ul>
+      <div class="guarantee"><b>Guarantee</b>This step computes the same way every time, from code the office approved &mdash; not freshly improvised prose.</div>
+      <p class="mustnot">limitation dates, mandatory-record lists, and the contents of the indexed record.</p>
+    </div>
+
+    <!-- HOOKS -->
+    <div class="surface">
+      <div class="surface-head"><span class="chip">Hooks</span><h3>Verification determinism</h3><span class="governs">governs <b>exit</b></span></div>
+      <p>Hooks fire deterministic code at fixed points in the loop. Their headline job here is at the <em>exit</em> &mdash; inspecting a draft before it is allowed to be &ldquo;done&rdquo; &mdash; but the same mechanism also gates each tool call: a <b>PreToolUse</b> hook can allow, deny or rewrite a call before it runs, and a <b>PostToolUse</b> hook inspects the result once it returns. Any of them can gate the work, and a stop-hook can re-drive it: a failed check feeds its reason back to the model as the next instruction, so the failure is worked off rather than landing on the officer's desk. One guardrail is mandatory at the exit: the harness exposes a flag that is true when the model is already in a forced continuation, and the stop-hook must honour it or it will loop forever.</p>
+      <ul class="examples">
+        <li><b>Provision &amp; citation verifier.</b> Every MLRC section, rule and case-law citation in a draft order is checked against the office's statute store &mdash; the Code <em>as amended through the configured cut-off date</em> &mdash; and against authoritative law reports before the draft can leave the harness. This is the mechanical answer to the run of Indian fabricated-citation incidents, to the Supreme Court's misconduct warning, and to the <span class="gloss" tabindex="0">Kerala High Court's AI policy<span class="tip"><span class="tt">First binding judicial AI policy &middot; July 2025</span>The Kerala High Court's policy on AI tools in the district judiciary (19 July 2025): AI is never a substitute for decision-making or legal reasoning, only approved tools may be used, and all AI-produced citations and translations must be meticulously verified.<a href="https://images.assettype.com/theleaflet/2025-07-22/mt4bw6n7/Kerala_HC_AI_Guidelines.pdf" target="_blank" rel="noopener">Kerala HC AI Guidelines (PDF) &#8599;</a></span></span> requirement that AI citations be meticulously verified &mdash; enforced as a gate, not a reminder. <span class="tagref">citations</span></li>
+        <li><b>Source-link gate.</b> No paragraph of a draft order or case brief may survive without a page-level citation into the digitised record (<code class="inl">p.3 &middot; p.239</code>). An unsourced finding cannot be the final turn &mdash; the &ldquo;every line cites its source&rdquo; promise of the pilot, made unskippable. <span class="tagref">provenance</span></li>
+        <li><b>Natural-justice gate.</b> Before an order finalises, a deterministic check that <span class="gloss" tabindex="0">audi alteram partem<span class="tip"><span class="tt">Natural justice</span>&ldquo;Hear the other side&rdquo; &mdash; the rule that no one is condemned unheard. For a quasi-judicial authority, an order passed without notice and opportunity of hearing is liable to be set aside regardless of its merits.</span></span> is satisfied on the record: notices issued and served on every respondent, appearances or ex-parte procedure recorded in the Roznama. An order that skipped a hearing is void on arrival; the gate makes it unreachable instead. <span class="tagref">natural justice</span></li>
+        <li><b>Reasoned-order gate.</b> Every operative conclusion must be supported by recorded reasons tied to the record &mdash; the duty the Supreme Court fixed on quasi-judicial authorities in <span class="gloss" tabindex="0"><b>Kranti Associates</b><span class="tip"><span class="tt">(2010) 9 SCC 496</span>Kranti Associates Pvt. Ltd. v. Masood Ahmed Khan: the Supreme Court's synthesis of why quasi-judicial orders must record reasons &mdash; reasons restrain arbitrariness, enable appeal and revision, and are as indispensable as natural justice itself.<a href="https://indiankanoon.org/doc/1304475/" target="_blank" rel="noopener">Kranti Associates v. Masood Ahmed Khan &#8599;</a></span></span>. A bare, unreasoned draft is blocked with the gaps named. <span class="tagref">reasons</span></li>
+        <li><b>Egress &amp; data-protection gate.</b> Blocks any output that would route case records or citizens' personal data to an un-approved destination &mdash; the concrete control behind &ldquo;no public AI model training on government data,&rdquo; on-premise deployment, and the <span class="gloss" tabindex="0">DPDP Act<span class="tip"><span class="tt">Digital Personal Data Protection Act, 2023</span>India's personal-data statute. Land-dispute files are dense with citizens' personal data &mdash; names, holdings, family partitions &mdash; and a government platform processing them needs purpose-bound, auditable data flows.</span></span> obligations that come with a file full of citizens' holdings and family disputes. <span class="tagref">confidentiality</span></li>
+        <li><b>Record-access gate.</b> A <b>PreToolUse</b> hook confines each retrieval to the cases the requesting role is permissioned for; a <b>PostToolUse</b> hook stamps provenance on every document returned and writes the access to the audit trail &mdash; case-wise permissioning enforced at the tool boundary, not in a policy document. <span class="tagref">access</span></li>
+      </ul>
+      <p>Where the property needs judgment rather than a pass/fail rule &mdash; &ldquo;does this order actually deal with every ground the appellant pressed?&rdquo; &mdash; a prompt- or agent-type hook runs a cheap evaluator in the same slot. The shape is identical; only the oracle changes.</p>
+<pre><span class="c">#!/usr/bin/env python3</span>
+<span class="c">"""Stop-hook gate: a draft order cannot leave the harness until every cited</span>
+<span class="c">provision verifies against the statute store, every paragraph carries a</span>
+<span class="c">page-level source link, and the natural-justice checks pass on the record.</span>
+<span class="c"></span>
+<span class="c">The harness invokes this when the model tries to end its turn. Emitting a</span>
+<span class="c">"block" decision returns control to the model with `reason` as its next</span>
+<span class="c">instruction; exiting 0 silently lets the turn finish.</span>
+<span class="c">"""</span>
+<span class="k">import</span> json, sys
+<span class="k">from</span> collectorate.verify <span class="k">import</span> (
+    unverified_provisions,   <span class="c"># MLRC as amended through the cut-off</span>
+    unsourced_paragraphs,    <span class="c"># every finding needs a page citation</span>
+    natural_justice_breaches, <span class="c"># notice served, hearing on the Roznama</span>
+)
+
+payload = json.load(sys.stdin)
+
+<span class="c"># Honour the forced-continuation flag, or this gate loops forever.</span>
+<span class="k">if</span> payload.get(<span class="s">"stop_hook_active"</span>):
+    sys.exit(0)
+
+draft = payload[<span class="s">"last_output"</span>]
+problems = (unverified_provisions(draft)
+            + unsourced_paragraphs(draft)
+            + natural_justice_breaches(draft))
+<span class="k">if</span> problems:
+    print(json.dumps({
+        <span class="s">"decision"</span>: <span class="s">"block"</span>,
+        <span class="s">"reason"</span>: <span class="s">"Resolve before finishing:\n- "</span> + <span class="s">"\n- "</span>.join(problems),
+    }))
+sys.exit(0)</pre>
+      <div class="guarantee"><b>Guarantee</b>The turn cannot end until the draft passes checks the model does not control &mdash; and failure re-drives the work, instead of landing on the officer's desk.</div>
+      <p class="mustnot">cited provisions, source links, notice &amp; hearing, reasons, and data egress.</p>
+    </div>
+
+    <!-- LOOPS -->
+    <div class="surface">
+      <div class="surface-head"><span class="chip">Loops</span><h3>Conditional continuation</h3><span class="governs">governs <b>iteration</b></span></div>
+      <p>A loop construct runs a task repeatedly until a satisfactory outcome is reached. It is not deterministic on its own &mdash; but it raises the floor of what the office can expect, and it composes naturally with hooks: the hook is the oracle, the loop is the driver. The honest caveat is that a loop is only as trustworthy as its verifier; a loop without a real test simply burns time.</p>
+      <ul class="examples">
+        <li><b>Draft order, until clean.</b> Redraft until the provision verifier, the source-link gate and the reasoned-order gate all report clean &mdash; convergence on verifiable properties, not a single best-effort pass that the officer must then debug. <span class="tagref">orders</span></li>
+        <li><b>Case timeline, until sourced.</b> Refine the reconstructed history of the case &mdash; notices, hearings, mutations, prior orders &mdash; until every event links to its page in the digitised file; no orphan facts surviving into the brief the officer relies on. <span class="tagref">timeline</span></li>
+        <li><b>Hearing record, until complete.</b> Iterate transcription and structuring until every hearing on the cause-list has its Roznama entry, participant log and order sheet attached to the right case. <span class="tagref">roznama</span></li>
+      </ul>
+      <div class="guarantee"><b>Guarantee</b>The harness keeps working until a stated condition holds &mdash; as trustworthy as the condition you can verify, and no more.</div>
+      <p class="mustnot">that a draft is only &ldquo;finished&rdquo; once a named test is satisfied.</p>
+    </div>
+
+    <!-- WRAPPERS -->
+    <div class="surface">
+      <div class="surface-head"><span class="chip">Wrappers</span><h3>Orchestration determinism</h3><span class="governs">governs the <b>whole workflow</b></span></div>
+      <p>A custom wrapper drives the harness through its API or CLI &mdash; the most deterministic surface, because the control flow lives in code the office owns rather than in the model's discretion. A first headless call returns a session identifier; subsequent calls resume that session, preserving full context across turns, so an external program can hold a case open from registration to disposal, insert hard human gates between phases, and bound iteration. The model supplies capability; the wrapper supplies the guarantee that nothing issues from the office unsigned.</p>
+      <ul class="examples">
+        <li><b>Officer sign-off gate.</b> &ldquo;AI shall not issue orders&rdquo; made structural: the issue step is unreachable in code without the Additional Collector's recorded approval. The AI drafts; the workflow makes it impossible for a draft to become an order any other way. <span class="tagref">sign-off</span></li>
+        <li><b>Role-routed workflow.</b> Record-room staff digitise, scrutiny staff run checklists, hearing staff capture Roznamas, the officer decides &mdash; the wrapper enforces who can trigger what, so case-wise, role-based permissioning is workflow fact rather than access-policy aspiration. <span class="tagref">roles</span></li>
+        <li><b>Objective docket record.</b> The wrapper emits a structured, real-time view of every appeal &mdash; what ran, what is pending, what is deficient, what is overdue &mdash; so the Collector supervises on an objective record rather than on what a monthly return chooses to report. <span class="tagref">supervision</span></li>
+        <li><b>Tamper-evident custody.</b> The wrapper owns the thread that drives every document pull and every edit, writing each to an append-only audit trail &mdash; the chain of custody that lets a digitised record stand behind the certificate an electronic record needs in evidence. <span class="tagref">audit</span></li>
+      </ul>
+<pre><span class="c">"""Deterministic envelope around the harness for an appeal file.</span>
+<span class="c"></span>
+<span class="c">The office &mdash; not the model &mdash; owns the control flow: it opens a session,</span>
+<span class="c">holds it open by session id across turns, and makes the "issue" step</span>
+<span class="c">structurally unreachable without the Additional Collector's sign-off.</span>
+<span class="c">"""</span>
+<span class="k">import</span> json, subprocess
+
+<span class="k">def</span> run(prompt, session=<span class="k">None</span>):
+    <span class="c">"""Run one turn of the harness; return its parsed JSON result.</span>
+<span class="c"></span>
+<span class="c">    :param prompt: the operator instruction for this turn.</span>
+<span class="c">    :param session: a session id to resume, or None to open a new case thread.</span>
+<span class="c">    :returns: the result dict, including `session_id` for continuation.</span>
+<span class="c">    """</span>
+    cmd = [<span class="s">"claude"</span>, <span class="s">"-p"</span>, prompt, <span class="s">"--output-format"</span>, <span class="s">"json"</span>, <span class="s">"--max-turns"</span>, <span class="s">"8"</span>]
+    <span class="k">if</span> session:
+        cmd += [<span class="s">"--resume"</span>, session]
+    <span class="k">return</span> json.loads(subprocess.run(cmd, capture_output=<span class="k">True</span>, text=<span class="k">True</span>).stdout)
+
+draft = run(<span class="s">"Draft the order for appeal 118/A-247/2026. Do not issue anything."</span>)
+sid = draft[<span class="s">"session_id"</span>]
+
+<span class="c"># The order cannot issue without the competent authority's approval.</span>
+<span class="k">if</span> additional_collector_signs_off(draft[<span class="s">"result"</span>]):
+    run(<span class="s">"Finalise the approved order and enter it in the case record."</span>, session=sid)</pre>
+      <div class="guarantee"><b>Guarantee</b>The entire control flow &mdash; gates, approvals, supervision &mdash; lives in code the office owns; the model is a callable step inside it, never the thing that decides what issues.</div>
+      <p class="mustnot">what leaves the office as an order, and who signed it.</p>
+    </div>
+  </section>
+
+  <section id="discretion">
+    <p class="sec-no">05 / THE DISCRETION QUESTION</p>
+    <h2>What the harness can and cannot do to the officer's judgment</h2>
+    <p>We will be straight about this, because it is the question every deciding officer should ask first. A determinism harness does not weigh evidence, does not prefer one witness's 7/12 story over another's, and does not decide an appeal. Judicial discretion &mdash; the appreciation of the record, the balancing of equities, the decision itself &mdash; belongs to the <span class="gloss" tabindex="0">competent authority<span class="tip"><span class="tt">The pilot's own words</span>&ldquo;AI shall not independently decide any case. AI shall not issue orders. Every final decision shall remain with the competent authority.&rdquo; The Kerala High Court's district-judiciary AI policy draws the same line: AI is never a substitute for decision-making or legal reasoning.</span></span>, and no surface on this spectrum touches it. That is not a limitation of the design; it <em>is</em> the design.</p>
+    <p>What the harness <em>does</em> is supply the substrate that discretion has always deserved: a complete record, verified citations, a sourced brief, a hearing history that is actually on the file, and a draft whose every line can be traced to its page. The officer's judgment gets spent on judging &mdash; not on finding, checking, and repeating. And because every control is code, the office holds a guaranteed, auditable account of which checks ran on which file: the evidence on which the order's integrity can stand when it is tested in revision or under Article 227. The discretion remains the officer's; the harness makes it defensible.</p>
+  </section>
+
+  <section id="compose">
+    <p class="sec-no">06 / COMPOSITION</p>
+    <h2>Deterministic skeleton, stochastic muscle</h2>
+    <p>These surfaces are not alternatives; they stack. A command routes the clerk into the office's procedure, a script performs the limitation arithmetic that must come out identically, a hook verifies the draft and re-drives on failure, and a wrapper holds the officer's signature around the whole exchange. The model keeps its fluency in the gaps between &mdash; reading a trilingual 687-page record, summarising it, drafting the first version of an order &mdash; which is exactly where fluency is worth having and where a wrong first draft is cheap to catch.</p>
+    <p class="pull">We are not making the AI deterministic. We are deciding, surface by surface, which things in an appeal the AI is no longer permitted to get wrong.</p>
+    <p>It is worth being precise about the claim. Generation stays stochastic; the model still improvises a draft. What the office gains is <em class="term">guaranteed invariants at the points that carry legal consequence</em> &mdash; islands of determinism around a fluent core. That is a more honest promise than &ldquo;trustworthy AI,&rdquo; and a far more useful one to an authority whose every order must survive appellate scrutiny.</p>
+  </section>
+
+  <section id="pilot">
+    <p class="sec-no">07 / THE PILOT, READ THROUGH THIS LENS</p>
+    <h2>The Nagpur modules already sort onto the spectrum</h2>
+    <p>The pilot proposed for the Additional Collector's office &mdash; ten modules over ~1,500 live land-dispute appeals, deployed in 12&ndash;16 weeks &mdash; was not written in this vocabulary, but it decomposes into it almost without remainder. Reading the module list against the spectrum shows which guarantees the pilot already implies, and where the discipline must be made explicit rather than assumed.</p>
+    <div class="riskmap">
+      <div class="row rh"><div>Pilot module</div><div>Surface it lives on</div></div>
+      <div class="row"><div class="pd"><span class="mno">M&middot;01</span>Case registration &mdash; structured metadata, tracked from filing</div><div class="ps">Commands</div></div>
+      <div class="row"><div class="pd"><span class="mno">M&middot;02</span>Digitisation &mdash; scanning, OCR, trilingual indexing</div><div class="ps">Scripts</div></div>
+      <div class="row"><div class="pd"><span class="mno">M&middot;03</span>AI document intelligence &mdash; classification, semantic search</div><div class="ps sub">The stochastic core</div></div>
+      <div class="row"><div class="pd"><span class="mno">M&middot;04</span>Document deficiency &mdash; checklist-driven flags for missing records</div><div class="ps">Scripts &middot; Hooks</div></div>
+      <div class="row"><div class="pd"><span class="mno">M&middot;05</span>Hearing management &mdash; cause-lists, recording, order sheets</div><div class="ps">Commands &middot; Scripts</div></div>
+      <div class="row"><div class="pd"><span class="mno">M&middot;06</span>Case summary &mdash; officer-ready briefs from the indexed record</div><div class="ps">Loops &middot; Hooks</div></div>
+      <div class="row"><div class="pd"><span class="mno">M&middot;07</span>Draft order &mdash; source-linked clauses, edited by the officer</div><div class="ps">Loops &middot; Hooks</div></div>
+      <div class="row"><div class="pd"><span class="mno">M&middot;08</span>Dashboard &mdash; pendency, upcoming hearings, disposal</div><div class="ps">Scripts &middot; Wrappers</div></div>
+      <div class="row"><div class="pd"><span class="mno">M&middot;09</span>User management &mdash; role-based, case-wise access</div><div class="ps">Wrappers</div></div>
+      <div class="row"><div class="pd"><span class="mno">M&middot;10</span>Audit trail &mdash; every action, edit and access logged</div><div class="ps">Wrappers</div></div>
+    </div>
+    <p style="margin-top:18px;">Two readings follow. First, the pilot's core AI modules &mdash; document intelligence, summaries, draft orders &mdash; are exactly the stochastic muscle this paper says to keep stochastic; their value is fluency across Marathi, Hindi and English at a scale no officer can match. Second, everything around them that the proposal promises as a <em>feature</em> &mdash; source-linked clauses, deficiency flags, human approval, audit logs &mdash; is only a <em>guarantee</em> if it is implemented out-of-band: as the command, script, hook and wrapper surfaces above, where the model cannot paraphrase its way past them. The distance between a feature and a guarantee is the distance between a demo and an institution.</p>
+  </section>
+
+  <section id="why">
+    <p class="sec-no">08 / WHY IT MATTERS HERE</p>
+    <h2>The control surface is the audit surface</h2>
+    <p>A revisional authority, a High Court under Article 227, an RTI applicant and a departmental audit do not ask for cleverness. They ask whether the office can show, after the fact, that the rule held &mdash; that notice was served, that the record was complete, that the cited provision exists as amended, that the officer and not the machine decided. Every surface on this spectrum is code &mdash; a command definition, a frozen script, a hook, an orchestration wrapper &mdash; and code is versionable, reviewable, signable and attestable. The same move that makes a control tamper-resistant against the model makes it legible to the Collector, to the appellate chain, and to the citizen whose land is in dispute.</p>
+    <p>For a quasi-judicial office adopting AI in the middle of India's fabricated-citation moment &mdash; with the Supreme Court calling unverified AI authorities misconduct and the first High Court policies drawing hard lines around judicial AI use &mdash; that shift from <em class="term">hoping the AI behaved</em> to <em class="term">demonstrating the envelope it ran inside</em> is the whole point. It is how the office sees its own compliance posture, how the Collector supervises work they cannot personally re-read, and how the officer who signs the order is finally equipped to stand behind it. Gradual determinism is how a Collectorate adopts AI without surrendering the authority, discretion and responsibility that make it a court.</p>
+  </section>
+
+  <footer>
+    <p>A working position on how a quasi-judicial office can adopt AI in land-dispute appellate work without surrendering accountability &mdash; written as a companion to the AI-enabled judicial workflow pilot proposed for the Office of the Additional Collector, Nagpur, and offered for discussion and refinement.</p>
+    <div class="refs">
+      <p>Legal references are indicative and intended to locate each control against a real obligation; the office's own legal branch remains the source of truth. Touchpoints referenced: the Maharashtra Land Revenue Code, 1966 (record of rights and register of mutations, &sect; 150; appeals, &sect; 247; revision, &sect; 257) and the Record of Rights rules behind the 7/12 extract; the natural-justice duties of quasi-judicial authorities and the reasoned-order requirement in Kranti Associates Pvt. Ltd. v. Masood Ahmed Khan, (2010) 9 SCC 496; the Kerala High Court's Policy Regarding Use of Artificial Intelligence Tools in District Judiciary (19 July 2025); the 2024&ndash;26 run of Indian fabricated-citation incidents and the Supreme Court's characterisation of citing unverified AI-generated authorities as misconduct; the certification requirements for electronic records in evidence; and the Digital Personal Data Protection Act, 2023.</p>
+      <p>Pilot particulars &mdash; case load, languages, module list, prototype behaviour and the AI-safety posture quoted &mdash; are from the proposal for an AI-enabled judicial workflow platform for the Collector's Office, Nagpur (I D Innovation Pvt. Ltd., 2026). Harness mechanics verified against the Claude Code Hooks reference (PreToolUse allow / deny / rewrite of a tool call before it runs, PostToolUse inspection of its result, and stop-hook block / continue semantics with the forced-continuation flag) and the Headless mode documentation (JSON output, session id, resume, and turn bounds).</p>
+    </div>
+  </footer>
+
+</div>
+<script>
+  (function () {
+    function place(g) {
+      var tip = g.querySelector('.tip');
+      if (!tip) return;
+      tip.classList.remove('flip-right', 'above');
+      var r = g.getBoundingClientRect();
+      var tw = tip.offsetWidth, th = tip.offsetHeight, pad = 10;
+      if (r.left + tw > window.innerWidth - pad) tip.classList.add('flip-right');
+      if (r.bottom + 9 + th > window.innerHeight - pad && r.top - th - 9 > pad) tip.classList.add('above');
+    }
+    document.querySelectorAll('.gloss').forEach(function (g) {
+      g.addEventListener('mouseenter', function () { place(g); });
+      g.addEventListener('focusin', function () { place(g); });
+    });
+  })();
+</script>
+</body>
+</html>

@@ -2,3 +2,5 @@ title: "Operant — A Proposal for Lyra, with the Cost Cortex"
 date: "2026-07-17"
 description: "The Lyra proposal with the economics attached: the delegation harness now learns every workflow it repeats — 16× faster and 140× cheaper once learned — walks each one down a cost ladder to models the firm owns, and structures the engagement in three phases with named outcomes."
 tags: ["operant", "lyra", "strata", "ai-agents", "autonomous-delivery", "economics", "pitch"]
+# password-protected; hidden from the homepage post list
+draft: true

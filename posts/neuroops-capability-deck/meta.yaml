@@ -2,3 +2,5 @@ title: "NeuroOps — Capability Deck"
 date: "2026-07-24"
 description: "Execution at the speed of thought — applied AI systems for marketplaces and commerce operators: predictive modelling, AI cataloguing and pricing, and verification infrastructure."
 tags: ["neuroops", "capability-deck", "applied-ai", "commerce"]
+# password-protected; hidden from the homepage post list
+draft: true

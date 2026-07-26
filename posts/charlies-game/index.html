@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FIFTEEN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0d1411;
+  --felt:#121b17;
+  --panel:#18231e;
+  --panel-2:#1d2a24;
+  --line:#24332b;
+  --line-2:#31423a;
+  --bone:#ece7db;
+  --dim:#8d9a92;
+  --dimmer:#5c6962;
+  --brass:#c9922f;
+  --iron:#7d9db0;
+  --plum:#a98aa1;
+  --rust:#c0503f;
+  --sage:#7fa87b;
+  --card-face:#f1ece0;
+  --card-red:#a83a2e;
+  --card-ink:#1b1a17;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:radial-gradient(120% 65% at 50% -8%, #1a2620 0%, rgba(26,38,32,0) 62%), var(--ink);
+  color:var(--bone);
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:15px;line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Bodoni Moda",Didot,Georgia,serif;font-weight:400;margin:0}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--dimmer)}
+:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+
+/* ── shell ── */
+header.top{border-bottom:1px solid var(--line);background:rgba(13,20,17,.85);backdrop-filter:blur(8px);position:sticky;top:0;z-index:50}
+.top-inner{max-width:1080px;margin:0 auto;padding:13px 24px;display:flex;align-items:baseline;gap:20px;flex-wrap:wrap}
+.brand{font-family:"Bodoni Moda",serif;font-size:23px;letter-spacing:.2em;font-weight:400}
+nav.tabs{margin-left:auto;display:flex;gap:0;flex-wrap:wrap}
+nav.tabs button{
+  background:none;border:0;border-bottom:1.5px solid transparent;color:var(--dim);
+  font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;padding:8px 13px;cursor:pointer;
+}
+nav.tabs button:hover{color:var(--bone)}
+nav.tabs button[aria-selected="true"]{color:var(--brass);border-bottom-color:var(--brass)}
+.page{display:none}
+.page.active{display:block}
+
+/* ══ PLAY — minimal ══ */
+#page-play{max-width:880px;margin:0 auto;padding:0 24px 60px}
+.meta{text-align:center;padding:26px 0 22px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dimmer)}
+.meta .sep{opacity:.4;margin:0 9px}
+.meta .flash{color:var(--brass)}
+
+.felt{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:start;justify-items:center}
+@media(max-width:620px){.felt{grid-template-columns:1fr;gap:26px}}
+
+.seat{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:200px;transition:opacity .3s}
+.seat.gone{opacity:.28}
+.name{font-family:"Bodoni Moda",serif;font-size:20px;letter-spacing:.07em}
+.seat.b .name{color:var(--iron)}
+.seat.c .name{color:var(--plum)}
+.seat.a .name{color:var(--brass)}
+
+.card{
+  width:92px;height:130px;border-radius:4px;position:relative;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-family:"Bodoni Moda",serif;user-select:none;
+}
+.seat.a .card{width:104px;height:147px}
+.card.face{background:var(--card-face);color:var(--card-ink);box-shadow:0 10px 26px rgba(0,0,0,.5)}
+.card.face.red{color:var(--card-red)}
+.card .rank{font-size:38px;line-height:1;font-weight:500}
+.seat.a .card .rank{font-size:44px}
+.card .suit{font-size:24px;line-height:1.25;font-family:"IBM Plex Sans",sans-serif}
+.card .corner{position:absolute;top:7px;left:8px;font-family:"IBM Plex Mono",monospace;font-size:10px}
+.card.back{
+  background:repeating-linear-gradient(45deg,#1b2922 0 6px,#20302a 6px 12px);
+  border:1px solid var(--line-2);
+}
+.card.back::after{content:"";position:absolute;inset:9px;border:1px solid rgba(201,146,47,.16);border-radius:2px}
+.card.joker{background:var(--card-face);color:var(--card-red);font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;box-shadow:0 10px 26px rgba(0,0,0,.5)}
+.card.empty{border:1px dashed var(--line-2);background:transparent}
+@media (prefers-reduced-motion: no-preference){
+  .card.face,.card.joker{animation:flip .3s ease-out}
+  @keyframes flip{from{transform:rotateY(82deg) scale(.94);opacity:.15}to{transform:none;opacity:1}}
+}
+
+.score{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--dim);display:flex;align-items:center;gap:11px}
+.strikes{display:flex;gap:4px}
+.strikes i{width:6px;height:6px;border:1px solid var(--line-2);border-radius:50%;display:block}
+.strikes i.on{background:var(--rust);border-color:var(--rust)}
+
+.slot{min-height:34px;display:flex;flex-direction:column;align-items:center;gap:5px;justify-content:flex-start}
+.watch{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dimmer);text-align:center}
+.said{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.13em;text-transform:uppercase;padding:3px 9px;border:1px solid}
+.said.play{color:var(--sage);border-color:rgba(127,168,123,.5)}
+.said.fold{color:var(--rust);border-color:rgba(192,80,63,.5)}
+.fate{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.fate.bust{color:var(--rust)} .fate.score{color:var(--brass)} .fate.fold{color:var(--dimmer)} .fate.gone{color:var(--dimmer)}
+
+.mini{display:flex;gap:5px}
+button.mini-btn{
+  background:transparent;border:1px solid var(--line-2);color:var(--dim);
+  font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.13em;
+  text-transform:uppercase;padding:5px 11px;cursor:pointer;border-radius:3px;transition:.15s;
+}
+button.mini-btn:hover{color:var(--bone);border-color:var(--dim)}
+button.mini-btn[aria-pressed="true"]{background:var(--sage);border-color:var(--sage);color:#0d1411;font-weight:500}
+button.mini-btn.f[aria-pressed="true"]{background:var(--rust);border-color:var(--rust);color:#fff}
+
+/* action bar */
+.bar{margin-top:38px;border-top:1px solid var(--line);padding-top:26px;text-align:center;min-height:130px}
+.prompt{color:var(--dim);font-size:14px;margin:0 0 18px}
+.headline{font-family:"Bodoni Moda",serif;font-size:27px;margin:0 0 8px;letter-spacing:.01em}
+.headline.good{color:var(--sage)} .headline.bad{color:var(--rust)} .headline.flat{color:var(--dim)}
+.detail{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--dimmer);margin:0 0 20px;line-height:1.9}
+.detail b{color:var(--dim);font-weight:400}
+.buttons{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+button.primary{
+  background:var(--brass);border:1px solid var(--brass);color:#171104;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;padding:12px 30px;cursor:pointer;font-weight:500;border-radius:3px;
+}
+button.primary:disabled{opacity:.25;cursor:not-allowed}
+button.primary:hover:not(:disabled){filter:brightness(1.12)}
+button.ghost{
+  background:transparent;border:1px solid var(--line-2);color:var(--dim);
+  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;padding:12px 26px;cursor:pointer;border-radius:3px;
+}
+button.ghost:hover{color:var(--bone);border-color:var(--dim)}
+.hint{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dimmer);margin-top:16px}
+
+/* history */
+.hist-wrap{margin-top:34px;text-align:center}
+button.hist-toggle{
+  background:none;border:0;color:var(--dimmer);font-family:"IBM Plex Mono",monospace;
+  font-size:10px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;padding:6px;
+}
+button.hist-toggle:hover{color:var(--dim)}
+.hist{display:none;margin-top:12px;border-top:1px solid var(--line);text-align:left;max-height:280px;overflow-y:auto}
+.hist.open{display:block}
+.hrow{border-bottom:1px solid var(--line);padding:9px 2px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;line-height:1.8;color:var(--dimmer)}
+.hrow .rn{letter-spacing:.14em;text-transform:uppercase;font-size:9px}
+.hrow .n-a{color:var(--brass)} .hrow .n-b{color:var(--iron)} .hrow .n-c{color:var(--plum)}
+.hrow .v{color:var(--dim)}
+.hrow .bust{color:var(--rust)} .hrow .win{color:var(--sage)}
+
+/* ══ prose pages ══ */
+.prose{max-width:720px;margin:0 auto;padding:34px 24px 80px}
+.prose h2{font-size:33px;margin:0 0 6px}
+.prose .lede{color:var(--dim);font-size:16px;margin:0 0 34px}
+.prose h3{font-size:21px;margin:36px 0 11px}
+.prose h4{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--brass);margin:26px 0 8px;font-weight:500}
+.prose p{margin:0 0 14px;color:#cfcabf}
+.prose ul{margin:0 0 14px;padding-left:20px;color:#cfcabf}
+.prose li{margin-bottom:7px}
+.prose strong{color:var(--bone);font-weight:500}
+.prose em{color:var(--dim);font-style:italic}
+table.data{width:100%;border-collapse:collapse;margin:14px 0 22px;font-family:"IBM Plex Mono",monospace;font-size:12px}
+table.data th{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line-2);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dimmer);font-weight:500}
+table.data td{padding:8px 12px;border-bottom:1px solid var(--line);color:#cfcabf}
+table.data td b{color:var(--bone);font-weight:500}
+table.data td.hi{color:var(--rust)}
+table.data tr:last-child td{border-bottom:0}
+.callout{border-left:2px solid var(--brass);background:rgba(201,146,47,.04);padding:14px 18px;margin:20px 0}
+.callout p:last-child{margin-bottom:0}
+figure.chart{margin:20px 0 28px;border:1px solid var(--line);background:var(--panel);padding:18px 18px 12px}
+figure.chart figcaption{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--dimmer);letter-spacing:.06em;margin-top:10px}
+.oq{border:1px solid var(--line);background:var(--panel);margin-bottom:11px}
+.oq-head{padding:12px 16px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);background:var(--panel-2)}
+.oq-head .num{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--dimmer);letter-spacing:.1em}
+.oq-head .q{font-family:"Bodoni Moda",serif;font-size:18px;flex:1;min-width:210px}
+.status{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:3px 9px;border:1px solid}
+.status.open{color:var(--brass);border-color:rgba(201,146,47,.5)}
+.status.declined{color:var(--rust);border-color:rgba(192,80,63,.5)}
+.status.confirmed{color:var(--sage);border-color:rgba(127,168,123,.5)}
+.oq-body{padding:14px 16px}
+.oq-body p{margin:0 0 10px;color:#cfcabf;font-size:14px}
+.oq-body p:last-of-type{margin-bottom:0}
+.oq-body .def{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--dimmer);border-top:1px solid var(--line);padding-top:10px;margin-top:12px;line-height:1.7}
+.oq-body .def b{color:var(--sage);font-weight:400}
+footer{border-top:1px solid var(--line);margin-top:52px;padding-top:18px;color:var(--dimmer);font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.08em}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <span class="brand">FIFTEEN</span>
+    <nav class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-page="play">Play</button>
+      <button role="tab" aria-selected="false" data-page="howto">How to play</button>
+      <button role="tab" aria-selected="false" data-page="design">Design notes</button>
+      <button role="tab" aria-selected="false" data-page="oq">Open questions</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ══════════════ PLAY ══════════════ -->
+<section class="page active" id="page-play">
+  <div class="meta" id="meta"></div>
+  <div class="felt" id="felt"></div>
+  <div class="bar" id="bar"></div>
+  <div class="hist-wrap">
+    <button class="hist-toggle" id="hist-toggle">History</button>
+    <div class="hist" id="hist"></div>
+  </div>
+</section>
+
+<!-- ══════════════ HOW TO PLAY ══════════════ -->
+<section class="page" id="page-howto">
+  <div class="prose">
+    <h2>How to play</h2>
+    <p class="lede">Three players. One card each. You are the only person at the table who cannot see your own card.</p>
+
+    <h3>The deal</h3>
+    <p>Everyone is dealt one card, face out. Vega and Rook can read yours perfectly. You can read theirs. Nobody can read their own.</p>
+    <p>So you always know exactly what the rest of the table is holding. The only thing in doubt is you.</p>
+
+    <h3>The advice</h3>
+    <p>Before anyone decides, each player tells the others whether they should commit to the round or sit it out. You advise both opponents; both opponents advise you. Everyone speaks at the same time and nobody can take it back.</p>
+    <p>Nothing requires anyone to be honest.</p>
+
+    <h3>The decision</h3>
+    <p>Commit or fold. You are choosing blind, on their word and whatever you have learned about how much that word is worth.</p>
+    <p>Folding scores you nothing, but nothing can hurt you either.</p>
+
+    <h3>The play</h3>
+    <p>Cards turn over and only committed players are counted.</p>
+    <ul>
+      <li>If the committed cards total <strong>15 or less</strong>, every committed player scores that total. Landing exactly on 15 wins.</li>
+      <li>If they total <strong>more than 15</strong>, every committed player busts.</li>
+      <li>A <strong>joker</strong> busts whoever holds it, on its own, and adds nothing to the total. Fold and it cannot touch you.</li>
+    </ul>
+    <p>Card values: ace is 1, jack 11, queen 12, king 13.</p>
+
+    <h3>Winning and losing</h3>
+    <p>First player to <strong>30 points</strong> wins. Three busts and you are out. Busting never costs you points — only a life.</p>
+
+    <h3>The deck</h3>
+    <p>54 cards: a standard deck plus two jokers. Cards that get committed are set aside and do not come back until the deck runs dry. Cards that get folded, and every joker, go straight back in.</p>
+    <p>Which means the deck thins out but the jokers never do. The longer a hand runs, the more likely the card you cannot see is the one that kills you. Counting is worth your time.</p>
+
+    <h3>What to watch for</h3>
+    <p>Advice is not information about the table — you can already see the table. It is only ever about the one card you cannot see, and it is only ever as good as the reason behind it.</p>
+    <p>Someone planning to commit wants your card in the pot, because a bigger total pays them more — right up until it pushes them over 15. Someone planning to fold has nothing at stake and every reason to walk you into a bust.</p>
+    <p>Since decisions are simultaneous, you never know which one you are talking to until the cards turn over. The history is there if you want it. What you do with it is the game.</p>
+  </div>
+</section>
+
+<!-- ══════════════ DESIGN NOTES ══════════════ -->
+<section class="page" id="page-design">
+  <div class="prose">
+    <h2>Design notes</h2>
+    <p class="lede">Reasoning, arithmetic and known weak points, for the team building the multiplayer version.</p>
+
+    <h3>Ruleset v0.1</h3>
+    <table class="data">
+      <tr><th>Element</th><th>Rule</th></tr>
+      <tr><td>Deck</td><td><b>54</b> — standard 52 plus 2 jokers</td></tr>
+      <tr><td>Values</td><td>A=1, 2–10 face, J=11, Q=12, K=13 <em>(pending confirmation)</em></td></tr>
+      <tr><td>Visibility</td><td>Every card but your own</td></tr>
+      <tr><td>Advice</td><td>Binary, simultaneous, revealed together</td></tr>
+      <tr><td>Threshold</td><td>Committed total of <b>15 or under</b> succeeds; 15 exactly wins</td></tr>
+      <tr><td>Payout</td><td><b>Full sum</b> to every committed player</td></tr>
+      <tr><td>Joker</td><td>Personal bust, contributes <b>0</b>, folding protects</td></tr>
+      <tr><td>Bust</td><td>One strike, no points lost; three strikes eliminates</td></tr>
+      <tr><td>Cycling</td><td>Committed cards leave circulation; <b>folded cards and jokers return</b></td></tr>
+      <tr><td>Reshuffle</td><td>Only when the pile cannot deal a full round</td></tr>
+      <tr><td>Victory</td><td>First to 30</td></tr>
+    </table>
+
+    <h3>Three properties worth naming</h3>
+
+    <h4>You already know the other two cards</h4>
+    <p>Inverted visibility means you enter every decision knowing precisely what the rest of the table holds. Advice can never tell you anything about the table — only about the single card you cannot see. One unknown, and everything hangs off it.</p>
+
+    <h4>Advice is honest or poisonous depending on hidden intent</h4>
+    <p>A player who means to commit gains from your card entering the pot, and loses if it pushes the total over. A player who means to fold has no stake in the total at all, and is left with one term in their calculation: the damage they can do to you. Simultaneous decisions mean you cannot tell the two apart in the moment.</p>
+    <p>The joker is the clean case. It adds nothing, so a joker-holder committing costs the rest of the table nothing and hands them a strike. Everyone who sees your joker will tell you to play. Learning to hear that is the first real skill the game teaches.</p>
+
+    <h4>The deck gets more dangerous as it drains</h4>
+    <p>Jokers return while real cards leave. Risk climbs on its own, with no designer intervention.</p>
+
+    <figure class="chart">
+      <svg viewBox="0 0 640 200" width="100%" height="200" role="img" aria-label="Chance of drawing a joker rising as committed cards leave circulation">
+        <g stroke="#24332b" stroke-width="1">
+          <line x1="46" y1="18" x2="620" y2="18"/><line x1="46" y1="63" x2="620" y2="63"/>
+          <line x1="46" y1="108" x2="620" y2="108"/><line x1="46" y1="153" x2="620" y2="153"/>
+        </g>
+        <g font-family="IBM Plex Mono, monospace" font-size="9" fill="#5c6962">
+          <text x="8" y="21">40%</text><text x="8" y="66">27%</text><text x="8" y="111">13%</text><text x="12" y="156">0%</text>
+          <text x="46" y="176">0</text><text x="160" y="176">10</text><text x="275" y="176">20</text>
+          <text x="390" y="176">30</text><text x="505" y="176">40</text><text x="600" y="176">48</text>
+          <text x="242" y="194" letter-spacing="1.4">CARDS OUT OF CIRCULATION</text>
+        </g>
+        <polyline fill="none" stroke="#c9922f" stroke-width="2"
+          points="46,148 103,147 160,146 218,144 275,142 333,139 390,133 448,124 505,102 563,62 601,33"/>
+        <circle cx="46" cy="148" r="3" fill="#c9922f"/><circle cx="390" cy="133" r="3" fill="#c9922f"/><circle cx="601" cy="33" r="3" fill="#c9922f"/>
+        <g font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#ece7db">
+          <text x="54" y="143">3.7%</text><text x="356" y="126">8.3%</text><text x="540" y="28">33%</text>
+        </g>
+      </svg>
+      <figcaption>Chance the next card dealt is a joker, as committed cards leave the deck.</figcaption>
+    </figure>
+
+    <h3>The balance problem</h3>
+    <p>Odds that a committed group lands at 15 or under:</p>
+    <table class="data">
+      <tr><th>Committed</th><th>52-card deck</th><th>40-card deck (A–10)</th></tr>
+      <tr><td>One</td><td><b>100%</b></td><td><b>100%</b></td></tr>
+      <tr><td>Two</td><td><b>61%</b></td><td><b>85%</b></td></tr>
+      <tr><td>All three</td><td class="hi"><b>21%</b></td><td><b>42.5%</b></td></tr>
+    </table>
+    <p>A single card can never break 15, so going alone is free and pays about 7. A full table fails four times in five. The correct line is to fold constantly and hope to be the only one in — which produces a quiet game where the table talk has nothing to bite on.</p>
+    <div class="callout">
+      <p>Stripping face cards was proposed and declined for this build. It stays on the register as <strong>open question 01</strong> with the full working, because it is the cheapest lever available if playtesting confirms the fold-heavy pattern.</p>
+    </div>
+
+    <h3>How the opponents think</h3>
+    <p>Vega and Rook are <strong>purely self-interested</strong>. Neither has a personality, an honesty setting or a scripted bluff. Everything they say falls out of one calculation.</p>
+    <ul>
+      <li>Their own card is unknown to them, exactly as yours is to you. They reason over the correct remaining distribution — the live deck plus the card in their hand, minus everything they can see.</li>
+      <li>They estimate what you will do by working out the subtotal visible from your seat, substituting their expected own value for the card they cannot see.</li>
+      <li>They form a private intent by comparing expected value both ways. Bust cost scales sharply with strikes already taken.</li>
+      <li>They advise whatever serves that intent: for each player they run the valuation twice, once assuming that player commits and once assuming they fold, and say whichever produced the better number for themselves.</li>
+      <li>A rival scoring is a cost; a rival busting is a gain. Both are weighted by how close that rival sits to 30, and a player on two strikes is worth much more to knock over.</li>
+    </ul>
+    <p>No deception is written anywhere in the code. It emerges — a bot that has decided to fold has nothing riding on the total, so sabotage is simply what its arithmetic returns.</p>
+
+    <h4>Your advice moves them</h4>
+    <p>Each opponent holds a private trust value for you, starting even. Your advice shifts their decision in proportion to it: enough to flip a marginal call, never enough to override a clear one. After the cards turn over they check whether following you would have been right and adjust. Mislead them and your influence decays; a run of honest rounds brings it back.</p>
+    <p>The number is never shown. Reading it off their behaviour is the point.</p>
+
+    <h3>Interface decisions</h3>
+    <p>The play screen shows the table and nothing else. An earlier build surfaced a live count panel with derived probabilities; it was removed because it did the player's thinking for them and flattened the tension the joker curve creates. The round counter and deck size are the only figures given — enough to count from, if you want to count.</p>
+    <p>The history drawer is a raw record with no accuracy scores or aggregates. Judging who has been lying is the game, and the interface should not do it for you.</p>
+
+    <h3>Not covered here</h3>
+    <ul>
+      <li>Netcode, lobbies, matchmaking, reconnection</li>
+      <li>Per-phase timers and absence handling</li>
+      <li>Voice and text chat, which is where a real table's deception actually lives</li>
+      <li>Persistent identity or cross-session reputation</li>
+      <li>State is memory-only and resets on reload</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════════ OPEN QUESTIONS ══════════════ -->
+<section class="page" id="page-oq">
+  <div class="prose">
+    <h2>Open questions</h2>
+    <p class="lede">Everything still undecided, plus the calls taken provisionally so the build could proceed. Defaults noted here are what this version implements — none are final.</p>
+    <div id="oq-list"></div>
+    <footer>FIFTEEN · working title · single-player build for studio review</footer>
+  </div>
+</section>
+
+<script>
+"use strict";
+
+/* ═════════ CONSTANTS ═════════ */
+const THRESHOLD = 15, TARGET = 30, MAX_STRIKES = 3;
+const ADVICE_WEIGHT = 7.0, BOT_TRUST = 0.25, TRUST_STEP = 0.12;
+const TRUST_MIN = 0.05, TRUST_MAX = 0.95;
+
+const RANKS = [
+  {r:"A",v:1},{r:"2",v:2},{r:"3",v:3},{r:"4",v:4},{r:"5",v:5},{r:"6",v:6},{r:"7",v:7},
+  {r:"8",v:8},{r:"9",v:9},{r:"10",v:10},{r:"J",v:11},{r:"Q",v:12},{r:"K",v:13}
+];
+const SUITS = [{s:"\u2660",red:false},{s:"\u2665",red:true},{s:"\u2666",red:true},{s:"\u2663",red:false}];
+
+let G = null, histOpen = false;
+
+const clamp = (x,lo,hi)=> Math.max(lo, Math.min(hi, x));
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+function buildDeck(){
+  const d=[]; let id=0;
+  for(const su of SUITS) for(const rk of RANKS)
+    d.push({id:id++,rank:rk.r,value:rk.v,suit:su.s,red:su.red,joker:false});
+  d.push({id:id++,rank:"JOKER",value:0,suit:"",red:true,joker:true});
+  d.push({id:id++,rank:"JOKER",value:0,suit:"",red:true,joker:true});
+  return shuffle(d);
+}
+
+/* ═════════ MATCH ═════════ */
+function newMatch(){
+  G = {
+    deck: buildDeck(), removed: [], round: 0, phase:"advice",
+    shuffles: 0, justShuffled: false,
+    players:[
+      {id:"A",name:"You", human:true,  points:0,strikes:0,out:false,card:null,committed:false,trust:null},
+      {id:"B",name:"Vega",human:false, points:0,strikes:0,out:false,card:null,committed:false,trust:0.5},
+      {id:"C",name:"Rook",human:false, points:0,strikes:0,out:false,card:null,committed:false,trust:0.5}
+    ],
+    humanAdvice:{}, adviceToHuman:{}, adviceBotToBot:{}, intents:{}, evs:{},
+    result:null, winner:null, over:false, log:[]
+  };
+  startRound();
+}
+const active = ()=> G.players.filter(p=>!p.out);
+const byId   = id => G.players.find(p=>p.id===id);
+const me     = ()=> byId("A");
+
+function startRound(){
+  G.round++; G.phase="advice";
+  G.humanAdvice={}; G.adviceToHuman={}; G.adviceBotToBot={}; G.intents={}; G.evs={}; G.result=null;
+
+  const n = active().length;
+  if(G.deck.length < n){                    // deck exhausted — bring everything back
+    G.deck = shuffle(G.deck.concat(G.removed));
+    G.removed = []; G.shuffles++; G.justShuffled = true;
+  } else G.justShuffled = false;
+
+  for(const p of G.players){
+    p.committed=false; p.busted=false; p.gained=0;
+    p.card = p.out ? null : G.deck.pop();
+  }
+
+  for(const bot of active().filter(p=>!p.human)){
+    const evC = evaluateEV(bot,1,{}), evF = evaluateEV(bot,0,{});
+    G.evs[bot.id] = {commit:evC, fold:evF};
+    G.intents[bot.id] = evC > evF ? 1 : 0;
+    G.adviceBotToBot[bot.id] = {};
+    for(const t of active()){
+      if(t.id===bot.id) continue;
+      const a = adviseOn(bot,t,G.intents[bot.id]);
+      if(t.human) G.adviceToHuman[bot.id]=a; else G.adviceBotToBot[bot.id][t.id]=a;
+    }
+  }
+  render();
+}
+
+/* ═════════ OPPONENT REASONING ═════════ */
+function ownCardPool(p){
+  const seen = new Set(active().filter(q=>q.id!==p.id).map(q=>q.card.id));
+  return G.deck.concat(active().map(q=>q.card)).filter(c=>!seen.has(c.id));
+}
+function bustCost(p){
+  const left = MAX_STRIKES - p.strikes;
+  return left>=3 ? -8 : left===2 ? -13 : -28;
+}
+const threatOf = p => 1 + p.points/TARGET;
+
+function estimateCommitProb(target, self, expectedOwn){
+  let sub = 0;
+  for(const p of active()){
+    if(p.id===target.id) continue;
+    sub += (p.id===self.id) ? expectedOwn : p.card.value;
+  }
+  return clamp(0.15 + 0.06*(THRESHOLD-sub), 0.05, 0.9);
+}
+
+function evaluateEV(self, selfCommit, forced){
+  const others = active().filter(p=>p.id!==self.id);
+  const pool = ownCardPool(self), n = pool.length;
+  const jokers = pool.filter(c=>c.joker).length;
+
+  const counts={}; let rs=0, rn=0;
+  for(const c of pool){ if(c.joker) continue; counts[c.value]=(counts[c.value]||0)+1; rs+=c.value; rn++; }
+  const expectedOwn = rn ? rs/rn : 7;
+
+  const probs = others.map(o =>
+    (forced && forced[o.id]!==undefined) ? forced[o.id] : estimateCommitProb(o,self,expectedOwn));
+
+  function branch(myVal, myJoker, flags){
+    let sum = 0;
+    if(selfCommit && !myJoker) sum += myVal;
+    others.forEach((o,i)=>{ if(flags[i] && !o.card.joker) sum += o.card.value; });
+    const ok = sum <= THRESHOLD;
+    let t = 0;
+    if(selfCommit) t += (myJoker || !ok) ? bustCost(self) : sum;
+    others.forEach((o,i)=>{
+      if(!flags[i]) return;
+      const th = threatOf(o);
+      if(o.card.joker || !ok) t += 2.5*th + (o.strikes===MAX_STRIKES-1 ? 4 : 0);
+      else t += -0.4*sum*th;
+    });
+    return t;
+  }
+
+  let ev = 0;
+  for(let m=0; m < (1<<others.length); m++){
+    const flags = others.map((_,i)=>(m>>i)&1 ? 1 : 0);
+    let cp = 1; flags.forEach((f,i)=> cp *= f ? probs[i] : (1-probs[i]));
+    if(cp<=0) continue;
+    if(!selfCommit){ ev += cp*branch(0,false,flags); continue; }
+    if(jokers>0) ev += cp*(jokers/n)*branch(0,true,flags);
+    for(const v in counts) ev += cp*(counts[v]/n)*branch(Number(v),false,flags);
+  }
+  return ev;
+}
+function adviseOn(self, target, intent){
+  return evaluateEV(self,intent,{[target.id]:1}) > evaluateEV(self,intent,{[target.id]:0}) ? "play" : "fold";
+}
+
+/* ═════════ ACTIONS ═════════ */
+function setAdvice(id,val){ if(G.phase!=="advice") return; G.humanAdvice[id]=val; render(); }
+function lockAdvice(){ if(G.phase!=="advice") return; G.phase="decision"; render(); }
+
+function decide(commit){
+  if(G.phase!=="decision") return;
+  me().committed = commit;
+  for(const bot of active().filter(p=>!p.human)){
+    let margin = G.evs[bot.id].commit - G.evs[bot.id].fold;
+    const h = G.humanAdvice[bot.id];
+    if(h) margin += bot.trust*ADVICE_WEIGHT*(h==="play"?1:-1);
+    for(const other of active().filter(p=>!p.human && p.id!==bot.id)){
+      const a = G.adviceBotToBot[other.id] && G.adviceBotToBot[other.id][bot.id];
+      if(a) margin += BOT_TRUST*ADVICE_WEIGHT*(a==="play"?1:-1);
+    }
+    bot.committed = margin > 0;
+  }
+  resolve();
+}
+
+function resolve(){
+  const committed = active().filter(p=>p.committed);
+  const sum = committed.filter(p=>!p.card.joker).reduce((s,p)=>s+p.card.value,0);
+  const ok = sum <= THRESHOLD;
+
+  for(const p of committed){
+    if(p.card.joker || !ok){ p.busted=true; p.strikes++; p.gained=0; }
+    else { p.gained=sum; p.points+=sum; }
+  }
+
+  for(const bot of active().filter(p=>!p.human)){
+    const adv = G.humanAdvice[bot.id];
+    if(!adv) continue;
+    const oth = active().filter(p=>p.id!==bot.id && p.committed && !p.card.joker)
+                        .reduce((s,p)=>s+p.card.value,0);
+    const best = (!bot.card.joker && oth + bot.card.value <= THRESHOLD) ? "play" : "fold";
+    bot.trust = clamp(bot.trust + (adv===best ? TRUST_STEP : -TRUST_STEP), TRUST_MIN, TRUST_MAX);
+  }
+
+  G.result = {sum, ok};
+  writeLog();
+
+  for(const p of active()){
+    if(p.committed && !p.card.joker) G.removed.push(p.card);
+    else G.deck.push(p.card);
+  }
+  shuffle(G.deck);
+
+  for(const p of G.players) if(!p.out && p.strikes>=MAX_STRIKES) p.out=true;
+  checkEnd();
+  G.phase = "resolved";
+  render();
+}
+
+function checkEnd(){
+  const alive = active();
+  const scorers = G.players.filter(p=>p.points>=TARGET && !p.out);
+  if(scorers.length){
+    scorers.sort((a,b)=> a.strikes-b.strikes || b.points-a.points);
+    const top = scorers[0];
+    const tied = scorers.filter(p=>p.strikes===top.strikes && p.points===top.points);
+    G.winner = tied; G.over = true; return;
+  }
+  if(alive.length===1){ G.winner=[alive[0]]; G.over=true; return; }
+  if(me().out){ G.winner=null; G.over=true; }
+}
+
+const label = c => c.joker ? "JOKER" : c.rank + c.suit;
+
+function writeLog(){
+  G.log.unshift({
+    round:G.round, shuffled:G.justShuffled, sum:G.result.sum, ok:G.result.ok,
+    seats: active().map(p=>({
+      id:p.id,name:p.name,
+      card: (p.human && !p.committed) ? "\u2014" : label(p.card),
+      committed:p.committed, busted:!!p.busted, gained:p.gained||0
+    })),
+    told: Object.entries(G.adviceToHuman).map(([id,a])=>({id,name:byId(id).name,a})),
+    gave: Object.entries(G.humanAdvice).map(([id,a])=>({id,name:byId(id).name,a}))
+  });
+}
+function nextRound(){ if(!G.over) startRound(); }
+
+/* ═════════ RENDER ═════════ */
+function cardHTML(card, faceUp){
+  if(!card) return `<div class="card empty"></div>`;
+  if(!faceUp) return `<div class="card back"></div>`;
+  if(card.joker) return `<div class="card joker">JOKER</div>`;
+  return `<div class="card face${card.red?" red":""}">
+    <span class="corner">${card.rank}</span>
+    <span class="rank">${card.rank}</span><span class="suit">${card.suit}</span></div>`;
+}
+
+function render(){ renderMeta(); renderFelt(); renderBar(); renderHist(); }
+
+function renderMeta(){
+  const parts = [`Round ${G.round}`, `Deck ${G.deck.length}`, `First to ${TARGET}`];
+  let html = parts.map(t=>`<span>${t}</span>`).join(`<span class="sep">·</span>`);
+  if(G.justShuffled) html += `<span class="sep">·</span><span class="flash">Deck reshuffled</span>`;
+  document.getElementById("meta").innerHTML = html;
+}
+
+function renderFelt(){
+  const order = ["B","A","C"];
+  const resolved = G.phase==="resolved";
+  document.getElementById("felt").innerHTML = order.map(id=>{
+    const p = byId(id);
+    const cls = id.toLowerCase();
+    const faceUp = p.out ? false : (p.human ? (resolved && p.committed) : true);
+
+    let slot = "";
+    if(p.out){
+      slot = `<div class="fate gone">Out</div>`;
+    } else if(p.human){
+      if(G.phase==="advice") slot = `<div class="watch">Vega &amp; Rook can see this</div>`;
+      else if(G.phase==="decision"){
+        slot = active().filter(q=>!q.human).map(b=>{
+          const a = G.adviceToHuman[b.id];
+          return `<div class="said ${a}">${b.name}: ${a}</div>`;
+        }).join("");
+      } else {
+        slot = !p.committed ? `<div class="fate fold">Folded</div>`
+             : p.busted ? `<div class="fate bust">Bust</div>`
+             : `<div class="fate score">+${p.gained}</div>`;
+      }
+    } else {
+      if(G.phase==="advice"){
+        const v = G.humanAdvice[p.id];
+        slot = `<div class="mini">
+          <button class="mini-btn" aria-pressed="${v==="play"}" onclick="setAdvice('${p.id}','play')">Play</button>
+          <button class="mini-btn f" aria-pressed="${v==="fold"}" onclick="setAdvice('${p.id}','fold')">Fold</button>
+        </div>`;
+      } else if(G.phase==="decision"){
+        const v = G.humanAdvice[p.id];
+        slot = `<div class="watch">you said ${v}</div>`;
+      } else {
+        slot = !p.committed ? `<div class="fate fold">Folded</div>`
+             : p.busted ? `<div class="fate bust">Bust</div>`
+             : `<div class="fate score">+${p.gained}</div>`;
+      }
+    }
+
+    return `<div class="seat ${cls}${p.out?" gone":""}">
+      <div class="name">${p.name}</div>
+      ${cardHTML(p.card, faceUp)}
+      <div class="score">
+        <span>${p.points}</span>
+        <span class="strikes">${[0,1,2].map(i=>`<i class="${i<p.strikes?"on":""}"></i>`).join("")}</span>
+      </div>
+      <div class="slot">${slot}</div>
+    </div>`;
+  }).join("");
+}
+
+function renderBar(){
+  const bar = document.getElementById("bar");
+
+  if(G.over){
+    let head, cls;
+    if(!G.winner){ head="You are out."; cls="bad"; }
+    else if(G.winner.length>1){ head="Dead heat \u2014 " + G.winner.map(p=>p.name).join(" and "); cls="flat"; }
+    else if(G.winner[0].human){ head="You reach thirty. You win."; cls="good"; }
+    else { head=`${G.winner[0].name} reaches thirty.`; cls="bad"; }
+    bar.innerHTML = `<div class="headline ${cls}">${head}</div>
+      <div class="detail">${G.players.map(p=>`<b>${p.name}</b> ${p.points} pts · ${p.strikes} strike${p.strikes===1?"":"s"}${p.out?" · out":""}`).join("<br>")}
+      <br><b>${G.round} rounds</b>${G.shuffles?` · deck reshuffled ${G.shuffles}\u00d7`:""}</div>
+      <div class="buttons"><button class="primary" onclick="newMatch()">New match</button></div>`;
+    return;
+  }
+
+  const bots = active().filter(p=>!p.human);
+
+  if(G.phase==="advice"){
+    const ready = bots.every(b=>G.humanAdvice[b.id]);
+    bar.innerHTML = `<p class="prompt">Tell them what to do with the cards you can see.</p>
+      <div class="buttons"><button class="primary" ${ready?"":"disabled"} onclick="lockAdvice()">Lock in advice</button></div>
+      <div class="hint">${ready?"enter":"advise both seats"}</div>`;
+    return;
+  }
+
+  if(G.phase==="decision"){
+    bar.innerHTML = `<p class="prompt">Commit to the round, or sit it out.</p>
+      <div class="buttons">
+        <button class="primary" onclick="decide(true)">Play</button>
+        <button class="ghost" onclick="decide(false)">Fold</button>
+      </div>
+      <div class="hint">enter to play</div>`;
+    return;
+  }
+
+  const r = G.result, you = me();
+  const inNames = active().filter(p=>p.committed).map(p=>p.name);
+  let head, cls;
+  if(!you.committed){ head="You sat it out."; cls="flat"; }
+  else if(you.card.joker){ head="Joker. You bust."; cls="bad"; }
+  else if(!r.ok){ head=`${r.sum}. Over the line.`; cls="bad"; }
+  else { head=`${r.sum}. You score ${r.sum}.`; cls="good"; }
+
+  const rows = active().map(p=>{
+    const shown = (p.human && !p.committed) ? "withheld" : label(p.card);
+    const fate = !p.committed ? "folded" : p.busted ? "bust" : `+${p.gained}`;
+    return `<b>${p.name}</b> ${shown} \u2014 ${fate}`;
+  }).join("<br>");
+
+  bar.innerHTML = `<div class="headline ${cls}">${head}</div>
+    <div class="detail">${inNames.length ? `In: <b>${inNames.join(", ")}</b> · total <b>${r.sum}</b>` : `Nobody committed.`}
+    <br>${rows}${you.committed?"":`<br>Your card went back in the deck unseen.`}</div>
+    <div class="buttons"><button class="primary" onclick="nextRound()">Next round</button></div>
+    <div class="hint">enter</div>`;
+}
+
+function renderHist(){
+  const el = document.getElementById("hist");
+  el.className = "hist" + (histOpen ? " open" : "");
+  if(!histOpen) return;
+  if(!G.log.length){ el.innerHTML = `<div class="hrow">Nothing played yet.</div>`; return; }
+  el.innerHTML = G.log.map(e=>{
+    const seats = e.seats.map(s=>{
+      const f = !s.committed ? "fold" : s.busted ? "bust" : "+"+s.gained;
+      const k = s.busted ? "bust" : s.committed ? "win" : "";
+      return `<span class="n-${s.id.toLowerCase()}">${s.name}</span> <span class="v">${s.card}</span> <span class="${k}">${f}</span>`;
+    }).join(" · ");
+    const told = e.told.map(t=>`<span class="n-${t.id.toLowerCase()}">${t.name}</span> ${t.a}`).join(", ");
+    const gave = e.gave.map(t=>`<span class="n-${t.id.toLowerCase()}">${t.name}</span> ${t.a}`).join(", ");
+    return `<div class="hrow">
+      <div class="rn">Round ${e.round} · total ${e.sum} ${e.ok?"under":"over"}${e.shuffled?" · reshuffled":""}</div>
+      <div>${seats}</div>
+      <div>they told you: ${told||"\u2014"} &nbsp;|&nbsp; you told them: ${gave||"\u2014"}</div>
+    </div>`;
+  }).join("");
+}
+
+/* ═════════ OPEN QUESTIONS ═════════ */
+const QUESTIONS = [
+{q:"Should the face cards come out of the deck?",status:"declined",statusLabel:"Declined for now",
+ body:`<p>With J/Q/K in play a full table succeeds only <strong>21%</strong> of the time, so folding and hoping to be the sole committer is close to a dominant strategy. A 40-card deck (A–10) lifts that to <strong>42.5%</strong>, and two-player commitment from 61% to 85%.</p>
+ <p>Raising the threshold to 21 while keeping all 52 gets to a similar place and preserves a familiar deck, which may matter more for how the game reads to someone new.</p>`,
+ def:`Full 52 plus 2 jokers, as directed. Revisit after the first playtest if the fold-heavy pattern shows up in the data.`},
+
+{q:"Do the face values and ace ranking hold?",status:"open",statusLabel:"Needs confirmation",
+ body:`<p>This build assumes A=1, J=11, Q=12, K=13. An ace ranking high, or face cards flattened to 10, moves the balance figures substantially and should be settled before anything is hardcoded.</p>`,
+ def:`A=1, J=11, Q=12, K=13.`},
+
+{q:"Does the threshold drop when a player is eliminated?",status:"open",statusLabel:"Open",
+ body:`<p>Fifteen is tuned for three cards. With two players left a static threshold makes commitment far safer — two cards land at or under 15 about 61% of the time against 21% for three. That may be a fair reward for surviving, or it may make the endgame trivially safe.</p>`,
+ def:`Threshold stays at 15 throughout, as directed.`},
+
+{q:"How much of the count should the interface expose?",status:"open",statusLabel:"Open",
+ body:`<p>Counting is meant to be viable, which leaves a choice: surface the count so everyone can use it, or leave it to memory and let the players who bother to track it hold a real edge.</p>
+ <p>An earlier build carried a full count panel with derived odds. It was cut — it did the player's thinking for them. Round number and deck size are all that remain, which is enough to count from without counting for you.</p>`,
+ def:`Round and deck size only. No derived probabilities.`},
+
+{q:"What ranks the leaderboard, and what breaks a tie at thirty?",status:"open",statusLabel:"Open",
+ body:`<p>Two players can cross the target in the same round, since everyone committed takes the same total. A tiebreak is needed, and the leaderboard needs a ranking key beyond raw points — fewest busts, best single round and win rate each say something different about what the game rewards.</p>`,
+ def:`Ties break on fewest strikes, then fall through to a declared dead heat.`},
+
+{q:"What happens when a player is eliminated but the match continues?",status:"open",statusLabel:"Open",
+ body:`<p>Three strikes removes a player while the others race on. Spectator mode, an immediate rematch queue, or a shortened match are all reasonable answers, and the choice matters far more in multiplayer than it does here.</p>`,
+ def:`Match ends if you are eliminated. Last player standing wins outright.`},
+
+{q:"When exactly does the deck reshuffle?",status:"confirmed",statusLabel:"Default set",
+ body:`<p>Committed cards leave circulation until the pile is exhausted. The edge case is a pile too short to deal a full round.</p>`,
+ def:`Everything removed folds back in and reshuffles as soon as the deck cannot deal every active player. The round counter notes it when it happens.`},
+
+{q:"How much weight does one player's advice carry with another?",status:"open",statusLabel:"Open",
+ body:`<p>In a human game this is entirely social. Here it needed a number, so opponents weight your advice by a private trust value that moves with hindsight accuracy, and weight each other at a flat 0.25. Both figures are tuning placeholders, not design claims.</p>`,
+ def:`Advice can shift an opponent's valuation by up to 7 points, scaled by trust. Enough to flip a close call, never enough to override a clear one.`},
+
+{q:"Is a folded card ever revealed to the player who held it?",status:"confirmed",statusLabel:"Default set",
+ body:`<p>Committed players can derive their own card from the announced total. Folded players cannot, and never will. That asymmetry is worth protecting — folding buys safety at the cost of information, which keeps the count honest and gives the decision real texture.</p>`,
+ def:`A folded card is never revealed to its owner, on the table or in the history.`},
+
+{q:"Does the payout structure reward the play the game is about?",status:"open",statusLabel:"Open",
+ body:`<p>Going alone takes roughly 7 points at no risk. Three committing average around 12 at 21% odds. The safest line is also the quietest one, which cuts against a game built on persuading people to come in with you.</p>
+ <p>A bonus for a full table, or a reduced payout for going alone, would put the reward where the interesting play is.</p>`,
+ def:`Full sum to every committed player, as specified.`},
+
+{q:"Is binary advice enough?",status:"open",statusLabel:"Open",
+ body:`<p>Buttons make advice legible, loggable and easy to synchronise. They also strip out everything that makes lying fun — hesitation, over-explanation, the tell in someone's voice. Voice or text alongside the buttons would give the deception somewhere to live, at the cost of moderation load and much longer rounds.</p>`,
+ def:`Buttons only, as specified.`},
+
+{q:"What does the game do about time, absence and disconnection?",status:"open",statusLabel:"For the studio",
+ body:`<p>Multiplayer needs answers this build does not model: per-phase timers, defaults on timeout, whether an absent player folds or holds, bot substitution mid-match, and whether a reconnecting player keeps their strikes.</p>
+ <p>Also unresolved: private rooms against matchmaking, and whether trust records persist between sessions or reset with every table.</p>`,
+ def:`Out of scope for this build.`}
+];
+
+document.getElementById("oq-list").innerHTML = QUESTIONS.map((o,i)=>`
+  <div class="oq">
+    <div class="oq-head">
+      <span class="num">${String(i+1).padStart(2,"0")}</span>
+      <span class="q">${o.q}</span>
+      <span class="status ${o.status}">${o.statusLabel}</span>
+    </div>
+    <div class="oq-body">${o.body}<div class="def">This build — <b>${o.def}</b></div></div>
+  </div>`).join("");
+
+/* ═════════ WIRING ═════════ */
+document.querySelectorAll("nav.tabs button").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected", b===btn));
+    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+    document.getElementById("page-"+btn.dataset.page).classList.add("active");
+    window.scrollTo(0,0);
+  });
+});
+document.getElementById("hist-toggle").addEventListener("click", ()=>{
+  histOpen = !histOpen;
+  document.getElementById("hist-toggle").textContent = histOpen ? "Hide history" : "History";
+  renderHist();
+});
+document.addEventListener("keydown", e=>{
+  if(e.key !== "Enter") return;
+  if(!document.getElementById("page-play").classList.contains("active")) return;
+  if(document.activeElement && document.activeElement.tagName === "BUTTON") return;
+  if(G.over) return;
+  if(G.phase==="advice"){ if(active().filter(p=>!p.human).every(b=>G.humanAdvice[b.id])) lockAdvice(); }
+  else if(G.phase==="decision") decide(true);
+  else nextRound();
+});
+
+newMatch();
+</script>
+</body>
+</html>

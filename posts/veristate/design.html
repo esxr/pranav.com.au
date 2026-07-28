@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veristate — Platform Design Proposal</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page:            #f9f9f7;
+    --surface-1:       #fcfcfb;
+    --text-primary:    #0b0b0b;
+    --text-secondary:  #52514e;
+    --text-muted:      #898781;
+    --grid:            #e1e0d9;
+    --baseline:        #c3c2b7;
+    --border:          rgba(11,11,11,0.10);
+    --series-1:        #2a78d6;
+    --series-2:        #eb6834;
+    --series-3:        #1baf7a;
+    --seq-100:         #cde2fb;
+    --seq-150:         #b7d3f6;
+    --seq-250:         #86b6ef;
+    --seq-400:         #3987e5;
+    --seq-550:         #1c5cab;
+    --accent-deep:     #1c5cab;
+    --wash:            rgba(42,120,214,0.08);
+    --wash-2:          rgba(235,104,52,0.08);
+    --wash-3:          rgba(27,175,122,0.08);
+    --good:            #0ca30c;
+    --good-text:       #006300;
+    --critical:        #d03b3b;
+    --deemph:          #c3c2b7;
+    --wf-fill:         #efeeea;
+    --wf-line:         #dddcd5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page:            #0d0d0d;
+      --surface-1:       #1a1a19;
+      --text-primary:    #ffffff;
+      --text-secondary:  #c3c2b7;
+      --text-muted:      #898781;
+      --grid:            #2c2c2a;
+      --baseline:        #383835;
+      --border:          rgba(255,255,255,0.10);
+      --series-1:        #3987e5;
+      --series-2:        #d95926;
+      --series-3:        #199e70;
+      --seq-100:         #104281;
+      --seq-150:         #184f95;
+      --seq-250:         #1c5cab;
+      --seq-400:         #3987e5;
+      --seq-550:         #86b6ef;
+      --accent-deep:     #86b6ef;
+      --wash:            rgba(57,135,229,0.12);
+      --wash-2:          rgba(217,89,38,0.12);
+      --wash-3:          rgba(25,158,112,0.12);
+      --good:            #0ca30c;
+      --good-text:       #0ca30c;
+      --critical:        #d03b3b;
+      --deemph:          #52514e;
+      --wf-fill:         #242423;
+      --wf-line:         #333331;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page); color: var(--text-primary);
+    line-height: 1.6; font-size: 16px;
+  }
+  .wrap { max-width: 1020px; margin: 0 auto; padding: 0 28px; }
+  a { color: var(--series-1); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  header.hero {
+    padding: 84px 0 58px; border-bottom: 1px solid var(--border);
+    background: radial-gradient(1200px 500px at 80% -10%, var(--wash), transparent 65%);
+  }
+  .kicker { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 18px; }
+  .brandline { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
+  .brand { font-size: 46px; font-weight: 750; letter-spacing: -0.02em; line-height: 1.05; }
+  .brand .thin { font-weight: 400; color: var(--text-secondary); }
+  .tick { display: inline-flex; width: 34px; height: 34px; flex: none; }
+  h1.tagline { font-size: 24px; font-weight: 500; color: var(--text-secondary); max-width: 780px; line-height: 1.35; margin-top: 6px; }
+  .hero-thesis { margin-top: 24px; max-width: 800px; font-size: 16.5px; color: var(--text-secondary); }
+  .hero-thesis strong { color: var(--text-primary); }
+  .hero-meta { margin-top: 30px; font-size: 13px; color: var(--text-muted); max-width: 860px; }
+
+  section { padding: 54px 0 8px; }
+  .secnum { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--series-1); font-weight: 700; margin-bottom: 8px; }
+  h2 { font-size: 28px; letter-spacing: -0.015em; line-height: 1.22; margin-bottom: 14px; font-weight: 700; }
+  h3 { font-size: 18.5px; margin: 30px 0 10px; font-weight: 650; }
+  p.lede { font-size: 17px; color: var(--text-secondary); max-width: 820px; }
+  p.body, section > .wrap > p { color: var(--text-secondary); max-width: 820px; margin-bottom: 14px; }
+  p strong, li strong, td strong { color: var(--text-primary); font-weight: 600; }
+  .rule { border: none; border-top: 1px solid var(--border); margin: 52px 0 0; }
+
+  /* cards */
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+  .cards.three { grid-template-columns: 1fr 1fr 1fr; }
+  @media (max-width: 860px) { .cards, .cards.three { grid-template-columns: 1fr; } }
+  .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; }
+  .card h4 { font-size: 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; font-weight: 650; }
+  .card p { font-size: 14px; color: var(--text-secondary); margin-bottom: 8px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card .who { font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--series-1); font-weight: 700; margin-bottom: 8px; }
+  .icon { width: 32px; height: 32px; border-radius: 9px; background: var(--wash); display: inline-flex; align-items: center; justify-content: center; flex: none; }
+  .icon svg { width: 17px; height: 17px; stroke: var(--series-1); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* principle numbers */
+  .pnum { font-size: 12px; font-weight: 750; color: var(--accent-deep); background: var(--wash); border-radius: 99px; padding: 2px 9px; }
+
+  /* figure cards */
+  figure.viz { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 22px 22px 18px; margin: 24px 0; }
+  .viz-title { font-size: 15.5px; font-weight: 650; }
+  .viz-sub { font-size: 13px; color: var(--text-muted); margin-top: 2px; margin-bottom: 14px; }
+  .fsignote { font-size: 12px; color: var(--text-muted); margin-top: 10px; }
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12.5px; color: var(--text-secondary); margin-top: 12px; }
+  .legend .key { display: inline-flex; align-items: center; gap: 7px; }
+  .legend .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+  /* layered architecture diagram */
+  .stack { display: flex; flex-direction: column; gap: 8px; }
+  .layer { display: flex; align-items: stretch; gap: 10px; }
+  .layer-label { flex: 0 0 148px; font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .07em; display: flex; align-items: center; justify-content: flex-end; text-align: right; line-height: 1.3; }
+  .layer-body { flex: 1; display: flex; flex-wrap: wrap; gap: 6px; border: 1px solid var(--border); border-radius: 10px; padding: 9px; background: var(--page); }
+  .layer-body.accent { background: var(--wash); border-color: transparent; }
+  .layer-body.accent2 { background: var(--wash-2); border-color: transparent; }
+  .layer-body.accent3 { background: var(--wash-3); border-color: transparent; }
+  .chip { font-size: 12.5px; font-weight: 600; color: var(--text-primary); background: var(--surface-1); border: 1px solid var(--border); border-radius: 7px; padding: 5px 10px; cursor: default; }
+  .chip.hot { border-color: var(--series-1); color: var(--accent-deep); }
+  .chip.dim { color: var(--text-secondary); font-weight: 500; }
+  .stack-gap { text-align: center; color: var(--text-muted); font-size: 13px; line-height: 1; margin-left: 158px; }
+
+  /* tables */
+  .tablecard { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 20px 0; }
+  .tablecard table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .tablecard th { text-align: left; font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); font-weight: 650; padding: 11px 14px; border-bottom: 1px solid var(--grid); }
+  .tablecard td { padding: 10px 14px; border-bottom: 1px solid var(--grid); color: var(--text-secondary); vertical-align: top; }
+  .tablecard tr:last-child td { border-bottom: none; }
+  .tablecard td:first-child { color: var(--text-primary); font-weight: 600; }
+  .tablecard code, .card code, p code, li code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 12px; background: var(--wash); color: var(--accent-deep); border-radius: 5px; padding: 1px 6px; white-space: nowrap; }
+  .pill { display: inline-block; font-size: 11px; font-weight: 650; padding: 1px 8px; border-radius: 99px; border: 1px solid var(--border); white-space: nowrap; }
+  .pill.b { color: var(--accent-deep); background: var(--wash); }
+  .pill.g { color: var(--good-text); background: rgba(12,163,12,0.08); }
+  .pill.o { color: var(--series-2); background: var(--wash-2); }
+  .pill.r { color: var(--critical); background: rgba(208,59,59,0.08); }
+
+  /* state machine strip */
+  .sm { display: flex; align-items: stretch; gap: 0; flex-wrap: wrap; margin: 14px 0 6px; }
+  .sm .st { background: var(--page); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; min-width: 128px; flex: 1; }
+  .sm .st .n { font-size: 13px; font-weight: 700; }
+  .sm .st .d { font-size: 11.5px; color: var(--text-muted); line-height: 1.4; margin-top: 3px; }
+  .sm .st.on { background: var(--wash); border-color: var(--series-1); }
+  .sm .st.warn { background: var(--wash-2); }
+  .sm .arr { display: flex; align-items: center; padding: 0 7px; color: var(--text-muted); font-size: 15px; }
+
+  /* wireframes */
+  .wfgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 24px 0; }
+  @media (max-width: 860px) { .wfgrid { grid-template-columns: 1fr; } }
+  .wfcard { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .wfcard .cap { font-size: 13.5px; font-weight: 650; margin: 10px 2px 2px; }
+  .wfcard .sub { font-size: 12.5px; color: var(--text-muted); margin: 0 2px; line-height: 1.45; }
+  .wf { border: 1px solid var(--grid); border-radius: 9px; overflow: hidden; background: var(--page); }
+  .wf .bar { display: flex; gap: 4px; padding: 6px 8px; border-bottom: 1px solid var(--grid); }
+  .wf .bar i { width: 7px; height: 7px; border-radius: 50%; background: var(--wf-line); }
+  .wf .cv { padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+  .b { border-radius: 5px; background: var(--wf-fill); }
+  .bl { height: 8px; border-radius: 4px; background: var(--wf-line); }
+  .row { display: flex; gap: 6px; }
+  .grow { flex: 1; }
+  .wtick { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; color: #fff; background: var(--series-1); border-radius: 99px; padding: 2px 8px; }
+  .wtag { display: inline-flex; font-size: 10px; font-weight: 650; color: var(--accent-deep); background: var(--wash); border-radius: 99px; padding: 2px 8px; }
+  .wtag.g { color: var(--good-text); background: rgba(12,163,12,0.10); }
+  .wtag.o { color: var(--series-2); background: var(--wash-2); }
+  .wbtn { font-size: 10.5px; font-weight: 700; color: #fff; background: var(--series-1); border-radius: 6px; padding: 4px 10px; text-align: center; }
+  .wbtn.ghost { color: var(--accent-deep); background: var(--wash); }
+  .wnote { font-size: 10.5px; color: var(--text-muted); }
+
+  /* numbered flow */
+  .flow { counter-reset: step; margin: 18px 0; }
+  .fstep { display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px dashed var(--grid); }
+  .fstep:last-child { border-bottom: none; }
+  .fstep::before {
+    counter-increment: step; content: counter(step);
+    flex: none; width: 26px; height: 26px; border-radius: 50%;
+    background: var(--wash); color: var(--accent-deep); font-weight: 750; font-size: 13px;
+    display: flex; align-items: center; justify-content: center; margin-top: 2px;
+  }
+  .fstep .fs-t { font-size: 14.5px; font-weight: 650; }
+  .fstep .fs-d { font-size: 13.5px; color: var(--text-secondary); }
+  .fstep .fs-w { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+
+  /* code block */
+  pre.codeblock {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 18px; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 12.5px; line-height: 1.6; overflow-x: auto; color: var(--text-secondary); margin: 18px 0;
+  }
+  pre.codeblock .k { color: var(--series-1); font-weight: 600; }
+  pre.codeblock .c { color: var(--text-muted); }
+
+  /* glossary/tooltip */
+  #tip { position: fixed; pointer-events: auto; z-index: 50; display: none; background: var(--surface-1); color: var(--text-primary); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 12.5px; box-shadow: 0 6px 24px rgba(0,0,0,0.14); max-width: 300px; line-height: 1.45; }
+  #tip .t { font-weight: 650; }
+  #tip .d { color: var(--text-secondary); }
+  .term { border-bottom: 1px dotted var(--text-muted); cursor: help; }
+
+  footer { padding: 40px 0 70px; color: var(--text-muted); font-size: 13px; }
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+</style>
+</head>
+<body>
+<div id="tip"></div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">Platform design proposal · Companion to the investor proposal · July 2026</div>
+    <div class="brandline">
+      <span class="brand">Veristate <span class="thin">/ design</span></span>
+      <svg class="tick" viewBox="0 0 24 24" aria-label="verified badge">
+        <path fill="var(--series-1)" d="M12 1.5l2.6 2.1 3.3-.5 1.2 3.1 3.1 1.2-.5 3.3 2.1 2.6-2.1 2.6.5 3.3-3.1 1.2-1.2 3.1-3.3-.5L12 22.5l-2.6-2.1-3.3.5-1.2-3.1-3.1-1.2.5-3.3L.2 12l2.1-2.6-.5-3.3 3.1-1.2 1.2-3.1 3.3.5z" transform="translate(0.9 -1) scale(0.96)"/>
+        <path d="M7.6 12.3l3 3 5.6-6.3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1 class="tagline">What all Veristate can be — the design of a trust platform wearing a marketplace as its front door.</h1>
+    <p class="hero-thesis">
+      The investor proposal made the case: verification in Australian property is synchronous, duplicated,
+      and — since 1 July 2026 — legally mandatory and legally reusable. This document designs the thing itself.
+      One <strong>trust engine</strong> verifies parties and properties against official rails and keeps them verified.
+      One <strong>trust graph</strong> holds the resulting objects — profiles, ticks, listings, buy-intents, loan cases, deals.
+      <strong>Five surfaces</strong> — the branded webapp, co-branded white-labels, an API/MCP layer for AI assistants,
+      an agent-harness plugin, and a broker workspace for verified finance — all sell the same underlying asset: portable, counterparty-visible trust,
+      with downstream orchestration into contracts, duty, and settlement.
+    </p>
+    <div class="hero-meta">
+      Written for both audiences: sections 01–11 are the product and platform design; sections 12–14 are the
+      implementation appendix (stack, build plan, open questions). Hover dotted terms for plain-English
+      explanations. Assumes the market context established in the investor proposal.
+    </div>
+  </div>
+</header>
+
+<section id="principles">
+  <div class="wrap">
+    <div class="secnum">01 · Design principles</div>
+    <h2>Six decisions that shape everything downstream</h2>
+    <p class="lede">Every design choice in this document traces back to one of these. When two options tie, the principle breaks the tie.</p>
+    <div class="cards three">
+      <div class="card"><h4><span class="pnum">P1</span>Trust is the product</h4>
+        <p>The marketplace, the compliance tooling, the API — all are interfaces onto one asset: a verified, continuously monitored claim about a party or property. We invest in the trust engine the way a bank invests in its ledger.</p></div>
+      <div class="card"><h4><span class="pnum">P2</span>Asynchronous by default</h4>
+        <p>No verification ever runs on the critical path of a deal moment. Everything verifiable in advance is verified in advance and kept warm by monitoring; the deal only consumes <em>state</em>, never waits on <em>process</em>.</p></div>
+      <div class="card"><h4><span class="pnum">P3</span>The consumer owns the credential</h4>
+        <p>Verification belongs to the person, not to the business that happened to pay for it. Consent is explicit, per relying party, revocable, and logged. This is the opposite of today's matter-scoped VOI — and the source of the network effect.</p></div>
+      <div class="card"><h4><span class="pnum">P4</span>One graph, many surfaces</h4>
+        <p>Webapp, white-labels, API/MCP and plugin are skins over the same trust graph. A profile verified inside one agency's co-brand is verified everywhere. Surfaces compete; the graph compounds.</p></div>
+      <div class="card"><h4><span class="pnum">P5</span>Orchestrate, never replace</h4>
+        <p>PEXA, practitioners, revenue offices, lenders and portals are rails and partners, not targets. Veristate's job is handing them cleaner inputs sooner — which is why they let us in.</p></div>
+      <div class="card"><h4><span class="pnum">P6</span>Compliance is exhaust</h4>
+        <p>Agents and practitioners never do "AML work" in Veristate. They do their ordinary work — onboarding a vendor, accepting an offer — and the evidence AUSTRAC requires falls out as a by-product: programs, screening logs, reliance records, reports.</p></div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="glance">
+  <div class="wrap">
+    <div class="secnum">02 · The platform at a glance</div>
+    <h2>Five layers, one direction of dependence</h2>
+    <p class="lede">
+      Surfaces depend on services, services on the graph, the graph on the engine, the engine on the rails.
+      Nothing reaches down more than one layer; nothing reaches up at all. Hover any element.
+    </p>
+    <figure class="viz">
+      <div class="stack">
+        <div class="layer">
+          <div class="layer-label">Surfaces</div>
+          <div class="layer-body accent">
+            <span class="chip hot" data-tip="<span class='t'>veristate.com.au</span><div class='d'>The flagship consumer marketplace. Owns the blue-tick brand. Section 05.</div>">Branded webapp</span>
+            <span class="chip hot" data-tip="<span class='t'>White-label</span><div class='d'>Co-branded deployments for agency networks &amp; developers. Section 06.</div>">Co-branded tenants</span>
+            <span class="chip hot" data-tip="<span class='t'>API + MCP</span><div class='d'>The same capabilities as clean REST + an MCP server for Claude, ChatGPT and other assistants. Section 07.</div>">API / MCP</span>
+            <span class="chip hot" data-tip="<span class='t'>Agent-harness plugin</span><div class='d'>Packaged skills + MCP for Claude Cowork — professional teams' daily pipeline. Section 08.</div>">Cowork plugin</span>
+            <span class="chip hot" data-tip="<span class='t'>Broker workspace</span><div class='d'>Professional seat for verified mortgage brokers: consented leads, live panel pricing, BID evidence. Section 11.</div>">Broker workspace</span>
+            <span class="chip dim" data-tip="<span class='t'>Embeds</span><div class='d'>Badge-verification widget and listing embeds for portals and agency sites.</div>">Badge embeds</span>
+          </div>
+        </div>
+        <div class="layer">
+          <div class="layer-label">Platform<br>services</div>
+          <div class="layer-body">
+            <span class="chip" data-tip="<span class='t'>Marketplace</span><div class='d'>Listings, buy-intents, matching, tick-to-tick offers and deal rooms.</div>">Marketplace &amp; matching</span>
+            <span class="chip" data-tip="<span class='t'>Orchestration</span><div class='d'>The deal state machine: exchange prep, duty pre-fill, practitioner and PEXA handoffs. Section 09.</div>">Deal orchestration</span>
+            <span class="chip" data-tip="<span class='t'>Panel</span><div class='d'>Practitioner network: onboarding, state-aware matching, fixed-fee menus. Section 10.</div>">Legal panel</span>
+            <span class="chip" data-tip="<span class='t'>Compliance service</span><div class='d'>Tenant AML programs, screening logs, SMR workflow, annual-report generation — the 'exhaust pipe' of P6.</div>">Compliance reporting</span>
+            <span class="chip" data-tip="<span class='t'>Notifications</span><div class='d'>Tick status changes, pack staleness, deal milestones — to humans and to webhooks/MCP subscribers.</div>">Events &amp; notifications</span>
+            <span class="chip" data-tip="<span class='t'>Panel pricing &amp; BID</span><div class='d'>Consent-scoped lender-panel matching, quote → AIP workflow, Best Interests Duty evidence assembly. Section 11.</div>">Panel pricing &amp; BID</span>
+          </div>
+        </div>
+        <div class="layer">
+          <div class="layer-label">Trust graph</div>
+          <div class="layer-body accent3">
+            <span class="chip" data-tip="<span class='t'>Party</span><div class='d'>Individual, company or trust — with its credentials and tick state. Section 03.</div>">Parties</span>
+            <span class="chip" data-tip="<span class='t'>Credential</span><div class='d'>A verified claim (identity, funds capacity, clean-party, ownership) with evidence, validity window and monitoring hooks.</div>">Credentials</span>
+            <span class="chip" data-tip="<span class='t'>Property &amp; Listing</span><div class='d'>Title-verified property with its living disclosure pack.</div>">Properties</span>
+            <span class="chip" data-tip="<span class='t'>Buy-intent</span><div class='d'>What a buyer wants + verified capacity to buy it.</div>">Buy-intents</span>
+            <span class="chip" data-tip="<span class='t'>Deal</span><div class='d'>Offer → exchange → settlement, as one orchestrated object.</div>">Deals</span>
+            <span class="chip" data-tip="<span class='t'>Reliance pact</span><div class='d'>The written agreement that lets a regulated business legally rely on Veristate CDD — the legal edge of the graph.</div>">Reliance pacts</span>
+            <span class="chip" data-tip="<span class='t'>BrokerPractice</span><div class='d'>A verified broking business: credit licence, aggregator accreditation, lender panel. Section 11.</div>">Broker practices</span>
+            <span class="chip" data-tip="<span class='t'>LoanCase &amp; FinanceConsent</span><div class='d'>The finance file (scenarios, matches, quotes, AIP, audit log) and the consent edge that lets a broker read a buyer’s band. Section 11.</div>">Loan cases &amp; consents</span>
+          </div>
+        </div>
+        <div class="layer">
+          <div class="layer-label">Trust engine</div>
+          <div class="layer-body accent">
+            <span class="chip hot" data-tip="<span class='t'>Verification orchestrator</span><div class='d'>Runs check plans per party/property type; parallel, resumable, auditable. Section 04.</div>">Verification orchestrator</span>
+            <span class="chip hot" data-tip="<span class='t'>Continuous monitoring</span><div class='d'>Delta-screening, expiry tracking, title-change watch. Turns point-in-time checks into living state.</div>">Monitoring</span>
+            <span class="chip hot" data-tip="<span class='t'>Evidence vault</span><div class='d'>Append-only, encrypted store of verification evidence — proofs preferred over raw documents. Section 11.</div>">Evidence vault</span>
+            <span class="chip hot" data-tip="<span class='t'>Reliance ledger</span><div class='d'>Who relied on which credential, when, under which pact — the record that makes shared CDD defensible.</div>">Reliance ledger</span>
+            <span class="chip" data-tip="<span class='t'>Badge service</span><div class='d'>Issues, presents and revokes ticks; powers the public verification endpoint behind every badge.</div>">Badge service</span>
+          </div>
+        </div>
+        <div class="layer">
+          <div class="layer-label">Official rails<br>(adapters)</div>
+          <div class="layer-body">
+            <span class="chip dim" data-tip="<span class='t'>DVS</span><div class='d'>Real-time government document verification, via a gateway provider.</div>">DVS</span>
+            <span class="chip dim" data-tip="<span class='t'>Biometric IDV</span><div class='d'>Licensed supplier for liveness + document biometrics (pluggable; commodity per P5).</div>">Biometric IDV</span>
+            <span class="chip dim" data-tip="<span class='t'>CDR / open banking</span><div class='d'>Consent-based bank data for funds capacity; accredited-recipient model.</div>">CDR</span>
+            <span class="chip dim" data-tip="<span class='t'>Land titles</span><div class='d'>Title search &amp; dealing watch via aggregators (InfoTrack / Dye &amp; Durham / triSearch).</div>">Titles</span>
+            <span class="chip dim" data-tip="<span class='t'>ASIC / ABR</span><div class='d'>Company &amp; trust verification, beneficial-ownership mapping.</div>">ASIC · ABR</span>
+            <span class="chip dim" data-tip="<span class='t'>Screening</span><div class='d'>PEP, sanctions, adverse-media lists with delta feeds.</div>">Sanctions / PEP</span>
+            <span class="chip dim" data-tip="<span class='t'>Revenue offices</span><div class='d'>EDR (NSW), Duties Online (VIC), QRO — duty pre-fill targets.</div>">Revenue offices</span>
+            <span class="chip dim" data-tip="<span class='t'>ConnectID / digital ID</span><div class='d'>Bank-anchored identity as an alternative identity input as adoption grows.</div>">ConnectID</span>
+            <span class="chip dim" data-tip="<span class='t'>PEXA (via practitioners)</span><div class='d'>Settlement handoff — we prepare, practitioners transact.</div>">PEXA handoff</span>
+            <span class="chip dim" data-tip="<span class='t'>Lender feeds</span><div class='d'>Product catalogues, carded rates, policy parameters and pricing outcomes — via lender and aggregator APIs. Section 11.</div>">Lender feeds</span>
+          </div>
+        </div>
+      </div>
+      <div class="fsignote">Adapters are swappable by design (P5): every rail sits behind an internal interface so a supplier change — or a new state — never touches the engine.</div>
+    </figure>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="domain">
+  <div class="wrap">
+    <div class="secnum">03 · Domain model</div>
+    <h2>The objects the graph is made of</h2>
+    <p class="lede">
+      Sixteen objects carry the whole platform — the four finance objects get their own section (11). The two that make Veristate different from every incumbent are
+      <strong>Credential</strong> (verification as a first-class, portable, monitored object) and
+      <strong>ReliancePact</strong> (the legal agreement that lets other businesses consume it).
+    </p>
+    <figure class="viz">
+      <div class="viz-title">Core object graph</div>
+      <div class="viz-sub">Solid arrows: ownership/containment. Dashed: reference. Hover any box.</div>
+      <svg viewBox="0 -12 940 412" width="100%" style="display:block;" role="img" aria-label="Domain model diagram: Party holds Credentials which back the Tick; Sellers register Properties with Packs; Buyers register BuyIntents; Offers form Deals; Organisations hold ReliancePacts and consume Credentials; Practitioners join Deals.">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--baseline)"/></marker>
+        </defs>
+        <g font-size="12.5" font-weight="600">
+          <!-- Party -->
+          <g data-tip="<span class='t'>Party</span><div class='d'>An individual, company or trust. Subtypes carry role context (buyer, seller, both). Companies/trusts link to their beneficial owners — themselves Parties.</div>">
+            <rect x="30" y="150" width="130" height="64" rx="10" fill="var(--wash)" stroke="var(--series-1)"/>
+            <text x="95" y="178" text-anchor="middle" fill="var(--text-primary)">Party</text>
+            <text x="95" y="196" text-anchor="middle" font-size="10.5" font-weight="400" fill="var(--text-secondary)">person · company · trust</text>
+          </g>
+          <!-- Credential -->
+          <g data-tip="<span class='t'>Credential</span><div class='d'>A verified claim: identity (VOI-standard), clean-party, funds-capacity, FIRB status, ownership. Carries evidence refs, validity window, monitoring subscription, and consent grants.</div>">
+            <rect x="240" y="60" width="150" height="56" rx="10" fill="var(--wash)" stroke="var(--series-1)"/>
+            <text x="315" y="84" text-anchor="middle" fill="var(--text-primary)">Credential</text>
+            <text x="315" y="101" text-anchor="middle" font-size="10.5" font-weight="400" fill="var(--text-secondary)">identity · funds · clean-party</text>
+          </g>
+          <!-- Tick -->
+          <g data-tip="<span class='t'>Tick</span><div class='d'>The badge: a computed, revocable roll-up of a Party's (or Property's) credentials. Levels V1–V3. Publicly checkable via the badge service.</div>">
+            <rect x="450" y="60" width="110" height="56" rx="10" fill="var(--surface-1)" stroke="var(--baseline)"/>
+            <text x="505" y="84" text-anchor="middle" fill="var(--text-primary)">Tick</text>
+            <text x="505" y="101" text-anchor="middle" font-size="10.5" font-weight="400" fill="var(--text-secondary)">V1 · V2 · V3</text>
+          </g>
+          <!-- Property -->
+          <g data-tip="<span class='t'>Property</span><div class='d'>A title-verified parcel linked to its verified owner. Carries encumbrance watch.</div>">
+            <rect x="240" y="160" width="150" height="52" rx="10" fill="var(--surface-1)" stroke="var(--baseline)"/>
+            <text x="315" y="182" text-anchor="middle" fill="var(--text-primary)">Property</text>
+            <text x="315" y="199" text-anchor="middle" font-size="10.5" font-weight="400" fill="var(--text-secondary)">title-matched</text>
+          </g>
+          <!-- Pack -->
+          <g data-tip="<span class='t'>Disclosure pack</span><div class='d'>The living vendor pack: state-specific documents auto-assembled from registry/council/water APIs, each item with freshness state.</div>">
+            <rect x="450" y="160" width="110" height="52" rx="10" fill="var(--surface-1)" stroke="var(--baseline)"/>
+            <text x="505" y="182" text-anchor="middle" fill="var(--text-primary)">Pack</text>
+            <text x="505" y="199" text-anchor="middle" font-size="10.5" font-weight="400" fill="var(--text-secondary)">living disclosure</text>
+          </g>
+          <!-- Listing -->
+          <g data-tip="<span class='t'>Listing</span><div class='d'>A Property offered for sale on a surface (flagship or tenant). Inherits the property tick.</div>">
+            <rect x="620" y="160" width="110" height="52" rx="10" fill="var(--surface-1)" stroke="var(--baseline)"/>
+            <text x="675" y="182" text-anchor="middle" fill="var(--text-primary)">Listing</text>
+            <text x="675" y="199" text-anchor="middle" font-size="10.5" font-weight="400" fill="var(--text-secondary)">on a surface</text>
+          </g>
+          <!-- BuyIntent -->
+          <g data-tip="<span class='t'>BuyIntent</span><div class='d'>Budget, locations, timing + verified capacity band. Drives matching; visible to sellers only as a verified summary, never raw data (P3).</div>">
+            <rect x="240" y="260" width="150" height="52" rx="10" fill="var(--surface-1)" stroke="var(--baseline)"/>
+            <text x="315" y="282" text-anchor="middle" fill="var(--text-primary)">BuyIntent</text>
+            <text x="315" y="299" text-anchor="middle" font-size="10.5" font-weight="400" fill="var(--text-secondary)">budget · area · timing</text>
+          </g>
+          <!-- Offer -->
+          <g data-tip="<span class='t'>Offer</span><div class='d'>A tick-to-tick proposal on a Listing: price, conditions, timing. Both parties' tick state is frozen into the offer record.</div>">
+            <rect x="620" y="260" width="110" height="52" rx="10" fill="var(--surface-1)" stroke="var(--baseline)"/>
+            <text x="675" y="282" text-anchor="middle" fill="var(--text-primary)">Offer</text>
+            <text x="675" y="299" text-anchor="middle" font-size="10.5" font-weight="400" fill="var(--text-secondary)">tick-to-tick</text>
+          </g>
+          <!-- Deal -->
+          <g data-tip="<span class='t'>Deal</span><div class='d'>The orchestrated transaction from accepted offer to registration: state machine, milestones, party workspace. Section 09.</div>">
+            <rect x="790" y="200" width="120" height="64" rx="10" fill="var(--wash)" stroke="var(--series-1)"/>
+            <text x="850" y="228" text-anchor="middle" fill="var(--text-primary)">Deal</text>
+            <text x="850" y="246" text-anchor="middle" font-size="10.5" font-weight="400" fill="var(--text-secondary)">offer → registered</text>
+          </g>
+          <!-- Organisation -->
+          <g data-tip="<span class='t'>Organisation</span><div class='d'>A tenant or relying business: agency network, developer, law firm. Carries branding config (if white-label) and its AML program state.</div>">
+            <rect x="30" y="30" width="130" height="56" rx="10" fill="var(--surface-1)" stroke="var(--baseline)"/>
+            <text x="95" y="54" text-anchor="middle" fill="var(--text-primary)">Organisation</text>
+            <text x="95" y="71" text-anchor="middle" font-size="10.5" font-weight="400" fill="var(--text-secondary)">tenant · agency · firm</text>
+          </g>
+          <!-- ReliancePact -->
+          <g data-tip="<span class='t'>ReliancePact</span><div class='d'>The executed reliance agreement between Veristate and a regulated business. Every credential consumption is written to the reliance ledger under a pact.</div>">
+            <rect x="240" y="-4" width="150" height="44" rx="10" fill="var(--wash-3)" stroke="var(--series-3)"/>
+            <text x="315" y="15" text-anchor="middle" fill="var(--text-primary)">ReliancePact</text>
+            <text x="315" y="31" text-anchor="middle" font-size="10.5" font-weight="400" fill="var(--text-secondary)">legal reliance edge</text>
+          </g>
+          <!-- Practitioner -->
+          <g data-tip="<span class='t'>Practitioner</span><div class='d'>Panel conveyancer or solicitor: an Organisation subtype with state licensing, fixed-fee menu, and capacity signals. Section 10.</div>">
+            <rect x="790" y="310" width="120" height="52" rx="10" fill="var(--surface-1)" stroke="var(--baseline)"/>
+            <text x="850" y="332" text-anchor="middle" fill="var(--text-primary)">Practitioner</text>
+            <text x="850" y="349" text-anchor="middle" font-size="10.5" font-weight="400" fill="var(--text-secondary)">panel member</text>
+          </g>
+        </g>
+        <!-- edges -->
+        <g stroke="var(--baseline)" stroke-width="1.5" fill="none">
+          <path d="M160 168 L236 96" marker-end="url(#arr)"/>                      <!-- Party -> Credential -->
+          <path d="M390 88 L446 88" marker-end="url(#arr)"/>                       <!-- Credential -> Tick -->
+          <path d="M160 184 L236 184" marker-end="url(#arr)"/>                     <!-- Party -> Property -->
+          <path d="M390 186 L446 186" marker-end="url(#arr)"/>                     <!-- Property -> Pack -->
+          <path d="M560 186 L616 186" marker-end="url(#arr)"/>                     <!-- Pack/Property -> Listing -->
+          <path d="M160 200 L236 282" marker-end="url(#arr)"/>                     <!-- Party -> BuyIntent -->
+          <path d="M390 286 L616 286" stroke-dasharray="4 4" marker-end="url(#arr)"/> <!-- BuyIntent -> Offer -->
+          <path d="M675 256 L675 216" stroke-dasharray="4 4" marker-end="url(#arr)"/> <!-- Offer -> Listing -->
+          <path d="M730 274 L786 244" marker-end="url(#arr)"/>                     <!-- Offer -> Deal -->
+          <path d="M850 306 L850 268" stroke-dasharray="4 4" marker-end="url(#arr)"/> <!-- Practitioner -> Deal -->
+          <path d="M160 58 L236 24" marker-end="url(#arr)"/>                       <!-- Organisation -> ReliancePact -->
+          <path d="M330 40 L318 56" stroke-dasharray="4 4" marker-end="url(#arr)"/>   <!-- ReliancePact -> Credential -->
+        </g>
+      </svg>
+    </figure>
+
+    <div class="tablecard">
+      <table>
+        <thead><tr><th>Object</th><th>Key design decisions</th></tr></thead>
+        <tbody>
+          <tr><td>Credential</td><td>Typed (<code>identity</code>, <code>clean_party</code>, <code>funds_capacity</code>, <code>firb_status</code>, <code>ownership</code>); stores <strong>derived proofs by default, raw documents only where law demands</strong>; carries validity window, refresh policy, and per-relying-party consent grants. Modelled to map onto W3C verifiable credentials later without a rewrite.</td></tr>
+          <tr><td>Tick</td><td><strong>Computed, never stored as fact.</strong> A roll-up function over live credentials: V1 identity-verified, V2 + funds capacity, V3 full (identity + clean-party + funds + FIRB). Any underlying credential lapsing instantly demotes the tick — the badge can never be stale.</td></tr>
+          <tr><td>ReliancePact</td><td>One executed agreement per relying Organisation, referencing AUSTRAC reliance provisions; every consumption event (who read which credential for which deal) appends to the reliance ledger. This ledger <em>is</em> the moat (investor proposal §08).</td></tr>
+          <tr><td>Deal</td><td>The only object that crosses into other systems: it holds the orchestration state machine and the handoff records (practitioner appointment, duty pre-fill payloads, settlement references). Deliberately <strong>not</strong> a contract-of-record — the legal contract stays with practitioners (P5).</td></tr>
+          <tr><td>BuyIntent</td><td>Sellers see a <strong>verified summary band</strong> ("deposit verified · pre-approval current · no FIRB constraint"), never balances or documents. Privacy is what makes buyers willing to register capacity at all (P3).</td></tr>
+          <tr><td>Finance objects <span class="pill b">§11</span></td><td><code>BrokerPractice</code>, <code>PanelAccreditation</code>, <code>FinanceConsent</code> and <code>LoanCase</code> form the finance layer’s two many-to-many edges: consent (buyer ↔ broker) and accreditation (broker ↔ lender). Quotes are written against a frozen consented view; an accepted quote escalates to an <strong>AIP credential</strong> on the buyer — portable into offers like any other credential.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="engine">
+  <div class="wrap">
+    <div class="secnum">04 · The trust engine</div>
+    <h2>Verification as a living state, not an event</h2>
+    <p class="lede">
+      The engine's defining behaviour: a check runs once, then <em>monitoring keeps it true</em>. Every incumbent
+      re-runs checks per transaction because their result is a PDF. Ours is a state machine with subscriptions.
+    </p>
+
+    <h3>Party verification lifecycle</h3>
+    <div class="sm">
+      <div class="st"><div class="n">Registered</div><div class="d">Profile created; nothing claimed yet</div></div>
+      <div class="arr">→</div>
+      <div class="st"><div class="n">Verifying</div><div class="d">Check plan runs in parallel; partial results visible to the user only</div></div>
+      <div class="arr">→</div>
+      <div class="st on"><div class="n">Verified ✓</div><div class="d">Tick issued at earned level; credentials enter monitoring</div></div>
+      <div class="arr">→</div>
+      <div class="st warn"><div class="n">Attention</div><div class="d">Expiry near, or a monitor fired (e.g. sanctions delta) — tick shows level, flags pending item</div></div>
+      <div class="arr">→</div>
+      <div class="st"><div class="n">Suspended / Revoked</div><div class="d">Tick withdrawn; relying parties who consumed it are notified via the ledger</div></div>
+    </div>
+    <p class="body" style="margin-top:12px;">
+      <strong>Attention</strong> is the state that matters most. Point-in-time systems have only "valid" and "expired";
+      the gap between those is where fraud and deal collapse live. Veristate surfaces degradation early —
+      to the user, and (with consent, under pact) to any party currently in a deal with them.
+    </p>
+
+    <h3>The check plans</h3>
+    <div class="tablecard">
+      <table>
+        <thead><tr><th>Check</th><th>Rail</th><th>Refresh</th><th>Feeds tick</th><th>Reusable via</th></tr></thead>
+        <tbody>
+          <tr><td>Identity (VOI standard)</td><td>DVS + biometric IDV; ConnectID as alternative input</td><td>2-year validity; re-verify on document expiry</td><td><span class="pill b">V1</span></td><td>ARNECC 2-yr validity · Identity-Agent appointment</td></tr>
+          <tr><td>Clean-party screening</td><td>PEP / sanctions / adverse-media lists</td><td><strong>Continuous</strong> (delta feeds)</td><td><span class="pill b">V3</span></td><td>AML reliance pact</td></tr>
+          <tr><td>Funds capacity</td><td>CDR consent + lender pre-approval link</td><td>Auto-refresh ~30 days; pre-approval expiry tracked</td><td><span class="pill b">V2</span></td><td>Consented summary band</td></tr>
+          <tr><td>FIRB status</td><td>Citizenship/residency screening; exemption-certificate pathway</td><td>On change of circumstance</td><td><span class="pill b">V3</span></td><td>Status flag on intent/offer</td></tr>
+          <tr><td>Entity &amp; beneficial ownership</td><td>ASIC / ABR + BO mapping</td><td>Change-monitored</td><td><span class="pill b">V1–V3</span></td><td>AML reliance pact</td></tr>
+          <tr><td>Ownership (property)</td><td>Title search: proprietor ↔ verified identity match</td><td>Dealing/caveat watch while listed</td><td><span class="pill g">Property tick</span></td><td>Pack + public badge check</td></tr>
+          <tr><td>Disclosure pack items</td><td>Registry / council / water / body-corporate APIs</td><td>Per-item staleness clocks (state rules)</td><td><span class="pill g">Property tick</span></td><td>Pack shared to buyer side</td></tr>
+          <tr><td>Settlement account</td><td>Account-name verification (ConnectID / PayID rails)</td><td>At deal open + before settlement</td><td><span class="pill o">Deal gate</span></td><td>Anti-redirection check</td></tr>
+          <tr><td>Broker practice</td><td>ASIC credit-licence register + aggregator accreditation + clean-party screening</td><td>Change-monitored</td><td><span class="pill b">Broker tick</span></td><td>AML reliance pact</td></tr>
+          <tr><td>Lender panel &amp; pricing</td><td>Lender / aggregator product, policy &amp; pricing feeds</td><td>Daily (products) · <strong>versioned</strong> (policy — matches record the version used)</td><td><span class="pill o">Match inputs</span></td><td>Panel pricing (§11)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Badge integrity — making the tick unfakeable</h3>
+    <div class="cards three">
+      <div class="card"><h4><span class="icon"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg></span>Computed, live</h4>
+        <p>The tick is a function of current credential state, evaluated on read. There is no cached "verified" flag to go stale or be forged in a screenshot — every render hits the badge service.</p></div>
+      <div class="card"><h4><span class="icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><path d="M13 13h3v3h-3zM17 17h3v3h-3z"/></svg></span>Publicly checkable</h4>
+        <p>Every badge carries a short code / QR resolving to <code>verify.veristate.com.au</code>, which confirms level, scope and freshness — without revealing anything else. Screenshots of ticks are worthless; the check is the badge.</p></div>
+      <div class="card"><h4><span class="icon"><svg viewBox="0 0 24 24"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg></span>Revocation propagates</h4>
+        <p>When a credential lapses, the ledger knows every open deal and relying party that consumed it — all are notified within minutes. A revoked tick is loud, not silent.</p></div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="webapp">
+  <div class="wrap">
+    <div class="secnum">05 · The consumer webapp</div>
+    <h2>Surface one: where the tick earns its meaning</h2>
+    <p class="lede">
+      The flagship's information architecture is deliberately small — five areas — because the product's depth
+      lives in states, not screens. These six wireframes seed the Phase 0 prototype; each maps to a use case
+      from the investor proposal.
+    </p>
+
+    <div class="tablecard">
+      <table>
+        <thead><tr><th>Area</th><th>What lives there</th></tr></thead>
+        <tbody>
+          <tr><td>Verification hub</td><td>The onboarding spine: check progress, credential wallet, consent grants, renewal prompts. The first-run experience <em>is</em> this hub.</td></tr>
+          <tr><td>My profile / My property</td><td>Party tick, buy-intents; seller's property, pack health, listing controls.</td></tr>
+          <tr><td>Market</td><td>Verified listings, match feed (intent ↔ listing), saved searches. Unverified browsing allowed; acting requires a tick.</td></tr>
+          <tr><td>Finance</td><td>Per-listing broker offers, panel-pricing comparison, consent grants, quote threads, AIP status. Buyers reach several brokers at once; every consent is scoped, logged and revocable (§11).</td></tr>
+          <tr><td>Deals</td><td>Offer threads and the deal room: milestones, parties, practitioner, documents, orchestration timeline.</td></tr>
+          <tr><td>Panel</td><td>Choose/compare practitioners: state-eligible, fixed-fee menus, capacity and rating signals.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="wfgrid">
+      <div class="wfcard">
+        <div class="wf"><div class="bar"><i></i><i></i><i></i></div>
+          <div class="cv">
+            <div class="row"><div class="bl" style="width:38%;"></div><div class="grow"></div><span class="wtag g">3 of 4 complete</span></div>
+            <div class="row"><div class="b grow" style="height:34px; border-left:3px solid var(--good);"></div><span class="wtag g">Identity ✓</span></div>
+            <div class="row"><div class="b grow" style="height:34px; border-left:3px solid var(--good);"></div><span class="wtag g">Screening ✓</span></div>
+            <div class="row"><div class="b grow" style="height:34px; border-left:3px solid var(--series-1);"></div><span class="wtag">Funds — bank consent…</span></div>
+            <div class="row"><div class="b grow" style="height:34px; border-left:3px solid var(--baseline);"></div><span class="wtag o">FIRB — not needed</span></div>
+            <div class="row"><div class="grow"></div><div class="wbtn">Connect bank securely</div></div>
+            <div class="wnote">Runs in the background — close this tab; we'll notify you.</div>
+          </div>
+        </div>
+        <div class="cap">W1 · Verification hub (first run)</div>
+        <div class="sub">Onboarding as a checklist that fills itself. Async by design: the user leaves, checks continue, the tick arrives by notification. Feeds UC1.</div>
+      </div>
+
+      <div class="wfcard">
+        <div class="wf"><div class="bar"><i></i><i></i><i></i></div>
+          <div class="cv">
+            <div class="row"><div class="b" style="width:44px; height:44px; border-radius:50%;"></div>
+              <div class="grow"><div class="bl" style="width:55%; margin:6px 0;"></div><span class="wtick">✓ Verified · V2</span></div>
+              <div class="wbtn ghost">Share status</div></div>
+            <div class="bl" style="width:30%;"></div>
+            <div class="row"><div class="b grow" style="height:46px;"></div><div class="b grow" style="height:46px;"></div><div class="b grow" style="height:46px;"></div></div>
+            <div class="row"><span class="wtag g">Deposit verified</span><span class="wtag g">Pre-approval current</span><span class="wtag">Renews 12 Aug</span></div>
+            <div class="row"><div class="b grow" style="height:30px;"></div><div class="wbtn">New buy-intent</div></div>
+          </div>
+        </div>
+        <div class="cap">W2 · Buyer profile &amp; buy-intent</div>
+        <div class="sub">The tick with its level, the verified summary band a seller will see, and intents. Raw financials never render here — only bands (P3).</div>
+      </div>
+
+      <div class="wfcard">
+        <div class="wf"><div class="bar"><i></i><i></i><i></i></div>
+          <div class="cv">
+            <div class="b" style="height:64px;"></div>
+            <div class="row"><div class="bl" style="width:46%;"></div><div class="grow"></div><span class="wtick">✓ Property verified</span></div>
+            <div class="row"><span class="wtag g">Title matched</span><span class="wtag g">Pack complete</span><span class="wtag o">1 item ages in 9 days</span></div>
+            <div class="row"><div class="b grow" style="height:38px;"></div><div class="b grow" style="height:38px;"></div><div class="b grow" style="height:38px;"></div><div class="b grow" style="height:38px;"></div></div>
+            <div class="wnote">Disclosure pack · 12 documents · live freshness</div>
+            <div class="row"><div class="wbtn">Make verified offer</div><div class="wbtn ghost">Check this badge</div></div>
+          </div>
+        </div>
+        <div class="cap">W3 · Verified listing &amp; property pack</div>
+        <div class="sub">The seller-side moat on one screen: ownership matched to title, living pack with per-item freshness, and a badge anyone can independently check. Feeds UC2.</div>
+      </div>
+
+      <div class="wfcard">
+        <div class="wf"><div class="bar"><i></i><i></i><i></i></div>
+          <div class="cv">
+            <div class="row"><div class="bl" style="width:34%;"></div><div class="grow"></div><span class="wtag">Offer · open</span></div>
+            <div class="row">
+              <div class="b grow" style="height:52px; border-top:3px solid var(--series-1);"></div>
+              <div class="b grow" style="height:52px; border-top:3px solid var(--series-1);"></div>
+            </div>
+            <div class="row"><span class="wtick">✓ Buyer V2</span><span class="wtick">✓ Seller ✓ title</span><span class="wtag">$ band verified</span></div>
+            <div class="b" style="height:26px;"></div>
+            <div class="b" style="height:26px; width:70%;"></div>
+            <div class="row"><div class="wbtn">Accept &amp; open deal</div><div class="wbtn ghost">Counter</div></div>
+          </div>
+        </div>
+        <div class="cap">W4 · Tick-to-tick offer</div>
+        <div class="sub">Both parties' verification state is frozen into the offer. Accepting instantly opens the deal room with practitioners pre-matched — the 48-hour exchange from UC2.</div>
+      </div>
+
+      <div class="wfcard">
+        <div class="wf"><div class="bar"><i></i><i></i><i></i></div>
+          <div class="cv">
+            <div class="row"><div class="bl" style="width:40%;"></div><div class="grow"></div><span class="wtag g">On track · day 9 of 35</span></div>
+            <div class="row">
+              <span class="wtag g">Offer ✓</span><span class="wtag g">Practitioners ✓</span><span class="wtag g">Exchange ✓</span><span class="wtag">Finance 14d</span><span class="wtag o">Duty pre-fill</span><span class="wtag o">Settlement</span>
+            </div>
+            <div class="b" style="height:40px;"></div>
+            <div class="row"><div class="b grow" style="height:30px;"></div><div class="b grow" style="height:30px;"></div></div>
+            <div class="wnote">Next: lender valuation booked · nothing needed from you</div>
+          </div>
+        </div>
+        <div class="cap">W5 · Deal room &amp; orchestration timeline</div>
+        <div class="sub">The consumer's view of section 09's state machine: milestone chips, who-holds-the-ball, and "nothing needed from you" as the default happy state.</div>
+      </div>
+
+      <div class="wfcard">
+        <div class="wf"><div class="bar"><i></i><i></i><i></i></div>
+          <div class="cv">
+            <div class="row"><div class="b" style="width:70px; height:20px;"></div><div class="grow"></div><span class="wtag">Powered by Veristate</span></div>
+            <div class="row"><div class="b grow" style="height:44px; border-left:3px solid var(--good);"></div><div class="b grow" style="height:44px; border-left:3px solid var(--series-2);"></div><div class="b grow" style="height:44px; border-left:3px solid var(--series-1);"></div></div>
+            <div class="row"><span class="wtag g">214 verified clients</span><span class="wtag o">6 ticks expiring</span><span class="wtag">3 SMR drafts</span></div>
+            <div class="b" style="height:26px;"></div>
+            <div class="b" style="height:26px;"></div>
+            <div class="row"><div class="grow"></div><div class="wbtn ghost">Annual AUSTRAC report ↓</div></div>
+          </div>
+        </div>
+        <div class="cap">W6 · Agency console (white-label)</div>
+        <div class="sub">The tenant's back office under their brand: verified-client book, expiring ticks, compliance exhaust (P6). Feeds UC3 and section 06.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="tenancy">
+  <div class="wrap">
+    <div class="secnum">06 · Co-branded white-label</div>
+    <h2>Surface two: their brand, the shared graph</h2>
+    <p class="lede">
+      The white-label's central design decision is what is tenant-scoped and what is network-shared.
+      Get this wrong one way and there is no network effect; wrong the other way and no agency will sign.
+    </p>
+    <div class="tablecard">
+      <table>
+        <thead><tr><th>Concern</th><th>Scope</th><th>Rationale</th></tr></thead>
+        <tbody>
+          <tr><td>Credentials &amp; ticks</td><td><span class="pill g">Network-shared</span></td><td>The whole point (P4): a client verified under any tenant is verified everywhere. Consumers are told this plainly at consent time — "your verification belongs to you."</td></tr>
+          <tr><td>Client relationships &amp; CRM data</td><td><span class="pill b">Tenant-scoped</span></td><td>An agency's book is its business. Veristate never leaks who a tenant's clients are to other tenants — only the portable credential travels, and only when the consumer uses it elsewhere.</td></tr>
+          <tr><td>Listings</td><td><span class="pill b">Tenant-scoped, opt-up</span></td><td>Tenants choose per listing: private to their branded surface, or syndicated to the flagship market. Syndication is the carrot that grows the flagship without threatening the agency.</td></tr>
+          <tr><td>Reliance pact &amp; AML program</td><td><span class="pill b">Per tenant</span></td><td>Each regulated entity holds its own pact and its own program state; the compliance service renders each tenant's obligations separately. Legally non-negotiable.</td></tr>
+          <tr><td>Panel</td><td><span class="pill o">Configurable</span></td><td>Tenants may pin preferred practitioners or inherit the open panel; conflict-of-interest disclosure rules apply either way (section 10).</td></tr>
+          <tr><td>Theming &amp; domain</td><td><span class="pill b">Per tenant</span></td><td>Design tokens (logo, palette, type), custom domain, email identity. The badge itself is <strong>never re-themed</strong> — the tick renders identically on every surface, because the badge is the brand that guarantees the others.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="body">
+      Technically the white-label is the flagship webapp with a tenant context: same code, tenant-resolved
+      tokens, feature flags per plan. A lightweight <strong>embed SDK</strong> (badge widget, verified-offer button,
+      pack viewer) lets tenants keep their existing website and bolt trust onto it — often the first step
+      before a full co-branded deployment.
+    </p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="api">
+  <div class="wrap">
+    <div class="secnum">07 · API &amp; MCP</div>
+    <h2>Surface three: Veristate as something an AI can act through</h2>
+    <p class="lede">
+      The API is the platform's real boundary — the webapp and white-labels are its first two clients. The MCP
+      server is a thin, opinionated projection of the same API for AI assistants, designed around one rule:
+      <strong>an assistant may gather and prepare anything, but binding actions require a human ceremony.</strong>
+    </p>
+
+    <h3>Resource surface (REST, versioned, consent-scoped)</h3>
+    <div class="tablecard">
+      <table>
+        <thead><tr><th>Resource</th><th>Representative operations</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><code>/parties</code></td><td>register · get tick state · start verification · grant/revoke consent</td><td>PII-minimal responses; credentials referenced by opaque IDs, evidence never leaves the vault via API</td></tr>
+          <tr><td><code>/credentials</code></td><td>status · summary-band presentation · renewal</td><td>Presentations are scoped claims ("V2, valid, deposit band ✓"), not data</td></tr>
+          <tr><td><code>/properties</code> · <code>/listings</code></td><td>register · title-match · pack status · list/syndicate · search</td><td>Search is public; pack contents gated on buyer tick + seller grant</td></tr>
+          <tr><td><code>/buy-intents</code></td><td>create · match feed · pause</td><td>Matching pushes events, not polling</td></tr>
+          <tr><td><code>/offers</code> · <code>/deals</code></td><td>draft · present · accept (ceremony) · milestones · handoffs</td><td>Accepting an offer and appointing a practitioner are ceremony-gated (below)</td></tr>
+          <tr><td><code>/panel</code></td><td>eligible practitioners · fee menus · appoint (ceremony)</td><td>State-eligibility rules enforced server-side</td></tr>
+          <tr><td><code>/brokers</code> · <code>/finance-consents</code></td><td>broker search &amp; profile · grant/revoke consent (ceremony) · consented-view reads</td><td>Every read of a band is ledgered; presentations are bands, never balances</td></tr>
+          <tr><td><code>/loan-cases</code> · <code>/quotes</code></td><td>scenario · panel matches · quote · AIP status · BID pack</td><td>Broker-scoped; every scenario change appends to the case audit log (§11)</td></tr>
+          <tr><td><code>/orgs</code> · <code>/pacts</code></td><td>tenant config · pact execution · reliance ledger queries · compliance reports</td><td>B2B scope; the compliance-exhaust endpoints</td></tr>
+          <tr><td><code>/badge</code></td><td>public verification of any tick code</td><td>Unauthenticated, rate-limited, reveals level + freshness only</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>The MCP server</h3>
+    <p class="body">
+      Tools are named for intent, not for endpoints, and each declares whether it is <strong>read</strong>,
+      <strong>prepare</strong>, or <strong>ceremony</strong> class. Ceremony-class tools never complete an action:
+      they stage it and return a signed link where the human confirms inside a Veristate surface (webapp or
+      white-label) with their verified session. The assistant's context receives reference tokens and summary
+      bands — never documents, balances, or identity data.
+    </p>
+    <div class="tablecard">
+      <table>
+        <thead><tr><th>MCP tool</th><th>Class</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td><code>check_verification_status</code></td><td><span class="pill g">read</span></td><td>Tick level, pending items, renewal dates for the connected user</td></tr>
+          <tr><td><code>start_verification</code></td><td><span class="pill o">prepare</span></td><td>Begins the async check plan; returns hub link for biometric/consent steps</td></tr>
+          <tr><td><code>screen_firb_position</code></td><td><span class="pill g">read</span></td><td>Residency-based eligibility summary (UC4's first step)</td></tr>
+          <tr><td><code>search_verified_listings</code></td><td><span class="pill g">read</span></td><td>Market search with tick/pack filters</td></tr>
+          <tr><td><code>get_property_pack_summary</code></td><td><span class="pill g">read</span></td><td>Pack table of contents + freshness; item access requires buyer tick grant</td></tr>
+          <tr><td><code>register_buy_intent</code></td><td><span class="pill o">prepare</span></td><td>Creates/updates an intent from conversational parameters</td></tr>
+          <tr><td><code>draft_offer</code></td><td><span class="pill o">prepare</span></td><td>Assembles a tick-to-tick offer with conditions; nothing is sent</td></tr>
+          <tr><td><code>present_offer</code></td><td><span class="pill r">ceremony</span></td><td>Stages the offer; human confirms via signed link before the seller sees it</td></tr>
+          <tr><td><code>appoint_practitioner</code></td><td><span class="pill r">ceremony</span></td><td>Stages a panel appointment at a fixed fee; human confirms</td></tr>
+          <tr><td><code>compare_broker_offers</code></td><td><span class="pill g">read</span></td><td>Per-listing broker pricing summaries for the connected buyer</td></tr>
+          <tr><td><code>grant_finance_consent</code></td><td><span class="pill r">ceremony</span></td><td>Stages a band share with chosen brokers — scoped, revocable; human confirms</td></tr>
+          <tr><td><code>get_panel_matches</code> / <code>reprice_scenario</code></td><td><span class="pill o">prepare</span></td><td>Broker scope: ranked lender matches for a LoanCase; every re-price appends to the audit log</td></tr>
+          <tr><td><code>generate_bid_pack</code></td><td><span class="pill o">prepare</span></td><td>Broker scope: drafts the Best Interests Duty evidence pack for review — never auto-filed</td></tr>
+          <tr><td><code>get_deal_status</code> / <code>subscribe_deal_events</code></td><td><span class="pill g">read</span></td><td>Milestones, who-holds-the-ball, next actions — the feed UC4's Claude narrates</td></tr>
+          <tr><td><code>generate_compliance_report</code></td><td><span class="pill o">prepare</span></td><td>B2B: tenant AML report drafts (plugin surface, section 08)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="body">
+      Why this matters strategically: as buying journeys move into assistants, the assistant needs a
+      counterparty it can trust <em>programmatically</em>. Portals offer HTML to scrape; Veristate offers signed
+      claims. The MCP surface is how "the trust layer for AI-assisted property" stops being a slogan and
+      becomes an integration.
+    </p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="plugin">
+  <div class="wrap">
+    <div class="secnum">08 · Agent-harness plugin</div>
+    <h2>Surface four: the professional's daily driver</h2>
+    <p class="lede">
+      The Cowork plugin composes the MCP server with packaged skills — prompts and workflows tuned to four
+      professional teams. It ships no logic of its own beyond these compositions, so it inherits every
+      platform improvement for free.
+    </p>
+    <div class="cards three">
+      <div class="card">
+        <div class="who">Buyer's agencies</div>
+        <h4>Pipeline skills</h4>
+        <p><code>/pipeline-brief</code> — morning digest: expiring ticks &amp; pre-approvals, new matches per client, pack changes overnight (the caveat flag from UC5).</p>
+        <p><code>/client-onboard</code> — conversational intake that ends with <code>start_verification</code> and a buy-intent draft.</p>
+        <p><code>/offer-pack</code> — comparable-listing analysis + drafted offer, staged for the client's ceremony.</p>
+      </div>
+      <div class="card">
+        <div class="who">Conveyancing &amp; law firms</div>
+        <h4>Matter skills</h4>
+        <p><code>/matter-open</code> — pulls verified party + pack into a new matter; VOI and CDD arrive as reliance records, not tasks.</p>
+        <p><code>/duty-prefill</code> — assembles the EDR / Duties Online / QRO payload from deal data for practitioner review.</p>
+        <p><code>/settlement-ready</code> — pre-settlement checklist against deal state, incl. account-verification gate.</p>
+      </div>
+      <div class="card">
+        <div class="who">Agency back offices</div>
+        <h4>Compliance skills</h4>
+        <p><code>/aml-health</code> — program status, screening backlog, training gaps across offices.</p>
+        <p><code>/smr-draft</code> — structures a suspicious-matter narrative from deal context for the compliance officer's review — never auto-filed.</p>
+        <p><code>/austrac-annual</code> — drafts the annual compliance report from the ledger.</p>
+      </div>
+      <div class="card" style="grid-column:1 / -1;">
+        <div class="who">Broking teams</div>
+        <h4>Finance skills</h4>
+        <p><code>/lead-brief</code> — morning digest: new consented leads with bands, expiring AIPs and consents, rate moves affecting open quotes.</p>
+        <p><code>/panel-reprice</code> — re-runs a LoanCase scenario across the panel and drafts the client note; the quote itself stays a human send.</p>
+        <p><code>/bid-pack</code> — assembles the Best Interests Duty evidence pack from the case log for the broker’s sign-off.</p>
+      </div>
+    </div>
+    <p class="body">
+      Design rule inherited from section 07: the plugin's agents read and prepare; humans confirm ceremonies.
+      A morning brief can notice, draft, and stage — it cannot bind a client to anything.
+    </p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="orchestration">
+  <div class="wrap">
+    <div class="secnum">09 · Downstream orchestration</div>
+    <h2>From accepted offer to registered title, with the ball always visibly held</h2>
+    <p class="lede">
+      The Deal state machine is Veristate's answer to the fragmented downstream chain. It does not perform
+      legal steps — it sequences them, pre-fills them, and makes their state legible to everyone entitled to see it.
+    </p>
+    <div class="flow">
+      <div class="fstep"><div><div class="fs-t">Offer accepted → Deal opens</div><div class="fs-d">Deal room created; both parties' tick states and the offer terms frozen in; reliance records written for the agent under their pact. The buyer’s broker and their AIP credential join the room — the finance milestone opens pre-warmed.</div><div class="fs-w">Ball: platform · minutes</div></div></div>
+      <div class="fstep"><div><div class="fs-t">Practitioners confirmed</div><div class="fs-d">Pre-selected panel members appointed (ceremony); verified party data + pack flow to their systems; VOI arrives as a reliance record — no re-verification.</div><div class="fs-w">Ball: parties → practitioners · same day</div></div></div>
+      <div class="fstep"><div><div class="fs-t">Exchange prepared &amp; executed</div><div class="fs-d">State-aware: NSW s66W certificate prepared if parties elect to waive cooling-off; QLD contract on the pre-disclosed Form 2 pack; contract itself signed in the practitioner's tooling (P5).</div><div class="fs-w">Ball: practitioners · target ≤ 2 days from acceptance</div></div></div>
+      <div class="fstep"><div><div class="fs-t">Conditions run</div><div class="fs-d">Finance (valuation-only — the AIP has been held via the buyer’s broker since search, and lender status webhooks straight into the milestone), building &amp; pest bookings, FIRB where applicable — each a tracked milestone with expiry clocks and nudges.</div><div class="fs-w">Ball: buyer side · state-typical windows</div></div></div>
+      <div class="fstep"><div><div class="fs-t">Duty pre-filled</div><div class="fs-d">EDR / Duties Online / QRO payloads assembled from verified deal data; practitioner reviews and lodges — assessment stays theirs.</div><div class="fs-w">Ball: practitioners</div></div></div>
+      <div class="fstep"><div><div class="fs-t">Settlement handoff</div><div class="fs-d">Deal reference and account-verification results handed to the practitioners' PEXA workflow; settlement-account gate re-checked; PEXA Key recommended to consumers.</div><div class="fs-w">Ball: practitioners + banks · Veristate observes</div></div></div>
+      <div class="fstep"><div><div class="fs-t">Registered → Deal archived</div><div class="fs-d">Milestone confirmed from title data; deal record sealed; AML records retained per statute; consumer credentials remain live for the next transaction — the flywheel.</div><div class="fs-w">Ball: platform · retention clocks start</div></div></div>
+    </div>
+    <p class="body">
+      Failure paths are first-class: a crashed condition reverts the Deal to <em>market-return</em> with the pack
+      and both ticks intact — relisting is hours, not weeks, which materially softens the cost of a fall-over
+      for both sides.
+    </p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="panel">
+  <div class="wrap">
+    <div class="secnum">10 · The legal panel</div>
+    <h2>Practitioners as first-class citizens, not a referral afterthought</h2>
+    <p class="lede">
+      Today buyers find conveyancers via agent referral — late, opaque, and conflict-prone. The panel redesigns
+      that relationship around three commitments.
+    </p>
+    <div class="cards three">
+      <div class="card"><h4>Verified, both ways</h4>
+        <p>Panel members are themselves VOI'd, licence-checked per state (solicitors-only in QLD/ACT), insurance-verified, and capacity-signalled. The trust engine runs on them too — a practitioner tick.</p></div>
+      <div class="card"><h4>Fixed-fee menus</h4>
+        <p>Published, structured fee menus (purchase/sale, state, complexity tiers) replace "from $X plus surprises". Comparison is native; disbursements itemised from live search pricing.</p></div>
+      <div class="card"><h4>Early engagement</h4>
+        <p>Parties select practitioners at verification time, not offer time — so the practitioner is warm when the deal opens (the 48-hour exchange depends on this). Switching remains one click until exchange.</p></div>
+    </div>
+    <p class="body">
+      Conflicts policy: tenants may pin preferred firms, but every recommendation surface discloses the
+      relationship, and the consumer's own choice always outranks the pin. Referral economics are flat-fee
+      per appointment — never a percentage — to keep incentives clean.
+    </p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="finance">
+  <div class="wrap">
+    <div class="secnum">11 · The finance layer</div>
+    <h2>Buyers, brokers, lenders — two many-to-many edges with pricing on top</h2>
+    <p class="lede">
+      Finance is the platform’s second marketplace. Buyers reach <strong>multiple verified brokers</strong>; each broker
+      reaches <strong>multiple lenders</strong> through an accredited panel; lenders feed products, policy and pricing into
+      the graph. Veristate owns the plumbing between them — consent, matching, comparison — and the evidence
+      trail the law demands. It never touches the money: commissions stay between broker, lender and client,
+      disclosed on every quote.
+    </p>
+
+    <figure class="viz">
+      <div class="viz-title">The finance topology</div>
+      <div class="viz-sub">Solid: FinanceConsent (buyer ↔ broker, M:N). Dashed: PanelAccreditation (broker ↔ lender, M:N). Below: the LoanCase spine. Hover any node.</div>
+      <svg viewBox="0 0 940 400" width="100%" style="display:block;" role="img" aria-label="Finance topology: buyers connect to multiple brokers via consents; brokers connect to multiple lenders via panel accreditations; a LoanCase spine runs scenario to drawdown.">
+        <g font-size="11" fill="var(--text-muted)" font-weight="700" text-anchor="middle" style="letter-spacing:.06em; text-transform:uppercase;">
+          <text x="120" y="22">Buyers · verified bands</text>
+          <text x="480" y="22">Verified brokers</text>
+          <text x="830" y="22">Lenders · feeds</text>
+        </g>
+        <g font-size="12.5" font-weight="600">
+          <g data-tip="<span class='t'>Buyer party</span><div class='d'>Verified band (never balances) + buy-intent. May hold consents — and LoanCases — with several brokers at once, deliberately.</div>">
+            <rect x="30" y="44" width="180" height="52" rx="10" fill="var(--wash)" stroke="var(--series-1)"/>
+            <text x="120" y="66" text-anchor="middle" fill="var(--text-primary)">Priya &amp; Dan</text>
+            <text x="120" y="84" text-anchor="middle" font-size="10.5" font-weight="400" fill="var(--text-secondary)">band ✓ to $1.4M</text>
+          </g>
+          <g data-tip="<span class='t'>Buyer party</span><div class='d'>Each consent edge is per-buyer, per-broker, scoped and revocable.</div>">
+            <rect x="30" y="116" width="180" height="52" rx="10" fill="var(--wash)" stroke="var(--series-1)"/>
+            <text x="120" y="138" text-anchor="middle" fill="var(--text-primary)">R. Costa</text>
+            <text x="120" y="156" text-anchor="middle" font-size="10.5" font-weight="400" fill="var(--text-secondary)">band ✓ to $1.6M</text>
+          </g>
+          <g data-tip="<span class='t'>Buyer party</span><div class='d'>Brokers also reach out: matched buy-intents surface as consented leads in the workspace.</div>">
+            <rect x="30" y="188" width="180" height="52" rx="10" fill="var(--wash)" stroke="var(--series-1)"/>
+            <text x="120" y="210" text-anchor="middle" fill="var(--text-primary)">J. Okafor</text>
+            <text x="120" y="228" text-anchor="middle" font-size="10.5" font-weight="400" fill="var(--text-secondary)">band ✓ to $980k</text>
+          </g>
+          <g data-tip="<span class='t'>BrokerPractice</span><div class='d'>Credit licence (ASIC), aggregator accreditation, clean-party — verified once, carrying a broker tick. Panel of 32 lenders via PanelAccreditation edges.</div>">
+            <rect x="390" y="64" width="180" height="60" rx="10" fill="var(--wash)" stroke="var(--series-1)"/>
+            <text x="480" y="88" text-anchor="middle" fill="var(--text-primary)">Harbourline Finance</text>
+            <text x="480" y="106" text-anchor="middle" font-size="10.5" font-weight="400" fill="var(--text-secondary)">broker tick ✓ · 32-lender panel</text>
+          </g>
+          <g data-tip="<span class='t'>BrokerPractice</span><div class='d'>Different practices carry different panels — comparison across brokers is comparison across panels.</div>">
+            <rect x="390" y="160" width="180" height="60" rx="10" fill="var(--wash)" stroke="var(--series-1)"/>
+            <text x="480" y="184" text-anchor="middle" fill="var(--text-primary)">Aster Finance</text>
+            <text x="480" y="202" text-anchor="middle" font-size="10.5" font-weight="400" fill="var(--text-secondary)">broker tick ✓ · 24-lender panel</text>
+          </g>
+          <g data-tip="<span class='t'>Lender</span><div class='d'>Feeds product catalogue, carded rates, versioned policy parameters, and (aggregated) pricing outcomes.</div>">
+            <rect x="750" y="36" width="160" height="38" rx="9" fill="var(--surface-1)" stroke="var(--baseline)"/>
+            <text x="830" y="60" text-anchor="middle" fill="var(--text-primary)">Macquarie</text>
+          </g>
+          <g data-tip="<span class='t'>Lender</span><div class='d'>Digital lender: non-discretionary pricing — the carded rate is final.</div>">
+            <rect x="750" y="86" width="160" height="38" rx="9" fill="var(--surface-1)" stroke="var(--baseline)"/>
+            <text x="830" y="110" text-anchor="middle" fill="var(--text-primary)">Athena</text>
+          </g>
+          <g data-tip="<span class='t'>Lender</span>">
+            <rect x="750" y="136" width="160" height="38" rx="9" fill="var(--surface-1)" stroke="var(--baseline)"/>
+            <text x="830" y="160" text-anchor="middle" fill="var(--text-primary)">ING</text>
+          </g>
+          <g data-tip="<span class='t'>Lender</span>">
+            <rect x="750" y="186" width="160" height="38" rx="9" fill="var(--surface-1)" stroke="var(--baseline)"/>
+            <text x="830" y="210" text-anchor="middle" fill="var(--text-primary)">Suncorp</text>
+          </g>
+          <g data-tip="<span class='t'>Lender</span><div class='d'>Even the buyer’s own bank often prices better through a broker — the panel keeps majors honest.</div>">
+            <rect x="750" y="236" width="160" height="38" rx="9" fill="var(--surface-1)" stroke="var(--baseline)"/>
+            <text x="830" y="260" text-anchor="middle" fill="var(--text-primary)">CBA</text>
+          </g>
+        </g>
+        <g stroke="var(--series-1)" stroke-width="1.8" fill="none" opacity="0.75">
+          <path d="M210 62 C 300 62 300 86 390 86"/>
+          <path d="M210 78 C 310 78 300 182 390 182"/>
+          <path d="M210 142 C 300 142 300 100 390 100"/>
+          <path d="M210 214 C 300 214 300 198 390 198"/>
+        </g>
+        <g stroke="var(--baseline)" stroke-width="1.5" stroke-dasharray="4 4" fill="none">
+          <path d="M570 82 C 660 82 660 55 750 55"/>
+          <path d="M570 92 C 660 92 660 105 750 105"/>
+          <path d="M570 102 C 660 102 660 155 750 155"/>
+          <path d="M570 112 C 660 112 660 205 750 205"/>
+          <path d="M570 118 C 665 118 660 255 750 255"/>
+          <path d="M570 176 C 660 176 660 62 750 62"/>
+          <path d="M570 190 C 660 190 660 112 750 112"/>
+          <path d="M570 204 C 660 204 660 248 750 248"/>
+        </g>
+        <g font-size="11.5" font-weight="600">
+          <rect x="30" y="316" width="120" height="36" rx="8" fill="var(--wash-2)"/>
+          <text x="90" y="338" text-anchor="middle" fill="var(--text-primary)">Scenario</text>
+          <rect x="188" y="316" width="130" height="36" rx="8" fill="var(--wash-2)"/>
+          <text x="253" y="338" text-anchor="middle" fill="var(--text-primary)">Panel match</text>
+          <rect x="356" y="316" width="100" height="36" rx="8" fill="var(--wash-2)"/>
+          <text x="406" y="338" text-anchor="middle" fill="var(--text-primary)">Quote</text>
+          <rect x="494" y="316" width="130" height="36" rx="8" fill="var(--wash)"/>
+          <text x="559" y="338" text-anchor="middle" fill="var(--accent-deep)">AIP credential</text>
+          <rect x="662" y="316" width="130" height="36" rx="8" fill="var(--wash-3)"/>
+          <text x="727" y="338" text-anchor="middle" fill="var(--text-primary)">Deal milestone</text>
+          <rect x="830" y="316" width="104" height="36" rx="8" fill="var(--wash-3)"/>
+          <text x="882" y="338" text-anchor="middle" fill="var(--text-primary)">Drawdown</text>
+          <g stroke="var(--baseline)" stroke-width="1.5" fill="none">
+            <path d="M150 334 L184 334" marker-end="url(#arr)"/>
+            <path d="M318 334 L352 334" marker-end="url(#arr)"/>
+            <path d="M456 334 L490 334" marker-end="url(#arr)"/>
+            <path d="M624 334 L658 334" marker-end="url(#arr)"/>
+            <path d="M792 334 L826 334" marker-end="url(#arr)"/>
+          </g>
+          <text x="30" y="384" font-size="11" font-weight="400" fill="var(--text-muted)">The LoanCase spine — the broker’s working file; every transition and scenario change appends to its audit log.</text>
+        </g>
+      </svg>
+    </figure>
+
+    <h3>The four finance objects</h3>
+    <div class="tablecard">
+      <table>
+        <thead><tr><th>Object</th><th>Key design decisions</th></tr></thead>
+        <tbody>
+          <tr><td>BrokerPractice</td><td>An Organisation subtype run through the same trust engine: ASIC credit licence, aggregator accreditation, clean-party — rolled into a <strong>broker tick</strong> the buyer sees. Carries response-time and settled-loan signals for comparison.</td></tr>
+          <tr><td>PanelAccreditation</td><td>The broker ↔ lender M:N edge. Snapshots the lender’s <strong>versioned policy parameters</strong> (LVR caps, serviceability buffer, income-type rules) and subscribes to its pricing feed — so a match can always name the policy version it ran against.</td></tr>
+          <tr><td>FinanceConsent</td><td>The buyer ↔ broker M:N edge, modelled exactly like credential consent (P3): scoped to a property or search, time-boxed (default 30 days), band-only presentation, every read ledgered, one-tap revocation that propagates like tick revocation. A buyer holds several at once — brokers compete, never queue.</td></tr>
+          <tr><td>LoanCase</td><td>The broker’s working file: scenario (loan, security, LVR, repayment, rate type), the ranked match set <em>including exclusions with reasons</em>, quotes, AIP, and an append-only audit log. Quotes are written against the <strong>frozen consented view</strong>, so they cannot silently degrade; an accepted quote escalates to an AIP credential on the buyer. One buyer, several brokers, several LoanCases — by design.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Lender feeds</h3>
+    <div class="tablecard">
+      <table>
+        <thead><tr><th>Feed</th><th>Contents</th><th>Refresh</th></tr></thead>
+        <tbody>
+          <tr><td>Product catalogue</td><td>Products, features (offset, redraw, cashbacks), carded rates</td><td>Daily</td></tr>
+          <tr><td>Policy parameters</td><td>LVR caps, serviceability buffers, income-type policies (incl. self-employed), security rules</td><td>On change, <strong>versioned</strong> — every match records the version it used</td></tr>
+          <tr><td>Pricing outcomes</td><td>Anonymised, aggregated discretion decisions → the <strong>discretion-outlook</strong> model ("−25 bp likely · 74% of similar requests approved")</td><td>Continuous, aggregated</td></tr>
+          <tr><td>Application status</td><td>AIP → valuation → unconditional → drawdown</td><td>Webhooks, straight into the deal’s finance milestone</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Panel pricing — a pure function</h3>
+    <p class="body">
+      Matching is deterministic, versioned and replayable: <em>"why did it rank this way on 12 August"</em> must be
+      answerable forever, because a regulated adviser recommends from its output. No stored ranking — like the
+      tick, matches are computed on read and logged on use.
+    </p>
+    <pre class="codeblock"><span class="k">match</span>(scenario, clientFile, panel) → ranked product set
+
+  <span class="c"># 1 · eligibility — policy filters (LVR cap, income type, security rules)</span>
+  <span class="c">#     exclusions are KEPT, with reasons: BID needs the considered set, not just winners</span>
+  <span class="k">eligible</span>, excluded = screen(panel.policies@version, scenario, clientFile)
+
+  <span class="c"># 2 · serviceability — income × policy factor ÷ lender buffer, vs loan</span>
+  <span class="k">for</span> p <span class="k">in</span> eligible: p.buffer_ratio = capacity(clientFile, p.policy) / scenario.loan   <span class="c"># pass / tight / fail</span>
+
+  <span class="c"># 3 · pricing — carded rate + scenario adjustments (LVR band, IO, fixed) − likely discretion</span>
+  <span class="k">for</span> p <span class="k">in</span> eligible: p.rate = card(p, scenario) − discretion_outlook(p, clientFile)
+
+  <span class="c"># 4 · rank — 5-year true cost, tie-broken by client objectives (offset need, certainty, speed)</span>
+  <span class="k">return</span> rank(eligible, by=true_cost_5yr, tiebreak=clientFile.objectives), excluded</pre>
+    <p class="body">
+      Every scenario change a broker makes — a slider move, a repayment toggle — re-runs the function and
+      <strong>appends the inputs, policy versions and output to the LoanCase log</strong>. That log is not overhead;
+      it is the raw material of the next subsection.
+    </p>
+
+    <h3>Best-interests calculation and the BID evidence pack</h3>
+    <p class="body">
+      Principle P6 applied to brokers: nobody "does BID paperwork". The Best Interests Duty demands the broker
+      show the considered set, why the recommendation beats it, and how the client’s objectives were weighed —
+      which is exactly what the LoanCase log already contains. The <strong>BID evidence pack</strong> renders it:
+      considered products (including exclusions and their reasons), the scenario history, the ranking rationale
+      verbatim from the model, the client’s stated objectives, and the commission disclosed on each quote.
+      Generated per file, on demand, regulator-ready — compliance as exhaust.
+    </p>
+
+    <h3>What each side sees</h3>
+    <div class="cards three">
+      <div class="card"><h4>The buyer sees</h4>
+        <p>Broker ticks and comparison signals; each broker’s per-listing pricing; quotes with commission disclosed; who read their band and when. Never one broker’s quote shown to another.</p></div>
+      <div class="card"><h4>The broker sees</h4>
+        <p>The consented view only: band, target property, objectives — never balances, payslips or documents. Their own panel, matches and files. Reads are ledgered and visible to the buyer.</p></div>
+      <div class="card"><h4>The platform holds</h4>
+        <p>Consents, the match model and its versions, audit logs, AIP credentials, the reliance ledger. <strong>No commission flows through Veristate</strong> — ranking has nothing to sell (investor proposal §07).</p></div>
+    </div>
+
+    <div class="wfgrid">
+      <div class="wfcard">
+        <div class="wf"><div class="bar"><i></i><i></i><i></i></div>
+          <div class="cv">
+            <div class="row"><div class="bl" style="width:34%;"></div><div class="grow"></div><span class="wtag">Consented file · reads logged</span></div>
+            <div class="row"><div class="b grow" style="height:26px;"></div><div class="b grow" style="height:26px;"></div><span class="wtag">LVR 80%</span></div>
+            <div class="row"><div class="b grow" style="height:24px; border-left:3px solid var(--series-1);"></div><span class="wtag g">Passes ×1.18</span><span class="wtag">−25 bp likely</span></div>
+            <div class="row"><div class="b grow" style="height:24px;"></div><span class="wtag g">Passes ×1.24</span><span class="wtag o">No discretion</span></div>
+            <div class="row"><div class="b grow" style="height:24px;"></div><span class="wtag o">Tight ×1.04</span><span class="wtag">−15 bp likely</span></div>
+            <div class="wnote">8 products · 6 eligible · exclusions kept with reasons</div>
+            <div class="row"><div class="wbtn ghost">Why ranked</div><div class="grow"></div><div class="wbtn">Generate BID pack</div></div>
+          </div>
+        </div>
+        <div class="cap">W7 · Broker workspace — live panel matching</div>
+        <div class="sub">Scenario controls re-run the match function on every change; serviceability, carded rate and discretion outlook per row. Every re-price appends to the LoanCase log.</div>
+      </div>
+      <div class="wfcard">
+        <div class="wf"><div class="bar"><i></i><i></i><i></i></div>
+          <div class="cv">
+            <div class="row"><div class="b" style="width:34px; height:34px; border-radius:50%;"></div><div class="grow"><div class="bl" style="width:52%; margin:4px 0;"></div></div><span class="wtick">✓ Verified broker</span></div>
+            <div class="row"><div class="b grow" style="height:34px;"></div><div class="b grow" style="height:34px;"></div><div class="b grow" style="height:34px;"></div></div>
+            <div class="row"><span class="wtag g">from 5.49%</span><span class="wtag">AIP in 2 days</span><span class="wtag o">vs your bank: −28 bp</span></div>
+            <div class="b" style="height:24px; width:74%;"></div>
+            <div class="row"><div class="wbtn">Request quotes</div><div class="wbtn ghost">Share band · 2 brokers</div></div>
+            <div class="wnote">Bands, never balances — consent scoped to this property, revocable</div>
+          </div>
+        </div>
+        <div class="cap">W8 · Buyer’s broker comparison &amp; connect</div>
+        <div class="sub">Per-listing broker offers with the multi-broker consent grant (ceremony). Quotes arrive into a thread; proceeding with one broker releases the others politely.</div>
+      </div>
+    </div>
+
+    <p class="body">
+      Action classes follow section 07’s rule: reading a consented file and running matches are
+      <strong>read/prepare</strong>; a buyer granting consent or proceeding with a broker, and a broker sending a
+      quote, are <strong>ceremonies</strong>. The AIP attaching to an offer is automatic — it is a credential
+      presentation, not an action.
+    </p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="security">
+  <div class="wrap">
+    <div class="secnum">12 · Security, privacy &amp; compliance architecture</div>
+    <h2>Designing for the honeypot problem we are choosing to have</h2>
+    <p class="lede">
+      A platform holding identity and financial verification for hundreds of thousands of people is a target.
+      The architecture assumes breach attempts and designs so that success yields as little as possible.
+    </p>
+    <div class="tablecard">
+      <table>
+        <thead><tr><th>Threat / duty</th><th>Design response</th></tr></thead>
+        <tbody>
+          <tr><td>Data honeypot</td><td><strong>Proofs over documents.</strong> Where law permits, the vault stores the derived attestation (check outcome + hash + supplier reference), not the source document. Where statute requires document retention (AML, 7 years), those objects live in a separately keyed, access-ceremonied cold store. Field-level encryption; per-party keys; vault reads are themselves ledgered.</td></tr>
+          <tr><td>Payment redirection fraud</td><td>Account-name verification at deal open and again pre-settlement; bank-detail changes inside a deal trigger a mandatory re-verification and out-of-band confirmation. PEXA Key promoted for the final leg.</td></tr>
+          <tr><td>Seller impersonation</td><td>The property tick's proprietor-match plus dealing watch; any title change while listed suspends the listing automatically.</td></tr>
+          <tr><td>Consent &amp; APP compliance</td><td>A consent ledger parallel to the reliance ledger: every grant is purpose-bound, per relying party, expiring, revocable in the hub. Privacy-Act APP mapping maintained per credential type; data-minimal presentations by default (bands, not balances).</td></tr>
+          <tr><td>Insider risk</td><td>No standing human access to the vault; support access is time-boxed, purpose-logged, dual-approved.</td></tr>
+          <tr><td>Regulatory posture</td><td>Insured Identity-Agent appointments under ARNECC rules; ISO 27001 program from Phase 1; independent AML program evaluation on the statutory 3-year clock; state-by-state legal review gates each market entry.</td></tr>
+          <tr><td>Tick liability</td><td>The badge asserts <em>what was checked and when</em> — never guarantees a counterparty's future conduct. Terms, badge-service responses, and marketing all carry the same bounded claim; this is a design constraint on copy as much as code.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="stack">
+  <div class="wrap">
+    <div class="secnum">13 · Implementation appendix</div>
+    <h2>Stack, shape, and the path to Phase 0</h2>
+    <p class="lede">
+      Boring technology, deliberately: the risk budget is spent on the trust engine's correctness and the
+      integrations, not on infrastructure novelty.
+    </p>
+    <h3>Proposed stack (Python-centred)</h3>
+    <div class="tablecard">
+      <table>
+        <thead><tr><th>Layer</th><th>Choice</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Backend</td><td>Python · FastAPI · Pydantic</td><td>One language across API, engine and workers; typed schemas shared end-to-end; the team's home ground</td></tr>
+          <tr><td>Trust-engine workflows</td><td>Temporal (Python SDK)</td><td>Check plans and deal orchestration are long-running, resumable, audit-heavy workflows — exactly Temporal's shape; Celery would reinvent it badly</td></tr>
+          <tr><td>Data</td><td>PostgreSQL (+ append-only ledger tables) · Redis · S3-compatible vault store</td><td>The reliance/consent ledgers are insert-only Postgres with hash chaining — auditable without exotic tech</td></tr>
+          <tr><td>Events</td><td>Postgres outbox → lightweight bus (NATS or SQS)</td><td>Tick changes, pack staleness, deal milestones as events; webhooks + MCP subscriptions ride on it</td></tr>
+          <tr><td>Frontend</td><td>Next.js/React, tenant design tokens</td><td>One codebase serves flagship + white-labels (section 06); the design system in this document's visual language</td></tr>
+          <tr><td>MCP server</td><td>Python MCP SDK over the public API</td><td>Thin projection; tool classes (read/prepare/ceremony) enforced at this layer</td></tr>
+          <tr><td>Deployment</td><td>Modular monolith first; extract services at proven seams (engine, badge, compliance)</td><td>Twelve domain objects do not need twelve microservices on day one</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Build plan mapped to the investor roadmap</h3>
+    <div class="tablecard">
+      <table>
+        <thead><tr><th>Phase</th><th>Builds</th><th>Mocked / deferred</th></tr></thead>
+        <tbody>
+          <tr><td>0 · Prototype<br><span style="font-weight:400; color:var(--text-muted); font-size:12px;">weeks</span></td><td>Screens W1–W6 as a clickable Next.js app; real API shapes (<code>/parties</code>, <code>/listings</code>, <code>/offers</code>) served by a FastAPI stub with in-memory state machines — the same stubs later become the MCP demo</td><td>All rails mocked; no auth beyond magic links; single state (QLD narrative)</td></tr>
+          <tr><td>1 · Compliance wedge</td><td>Trust engine v1 (identity + screening + monitoring), evidence vault, reliance ledger + pact flow, agency console (W6), compliance reports; Temporal in production</td><td>Marketplace closed; CDR funds-capacity in pilot; panel manual</td></tr>
+          <tr><td>2 · Marketplace &amp; badge</td><td>Flagship market with property search, property tick + packs, tick-to-tick offers, deal rooms, panel v1, public badge service; broker workspace with the panel-matching engine (pure-function library + lender-feed adapters), finance consents, quote→AIP workflow and the BID evidence generator</td><td>Duty pre-fill behind practitioner review flag</td></tr>
+          <tr><td>3 · Platform</td><td>Public API GA, MCP server, Cowork plugin, embed SDK, duty pre-fill integrations, additional states/tenants</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="body">
+      Team shape for Phases 0–1: two backend (engine + integrations), one frontend, one design, fractional
+      legal/compliance counsel — the reliance-pact framework and Identity-Agent appointments are as much
+      "build" as the code.
+    </p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="questions">
+  <div class="wrap">
+    <div class="secnum">14 · Open design questions</div>
+    <h2>Decisions this document deliberately leaves open</h2>
+    <div class="cards">
+      <div class="card"><h4>Custodial credentials vs consumer wallet</h4>
+        <p>V1 is custodial (Veristate holds credentials, consumers hold consent). W3C verifiable credentials in a consumer wallet is the principled end-state (P3) and the ConnectID-convergence hedge — but wallets today cost conversion. The domain model keeps the migration path open; the trigger point is undecided.</p></div>
+      <div class="card"><h4>How loud is "Attention"?</h4>
+        <p>Surfacing credential degradation to a counterparty mid-deal protects them but could unfairly torpedo a party over a false-positive screening delta. Grace windows, human review before propagation, and what exactly counterparties see all need careful policy design with counsel.</p></div>
+      <div class="card"><h4>Flagship vs tenant primacy in Phase 2</h4>
+        <p>Does the marketplace open as the flagship brand, or do we let the first large tenant's co-brand be the consumer-facing debut and keep the flagship as the network's neutral spine? Cold-start strategy says seed via tenants; brand strategy says the tick needs one famous home. Sequencing TBD with the pilot partner.</p></div>
+      <div class="card"><h4>Duty and FIRB integration depth</h4>
+        <p>Pre-fill (practitioner reviews and lodges) is safe and shippable. Direct lodgment as a revenue-office CSP is deeper moat but a regulatory project per state. Phase 3 decision, informed by Phase 1 relationships.</p></div>
+      <div class="card"><h4>Discretion-outlook modelling</h4>
+        <p>Predicting likely pricing discretion from aggregated outcomes is genuinely useful and genuinely sensitive: lenders may resist publication, and a wrong estimate skews regulated advice. Options: lender-sanctioned ranges, aggregator data partnerships, or shipping without the column until confidence is proven. Needs lender conversations in Phase 1.</p></div>
+      <div class="card"><h4>Ranking neutrality &amp; audit</h4>
+        <p>The match model orders products a regulated adviser then recommends. Who audits its weights, how objective-fit trades against raw cost, and whether brokers may tune defaults per client are open policy questions. The versioned, replayable log makes any answer defensible — but the defaults still matter.</p></div>
+    </div>
+    <p class="body" style="margin-top:8px;">
+      Next step, as before: Phase 0. Wireframes W1–W6 (W7–W8 follow with the Phase 2 finance surfaces) and
+      the API stubs in section 13 are specified precisely so the prototype can start from this document
+      without another planning round.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Veristate — platform design proposal v2 · July 2026 · v2 adds section 11, the finance layer: broker practices, panel pricing, best-interests evidence. Companion to "Veristate — The Verified Property Marketplace" (investor proposal v2). Interfaces, names and shapes in this document are design intent, not shipped software.
+  </div>
+</footer>
+
+<script>
+(function () {
+  var GLOSSARY = [
+    ['Verification of Identity', 'The formal identity check required in Australian property dealings, performed to the national ARNECC standard. Valid for two years once completed.'],
+    ['reliance provisions', 'Rules in the new AML/CTF Act that let one regulated business formally accept another’s completed customer checks under a written agreement instead of repeating them.'],
+    ['reliance ledger', 'Veristate’s append-only record of who relied on which credential, when, for which deal, under which pact — the audit trail that makes shared verification legally defensible.'],
+    ['reliance pact', 'The executed reliance agreement between Veristate and a regulated business, under the AML/CTF Act’s reliance provisions.'],
+    ['beneficial ownership', 'The real people who ultimately own or control a company or trust. AML law requires identifying them, not just the entity that signs.'],
+    ['customer due diligence', 'The checks a regulated business must run on a customer under AML law: identity, beneficial ownership, risk screening, ongoing monitoring.'],
+    ['verifiable credentials', 'A W3C standard for digitally signed claims a person can hold and present themselves, letting a verifier check authenticity without calling the issuer.'],
+    ['Identity Agent', 'A person or business formally appointed under ARNECC rules to conduct Verification of Identity on a practitioner’s behalf — insured and auditable.'],
+    ['transfer duty', 'The state tax on property purchases (commonly “stamp duty”), assessed and paid before the transfer can be registered.'],
+    ['eConveyancing', 'Completing the legal transfer of property digitally — lodgment and settlement done electronically. Mandatory in NSW, VIC and QLD.'],
+    ['conveyancer', 'A licensed specialist (not necessarily a lawyer) who handles the legal transfer of property. In QLD and the ACT only solicitors may do this work.'],
+    ['conveyancing', 'The legal process of transferring property from seller to buyer: searches, contract review, duty, settlement.'],
+    ['cooling-off', 'A short statutory window after signing in which the buyer may withdraw for a small penalty.'],
+    ['gazumping', 'When a seller accepts an offer, then takes a better one before contracts are exchanged. Legal in NSW because nothing binds either party until exchange.'],
+    ['settlement', 'The final step of a property deal: money moves, the title transfers, keys change hands.'],
+    ['exchange', 'The moment signed contracts are swapped and the deal becomes legally binding.'],
+    ['gazetted', ''],
+    ['caveat', 'A notice recorded on a property’s title flagging that someone claims an interest in it.'],
+    ['encumbrance', 'Anything registered against a title that limits it — mortgages, caveats, easements.'],
+    ['buy-intent', 'A registered profile of what a buyer wants — budget, locations, timing — paired with their verified capacity to buy it.'],
+    ['Best Interests Duty', 'The legal duty (since 2021) requiring mortgage brokers to act in the borrower’s best interests and document why the recommended loan beats the alternatives considered.'],
+    ['approval in principle', 'A lender’s conditional commitment to lend based on the borrower’s verified circumstances — everything except a valuation of the specific property.'],
+    ['discretion-outlook', 'The likelihood a lender will approve a below-card pricing request for a given borrower profile, estimated from past pricing outcomes.'],
+    ['serviceability', 'A lender’s assessment of whether a borrower can afford repayments, stress-tested with a regulatory buffer above the actual rate.'],
+    ['carded rate', 'A lender’s published interest rate before any negotiated (discretionary) discount.'],
+    ['lender panel', 'The set of lenders a mortgage broker is accredited to write loans with — typically 20–40, arranged through their aggregator.'],
+    ['aggregator accreditation', 'A broker’s authority to write a given lender’s loans, arranged through their aggregator — the wholesale platform brokers operate under.'],
+    ['aggregator', 'The wholesale platform a mortgage broker operates under — lender accreditations, software and compliance infrastructure.'],
+    ['drawdown', 'The moment the lender actually advances the loan funds at settlement.'],
+    ['AIP', 'Approval in principle — a lender’s conditional commitment based on verified circumstances; everything except the property valuation.'],
+    ['LVR', 'Loan-to-value ratio — the loan as a percentage of the property’s value; above 80% usually triggers lenders mortgage insurance.'],
+    ['BID', 'Best Interests Duty — the broker’s legal duty to act in the borrower’s best interests and document the comparison behind the recommendation.'],
+    ['white-label', 'A product built by one company and rebranded by another to run as its own.'],
+    ['multi-tenancy', 'One deployment serving many separately branded, separately scoped customer organisations.'],
+    ['design tokens', 'Named values (colours, type, spacing) that let one codebase render many brands.'],
+    ['state machine', 'A design pattern where an object is always in exactly one named state, with defined transitions — making complex processes auditable and resumable.'],
+    ['Tranche 2', 'The second wave of Australia’s anti-money-laundering law, in force 1 July 2026, extending obligations to real estate agents, conveyancers, lawyers and accountants.'],
+    ['AML/CTF', 'Anti-Money-Laundering / Counter-Terrorism-Financing — the law requiring businesses to verify customers and report suspicious transactions.'],
+    ['AUSTRAC', 'Australia’s financial-crime regulator. Regulated businesses must enrol, run customer checks, and report suspicious matters.'],
+    ['ARNECC', 'The Australian Registrars’ National Electronic Conveyancing Council — sets the national rules for electronic conveyancing, including the VOI standard.'],
+    ['PEXA', 'Property Exchange Australia — the platform on which ~90% of Australian property settlements complete.'],
+    ['PEXA Key', 'PEXA’s consumer app for exchanging bank details securely during settlement, countering payment-redirection scams.'],
+    ['FIRB', 'The Foreign Investment Review Board — approves foreign purchases of Australian property; foreign buyers face fees, a 30-day clock, and (to mid-2029) a ban on established homes.'],
+    ['VOI', 'Verification of Identity — the formal identity check in property dealings, done to the ARNECC standard. Valid two years.'],
+    ['CDD', 'Customer due diligence — identity, beneficial ownership, screening and monitoring checks required under AML law.'],
+    ['KYC', '“Know Your Customer” — the identity checks banks run before providing services.'],
+    ['PEP', 'Politically Exposed Person — attracts extra scrutiny under AML rules.'],
+    ['DVS', 'The federal Document Verification Service — real-time check that an identity document matches the issuing agency’s records.'],
+    ['CDR', 'The Consumer Data Right (“open banking”) — consumer-consented sharing of verified bank data with accredited services.'],
+    ['ASIC', 'The Australian corporate regulator; its registers verify companies and officers.'],
+    ['ABR', 'The Australian Business Register — the government register of businesses and ABNs.'],
+    ['EDR', 'Electronic Duties Returns — Revenue NSW’s system for practitioners to self-assess and pay transfer duty online.'],
+    ['QRO', 'The Queensland Revenue Office, which assesses transfer duty in QLD.'],
+    ['Duties Online', 'The Victorian State Revenue Office’s online duty system.'],
+    ['s66W', 'A NSW lawyer’s certificate that waives the buyer’s cooling-off period so exchange is immediately binding.'],
+    ['Form 2', 'Queensland’s mandatory seller-disclosure statement (from Aug 2025) given to buyers before signing.'],
+    ['SMR', 'Suspicious Matter Report — the report a regulated business must file with AUSTRAC on suspicion of criminal links.'],
+    ['MCP', 'Model Context Protocol — an open standard letting AI assistants like Claude securely call external tools and services.'],
+    ['ceremony', 'Veristate’s term for a binding action that an assistant may stage but only a human can confirm, inside a verified session.'],
+    ['ConnectID', 'The bank-backed Australian digital-identity exchange operated by Australian Payments Plus.'],
+    ['Temporal', 'An open-source workflow engine for long-running, resumable, auditable processes.'],
+    ['FastAPI', 'A modern Python web framework built on type hints — fast to build with, self-documenting APIs.'],
+    ['Pydantic', 'Python’s de-facto data-validation library; defines typed schemas shared across API and workers.'],
+    ['ISO 27001', 'The international standard for information-security management systems.'],
+    ['APP', 'The Australian Privacy Principles — the core obligations of the Privacy Act.'],
+    ['W3C', 'The World Wide Web Consortium — the web-standards body, home of the verifiable-credentials standard.'],
+    ['CSP', 'Client Service Provider — a software provider authorised to integrate with a revenue office’s duty systems.'],
+    ['AML', 'Anti-money-laundering — the law requiring businesses to verify customers and report suspicious activity.']
+  ].filter(function (e) { return e[1]; });
+
+  var tip = document.getElementById('tip');
+  var hideTimer = null;
+  function place(el) {
+    var r = el.getBoundingClientRect();
+    tip.style.left = '0px'; tip.style.top = '0px'; tip.style.display = 'block';
+    var tr = tip.getBoundingClientRect();
+    var x = Math.max(8, Math.min(r.left + r.width / 2 - tr.width / 2, window.innerWidth - tr.width - 8));
+    var y = r.bottom + 8;
+    if (y + tr.height > window.innerHeight - 8) y = r.top - tr.height - 8;
+    if (y < 8) y = 8;
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  }
+  function show(el, html) { clearTimeout(hideTimer); tip.innerHTML = html; place(el); }
+  function scheduleHide() { clearTimeout(hideTimer); hideTimer = setTimeout(function () { tip.style.display = 'none'; }, 240); }
+  tip.addEventListener('mouseenter', function () { clearTimeout(hideTimer); });
+  tip.addEventListener('mouseleave', scheduleHide);
+  function bind(el, htmlFn) {
+    el.addEventListener('mouseenter', function () { show(el, htmlFn()); });
+    el.addEventListener('mouseleave', scheduleHide);
+    el.addEventListener('click', function () { show(el, htmlFn()); });
+  }
+  document.querySelectorAll('[data-tip]').forEach(function (el) {
+    bind(el, function () { return el.getAttribute('data-tip'); });
+  });
+
+  var SKIP = 'a, script, style, svg, .term, h1, h2, .brand, .kicker, .secnum, code, pre, .wtag, .wtick, .wbtn, .wnote, .chip, .pill, .wf';
+  document.querySelectorAll('header.hero, section').forEach(function (root) {
+    GLOSSARY.forEach(function (entry) {
+      var term = entry[0], def = entry[1];
+      var re = new RegExp('(^|[^\\w-])(' + term.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&') + ')($|[^\\w-])');
+      var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode: function (node) {
+          var p = node.parentElement;
+          if (!p || p.closest(SKIP) || p.closest('[data-tip]')) return NodeFilter.FILTER_REJECT;
+          return re.test(node.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+        }
+      });
+      var node = walker.nextNode();
+      if (!node) return;
+      var m = node.nodeValue.match(re);
+      if (!m) return;
+      var idx = m.index + m[1].length;
+      var after = node.splitText(idx);
+      after.nodeValue = after.nodeValue.slice(term.length);
+      var span = document.createElement('span');
+      span.className = 'term';
+      span.textContent = term;
+      node.parentNode.insertBefore(span, after);
+      bind(span, function () { return "<span class='t'>" + span.textContent + "</span><div class='d'>" + def + "</div>"; });
+    });
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('#tip') && !e.target.closest('.term') && !e.target.closest('[data-tip]')) tip.style.display = 'none';
+  });
+})();
+</script>
+</body>
+</html>

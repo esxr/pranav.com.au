@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veristate — The Verified Property Marketplace · Investor Proposal</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page:            #f9f9f7;
+    --surface-1:       #fcfcfb;
+    --text-primary:    #0b0b0b;
+    --text-secondary:  #52514e;
+    --text-muted:      #898781;
+    --grid:            #e1e0d9;
+    --baseline:        #c3c2b7;
+    --border:          rgba(11,11,11,0.10);
+    --series-1:        #2a78d6;  /* blue — accent / Veristate */
+    --series-2:        #eb6834;  /* orange */
+    --series-3:        #1baf7a;  /* aqua */
+    --seq-150:         #b7d3f6;
+    --seq-250:         #86b6ef;
+    --seq-400:         #3987e5;
+    --seq-550:         #1c5cab;
+    --seq-100:         #cde2fb;
+    --accent-deep:     #1c5cab;
+    --wash:            rgba(42,120,214,0.08);
+    --good:            #0ca30c;
+    --good-text:       #006300;
+    --critical:        #d03b3b;
+    --deemph:          #c3c2b7;
+    --seg-ink:         #0d366b;
+    --seg-ink-inv:     #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page:            #0d0d0d;
+      --surface-1:       #1a1a19;
+      --text-primary:    #ffffff;
+      --text-secondary:  #c3c2b7;
+      --text-muted:      #898781;
+      --grid:            #2c2c2a;
+      --baseline:        #383835;
+      --border:          rgba(255,255,255,0.10);
+      --series-1:        #3987e5;
+      --series-2:        #d95926;
+      --series-3:        #199e70;
+      --seq-150:         #184f95;
+      --seq-250:         #1c5cab;
+      --seq-400:         #3987e5;
+      --seq-550:         #86b6ef;
+      --seq-100:         #104281;
+      --accent-deep:     #86b6ef;
+      --wash:            rgba(57,135,229,0.12);
+      --good:            #0ca30c;
+      --good-text:       #0ca30c;
+      --critical:        #d03b3b;
+      --deemph:          #52514e;
+      --seg-ink:         #ffffff;
+      --seg-ink-inv:     #0d366b;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page);
+    color: var(--text-primary);
+    line-height: 1.6;
+    font-size: 16px;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 28px; }
+  a { color: var(--series-1); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ---------- hero ---------- */
+  header.hero {
+    padding: 88px 0 64px;
+    border-bottom: 1px solid var(--border);
+    background:
+      radial-gradient(1200px 500px at 80% -10%, var(--wash), transparent 65%);
+  }
+  .kicker {
+    font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--text-muted); font-weight: 600; margin-bottom: 18px;
+  }
+  .brandline { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
+  .brand { font-size: 54px; font-weight: 750; letter-spacing: -0.02em; line-height: 1.05; }
+  .tick {
+    display: inline-flex; width: 40px; height: 40px; flex: none;
+  }
+  h1.tagline { font-size: 26px; font-weight: 500; color: var(--text-secondary); max-width: 720px; line-height: 1.35; margin-top: 6px; }
+  .hero-thesis { margin-top: 26px; max-width: 760px; font-size: 17px; color: var(--text-secondary); }
+  .hero-thesis strong { color: var(--text-primary); }
+  .hero-meta { margin-top: 34px; font-size: 13px; color: var(--text-muted); }
+
+  /* ---------- sections ---------- */
+  section { padding: 58px 0 8px; }
+  .secnum {
+    font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--series-1); font-weight: 700; margin-bottom: 8px;
+  }
+  h2 { font-size: 30px; letter-spacing: -0.015em; line-height: 1.2; margin-bottom: 16px; font-weight: 700; }
+  h3 { font-size: 19px; margin: 30px 0 10px; font-weight: 650; }
+  p.lede { font-size: 17.5px; color: var(--text-secondary); max-width: 800px; }
+  p.body, section > .wrap > p { color: var(--text-secondary); max-width: 800px; margin-bottom: 14px; }
+  p strong, li strong { color: var(--text-primary); font-weight: 600; }
+  .rule { border: none; border-top: 1px solid var(--border); margin: 56px 0 0; }
+
+  /* ---------- KPI row / stat tiles ---------- */
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 30px 0 8px; }
+  @media (max-width: 800px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .tile {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 18px 16px;
+  }
+  .tile .label { font-size: 12.5px; color: var(--text-muted); margin-bottom: 6px; line-height: 1.35; }
+  .tile .value { font-size: 32px; font-weight: 650; letter-spacing: -0.01em; line-height: 1.1; }
+  .tile .sub { font-size: 12.5px; color: var(--text-secondary); margin-top: 6px; }
+  .tile .delta-bad { color: var(--critical); font-weight: 600; }
+  .tile .delta-good { color: var(--good-text); font-weight: 600; }
+
+  /* ---------- figure / chart cards ---------- */
+  figure.viz {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
+    padding: 22px 22px 18px; margin: 26px 0;
+  }
+  figure.viz figcaption { margin-bottom: 4px; }
+  .viz-title { font-size: 15.5px; font-weight: 650; }
+  .viz-sub { font-size: 13px; color: var(--text-muted); margin-top: 2px; margin-bottom: 14px; }
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12.5px; color: var(--text-secondary); margin-top: 12px; }
+  .legend .key { display: inline-flex; align-items: center; gap: 7px; }
+  .legend .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  .fsignote { font-size: 12px; color: var(--text-muted); margin-top: 10px; }
+
+  /* journey strip (before/after) */
+  .journey { margin: 14px 0 4px; }
+  .journey .row { display: flex; align-items: center; gap: 10px; margin: 14px 0; }
+  .journey .row-label { flex: 0 0 118px; font-size: 12.5px; color: var(--text-secondary); font-weight: 600; text-align: right; }
+  .strip { display: flex; flex: 1; gap: 2px; height: 24px; }
+  .seg { border-radius: 4px; position: relative; min-width: 4px; }
+  .seg span {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: #fff; white-space: nowrap; overflow: visible;
+  }
+  .seg.dark-text span, .seg span.dark-text { color: var(--seg-ink, #0d366b); }
+  .seg span.inv { color: var(--seg-ink-inv, #ffffff); }
+  .strip-scale { display: flex; flex: 1; justify-content: space-between; font-size: 11px; color: var(--text-muted); }
+
+  /* tables */
+  table.data { width: 100%; border-collapse: collapse; font-size: 14px; margin: 18px 0 10px; background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  table.data { border-radius: 0; }
+  .tablecard { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 22px 0; }
+  .tablecard table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .tablecard th { text-align: left; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); font-weight: 650; padding: 12px 16px; border-bottom: 1px solid var(--grid); }
+  .tablecard td { padding: 11px 16px; border-bottom: 1px solid var(--grid); color: var(--text-secondary); vertical-align: top; }
+  .tablecard tr:last-child td { border-bottom: none; }
+  .tablecard td:first-child { color: var(--text-primary); font-weight: 600; white-space: nowrap; }
+  .pill { display: inline-block; font-size: 11.5px; font-weight: 650; padding: 2px 9px; border-radius: 99px; border: 1px solid var(--border); }
+  .pill.yes { color: var(--good-text); background: rgba(12,163,12,0.08); }
+  .pill.no  { color: var(--critical); background: rgba(208,59,59,0.08); }
+  .pill.part{ color: var(--text-secondary); background: var(--wash); }
+
+  /* cards grid */
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 26px 0; }
+  @media (max-width: 800px) { .cards { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
+    padding: 22px;
+  }
+  .card h4 { font-size: 16.5px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; font-weight: 650; }
+  .card p { font-size: 14px; color: var(--text-secondary); margin-bottom: 8px; }
+  .card .who { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--series-1); font-weight: 700; margin-bottom: 8px; }
+  .icon {
+    width: 34px; height: 34px; border-radius: 9px; background: var(--wash);
+    display: inline-flex; align-items: center; justify-content: center; flex: none;
+  }
+  .icon svg { width: 18px; height: 18px; stroke: var(--series-1); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* use-case cards */
+  .uc { border-left: 3px solid var(--series-1); }
+  .uc .quote { font-style: italic; color: var(--text-secondary); font-size: 14px; border-top: 1px dashed var(--grid); padding-top: 10px; margin-top: 10px; }
+  .ucsteps { margin: 10px 0 2px; padding-left: 0; list-style: none; }
+  .ucsteps li { font-size: 13.5px; color: var(--text-secondary); padding: 5px 0 5px 26px; position: relative; }
+  .ucsteps li::before {
+    content: ""; position: absolute; left: 6px; top: 11px; width: 7px; height: 7px;
+    border-radius: 50%; background: var(--series-1);
+  }
+  .ucsteps li.pre::before { background: var(--series-3); }
+  .ucsteps li.auto::before { background: var(--series-2); }
+
+  /* risk table rows */
+  .risk h4 { font-size: 15px; margin-bottom: 4px; }
+
+  /* sources */
+  .sources { font-size: 13px; color: var(--text-secondary); columns: 2; column-gap: 34px; }
+  @media (max-width: 800px) { .sources { columns: 1; } }
+  .sources li { margin-bottom: 7px; break-inside: avoid; }
+  footer { padding: 40px 0 70px; color: var(--text-muted); font-size: 13px; }
+
+  /* tooltip */
+  #tip {
+    position: fixed; pointer-events: auto; z-index: 50; display: none;
+    background: var(--surface-1); color: var(--text-primary);
+    border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px;
+    font-size: 12.5px; box-shadow: 0 6px 24px rgba(0,0,0,0.14); max-width: 300px; line-height: 1.45;
+  }
+  #tip .t { font-weight: 650; }
+  #tip .d { color: var(--text-secondary); }
+  #tip .src { margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--grid); font-size: 12px; }
+  #tip .src a { font-weight: 600; }
+
+  /* glossary terms & citations */
+  .term {
+    border-bottom: 1px dotted var(--text-muted);
+    cursor: help; text-decoration: none;
+  }
+  sup.cite {
+    font-size: 10.5px; line-height: 0; margin-left: 1px;
+    color: var(--series-1); font-weight: 700; cursor: pointer;
+    user-select: none; white-space: nowrap;
+  }
+  sup.cite:hover { text-decoration: underline; }
+
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .axis-label { font-size: 11px; fill: var(--text-muted); }
+  .pt-label { font-size: 11.5px; fill: var(--text-secondary); font-weight: 600; }
+</style>
+</head>
+<body>
+<div id="tip"></div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">Investor proposal · Confidential draft · July 2026</div>
+    <div class="brandline">
+      <span class="brand">Veristate</span>
+      <svg class="tick" viewBox="0 0 24 24" aria-label="verified badge">
+        <path fill="var(--series-1)" d="M12 1.5l2.6 2.1 3.3-.5 1.2 3.1 3.1 1.2-.5 3.3 2.1 2.6-2.1 2.6.5 3.3-3.1 1.2-1.2 3.1-3.3-.5L12 22.5l-2.6-2.1-3.3.5-1.2-3.1-3.1-1.2.5-3.3L.2 12l2.1-2.6-.5-3.3 3.1-1.2 1.2-3.1 3.3.5z" transform="translate(0.9 -1) scale(0.96)"/>
+        <path d="M7.6 12.3l3 3 5.6-6.3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1 class="tagline">The verified property marketplace. Verify once — transact with trust.</h1>
+    <p class="hero-thesis">
+      Australia settles <strong>~722,000 properties worth $726&nbsp;billion a year</strong><sup class="cite" data-cite="pexa-fy25"></sup>, yet every transaction
+      still re-verifies the same people, the same titles, and the same funds — synchronously, at the most
+      stressful moment of the deal. Veristate moves verification <strong>out of the transaction and ahead of it</strong>:
+      buyers, sellers, and properties are verified once against official sources, carry a portable
+      blue-tick credential into the market, have verified mortgage brokers price finance against it, and hand off automatically to contracts, duty, and settlement
+      when a deal is struck. As of <strong>1 July 2026</strong>, new anti-money-laundering law makes this
+      verification legally mandatory for over 100,000 businesses<sup class="cite" data-cite="biometric"></sup> — and legally <em>reusable</em>. Nobody has built the network that reuses it.
+    </p>
+    <div class="hero-meta">Working name: Veristate (alternates considered: Torrens, Vouch Property). Prepared for seed-stage discussion — figures are sourced estimates, not audited forecasts. <span style="white-space:nowrap;">Hover <span class="term" data-tip="<span class='t'>Like this</span><div class='d'>Every dotted term in the paper opens a plain-English explanation — jargon, abbreviations, and Australian property terms included.</div>">dotted terms</span> for plain-English explanations, and <sup class="cite" style="cursor:default;">[n]</sup> markers for the source behind a claim.</span></div>
+  </div>
+</header>
+
+<section id="problem">
+  <div class="wrap">
+    <div class="secnum">01 · The problem</div>
+    <h2>Verification is synchronous with the transaction — so every deal starts from zero trust</h2>
+    <p class="lede">
+      In an Australian property sale, nobody is verified until after the parties have already found each other
+      and committed. Identity, ownership, and funds are all checked <em>inside</em> the transaction window,
+      by multiple parties, each starting from scratch. The result: slow exchanges, crashed contracts,
+      gazumping windows, settlement delays, and — since 1 July 2026 — a brand-new compliance bill on every sale.
+    </p>
+
+    <div class="kpis">
+      <div class="tile" data-cite="pexa-fy25" data-tip="<span class='t'>PEXA Group, FY25</span><div class='d'>Settlement volumes across NSW, VIC, QLD, WA, SA — up 3.2% year on year.</div>">
+        <div class="label">Residential settlements, FY25</div>
+        <div class="value">~722K</div>
+        <div class="sub">worth $726.6B in aggregate</div>
+      </div>
+      <div class="tile" data-tip="<span class='t'>Bank KYC + broker VOI + agent CDD + conveyancer VOI + conveyancer CDD + revenue declaration</span><div class='d'>Each check is run independently, by a different party, on the same person.</div>">
+        <div class="label">Times one buyer proves identity in one purchase</div>
+        <div class="value">4–6<span style="font-size:18px; color:var(--text-muted);">×</span></div>
+        <div class="sub">across bank, agent, conveyancer, revenue office</div>
+      </div>
+      <div class="tile" data-cite="pexa-ontime" data-tip="<span class='t'>PEXA on-time settlement data</span><div class='d'>88.1% of sales settled on the first scheduled date nationally (Q4 2022) — roughly 1 in 8 slips at least once.</div>">
+        <div class="label">Settlements that miss their first scheduled date</div>
+        <div class="value"><span class="delta-bad">~1 in 8</span></div>
+        <div class="sub">before AML duplication was added</div>
+      </div>
+      <div class="tile" data-cite="days" data-tip="<span class='t'>Decide-to-sell → settlement</span><div class='d'>Typical end-to-end journey of 12–24 weeks; conveyancing alone costs ~$1,650–$3,350 per side all-in.</div>">
+        <div class="label">Typical end-to-end journey</div>
+        <div class="value">3–6<span style="font-size:18px; color:var(--text-muted);"> mo</span></div>
+        <div class="sub">plus $1.6K–$3.4K conveyancing per side</div>
+      </div>
+    </div>
+
+    <h3>The same person, verified again and again</h3>
+    <p class="body">
+      A buyer with a loan proves who they are to the <strong>bank</strong> (full statutory KYC), often again to a
+      <strong>mortgage broker</strong>, now to the <strong>selling agent</strong> (customer due diligence under the new
+      AML/CTF regime), again to their <strong>conveyancer or solicitor</strong> (ARNECC face-to-face Verification of
+      Identity <em>plus</em>, separately, that practitioner's own new AML due diligence), and finally in
+      <strong>revenue-office purchaser declarations</strong>. Sellers run a parallel gauntlet. None of these checks
+      talk to each other — even though the law now explicitly permits them to: ARNECC VOI is
+      <strong>valid for two years</strong><sup class="cite" data-cite="arnecc"></sup>, and the new AML Act contains <strong>reliance provisions</strong><sup class="cite" data-cite="infotrack-reliance"></sup> that let one
+      regulated business formally rely on another's verification. The primitives for "verify once" exist.
+      The network that connects them does not.
+    </p>
+
+    <figure class="viz">
+      <figcaption>
+        <div class="viz-title">Where three months go — typical seller journey, NSW private treaty</div>
+        <div class="viz-sub">Indicative days per stage; hover a segment for what happens in it. Veristate compresses the stages where verification and legal prep sit on the critical path — it does not change how long a home takes to attract a buyer.</div>
+      </figcaption>
+      <div class="journey">
+        <div class="row">
+          <div class="row-label">Today</div>
+          <div class="strip" role="img" aria-label="Today: prep 14 days, on market 31 days, offer to exchange 10 days, exchange to settlement 42 days — about 97 days">
+            <div class="seg" style="flex:14; background:var(--seq-250);" data-tip="<span class='t'>Prep &amp; listing · ~14 days</span><div class='d'>Draft contract of sale / vendor statement / disclosure certificates assembled from scratch before marketing can start.</div>"><span class="dark-text">Prep 14d</span></div>
+            <div class="seg" style="flex:31; background:var(--seq-400);" data-tip="<span class='t'>On market · ~31 days</span><div class='d'>Median days on market (NSW). Offers arrive from strangers — identity, finance and FIRB status all unknown.</div>"><span>On market 31d</span></div>
+            <div class="seg" style="flex:10; background:var(--seq-550);" data-tip="<span class='t'>Offer → exchange · ~10 days</span><div class='d'>The gazumping window: accepted offer is not binding while the buyer scrambles for reports, finance and a conveyancer. Deals die here.</div>"><span class="inv">10d</span></div>
+            <div class="seg" style="flex:42; background:var(--seq-100);" data-tip="<span class='t'>Exchange → settlement · ~42 days</span><div class='d'>Conveyancing, VOI, duty assessment, bank coordination; ~1 in 8 settlements miss the first date.</div>"><span class="dark-text">Exchange → settlement 42d</span></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label">With Veristate</div>
+          <div class="strip" role="img" aria-label="With Veristate: prep 5 days, on market 31 days, offer to exchange 2 days, exchange to settlement 30 days — about 68 days">
+            <div class="seg" style="flex:5; background:var(--seq-250);" data-tip="<span class='t'>Prep · ~5 days</span><div class='d'>Title verified and disclosure pack pre-assembled from registry, council and water APIs when the property was registered on the platform.</div>"><span class="dark-text">5d</span></div>
+            <div class="seg" style="flex:31; background:var(--seq-400);" data-tip="<span class='t'>On market · ~31 days</span><div class='d'>Unchanged — but offers now come from blue-tick buyers whose identity, funds capacity and FIRB status are already verified.</div>"><span>On market 31d</span></div>
+            <div class="seg" style="flex:2; background:var(--seq-550);" data-tip="<span class='t'>Offer → exchange · ~2 days</span><div class='d'>Both parties pre-verified; practitioners already matched and holding reusable VOI; contract exchanged while the deal is warm.</div>"><span class="inv">2d</span></div>
+            <div class="seg" style="flex:30; background:var(--seq-100);" data-tip="<span class='t'>Exchange → settlement · ~30 days</span><div class='d'>Duty forms pre-filled from verified data; AML reliance replaces re-checks; settlement delay risk falls with fewer moving parts.</div>"><span class="dark-text">Exchange → settlement 30d</span></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-label"></div>
+          <div class="strip-scale"><span>day 0</span><span>~day 50</span><span>~day 97</span></div>
+        </div>
+      </div>
+      <div class="fsignote">Sources: median days on market (whichrealestateagent.com.au); NSW exchange→settlement ≈ 6 weeks (nsw.gov.au); "with Veristate" bars are the proposal's design target, not a measured result.</div>
+    </figure>
+
+    <p class="body">
+      The structural flaws compound by state. In <strong>NSW</strong>, nothing binds the parties between accepted offer
+      and exchange — the legal gazumping window.<sup class="cite" data-cite="nsw"></sup> In <strong>QLD</strong>, contracts bind on signing, so buyers must
+      complete due diligence at auction speed, and the new Form 2 seller-disclosure regime (Aug 2025)<sup class="cite" data-cite="hr-qld"></sup> front-loads
+      certificate work that goes stale if the sale drags. In <strong>VIC</strong>, subject-to-finance periods stretch
+      uncertainty for weeks. Everywhere, the leading cause of crashed contracts is finance falling through —
+      discovered only <em>after</em> the deal was struck, because nobody could verify capacity before it. And the channel best placed to fix it — mortgage brokers, who now write <strong>~81% of new home loans</strong><sup class="cite" data-cite="mfaa-share"></sup> — meets the buyer late, re-verifies what the bank and agent already checked, and prices blind to the specific property.
+    </p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="whynow">
+  <div class="wrap">
+    <div class="secnum">02 · Why now</div>
+    <h2>On 1 July 2026, verification became a legal cost on every sale — and a legally reusable asset</h2>
+    <p class="lede">
+      Australia's AML/CTF "Tranche 2" reforms commenced three weeks ago. Real estate agents, conveyancers,
+      and lawyers are now AUSTRAC reporting entities. Every sale now carries mandatory customer due diligence,
+      by multiple parties, on both sides — layered on top of the checks that already existed. The industry's own
+      survey says it is not ready. This is the moment asynchronous verification stops being a nice-to-have.
+    </p>
+
+    <div class="kpis">
+      <div class="tile" data-cite="reia" data-tip="<span class='t'>AML/CTF Amendment Act 2024</span><div class='d'>Obligations commenced 1 July 2026; entities trading at commencement must enrol with AUSTRAC by 29 July 2026.</div>">
+        <div class="label">Newly regulated businesses from 1 Jul 2026</div>
+        <div class="value">100K+</div>
+        <div class="sub">agents, conveyancers, lawyers, accountants</div>
+      </div>
+      <div class="tile" data-cite="pexa-survey" data-tip="<span class='t'>PEXA-commissioned industry survey, n=337 (Apr–May 2025)</span>">
+        <div class="label">Industry concerned about AML cost &amp; complexity</div>
+        <div class="value">69%</div>
+        <div class="sub">77% of agents concerned about preparation</div>
+      </div>
+      <div class="tile" data-cite="pexa-survey" data-tip="<span class='t'>Same survey</span><div class='d'>65% of lawyers/conveyancers were unfamiliar with the new obligations.</div>">
+        <div class="label">Lawyers &amp; conveyancers unprepared</div>
+        <div class="value"><span class="delta-bad">78%</span></div>
+        <div class="sub">over half expect settlement delays</div>
+      </div>
+      <div class="tile" data-cite="arnecc" data-tip="<span class='t'>ARNECC Model Participation Rules + AML/CTF reliance provisions</span><div class='d'>VOI valid 2 years for the same subscriber–client pairing; AML reliance lets one reporting entity accept another's CDD under written agreement.</div>">
+        <div class="label">Legal shelf-life of a completed identity verification</div>
+        <div class="value"><span class="delta-good">2 yrs</span></div>
+        <div class="sub">+ statutory reliance between businesses</div>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <h4><span class="icon"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg></span>Regulation just created the demand</h4>
+        <p>Tranche 2 makes due diligence a per-transaction legal cost for every agent and practitioner — and its <strong>reliance provisions</strong> are an explicit legislative invitation to share verification rather than repeat it.<sup class="cite" data-cite="gadens"></sup> A pre-verified profile is now worth hard dollars to every regulated business that touches it.</p>
+      </div>
+      <div class="card">
+        <h4><span class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18M8 14h4"/></svg></span>The rails are finally digital</h4>
+        <p>eConveyancing is mandatory in NSW (2021), VIC (2018) and QLD (2023);<sup class="cite" data-cite="nsw-rg"></sup> PEXA settles ~90% of transfers;<sup class="cite" data-cite="sympli"></sup> duty is assessed online in all three states; titles, DVS identity checks, and open-banking (CDR) financial data are all API-accessible. Every source Veristate needs to verify against already has a digital interface.</p>
+      </div>
+      <div class="card">
+        <h4><span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5"/></svg></span>Digital identity is arriving in property</h4>
+        <p>Bank-backed <strong>ConnectID</strong> is live in real estate (rentals) and named in the federal digital-ID + CDR rental pilot with IDVerse and CBA.<sup class="cite" data-cite="connectid-pilot"></sup> Government is validating "verify once, share less" one segment away from sales. Nobody has carried it across to transactions.</p>
+      </div>
+      <div class="card">
+        <h4><span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 010 18M12 3a15 15 0 000 18"/></svg></span>The playbook exists overseas</h4>
+        <p>The UK's Coadjute and Moverly are building <strong>digital property packs</strong> — pre-assembled, provenance-tracked ownership and disclosure data — backed by government reform of home buying.<sup class="cite" data-cite="coadjute"></sup> Australia, despite being further ahead on e-settlement, has <strong>no property-pack player at all</strong>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="solution">
+  <div class="secnum wrap" style="padding:0;"></div>
+  <div class="wrap">
+    <div class="secnum">03 · The proposal</div>
+    <h2>Veristate: verify asynchronously, transact synchronously</h2>
+    <p class="lede">
+      Veristate is a two-sided marketplace built on a verification network. Parties register
+      <strong>before</strong> they transact; the platform verifies them against official sources in the background;
+      verified parties carry a visible blue tick; and when a deal is agreed, the platform orchestrates the
+      handoff into contracts, duty, settlement, and legal representation.
+    </p>
+
+    <h3>Four registered objects, three ticks</h3>
+    <p class="body">
+      Users register three things: a <strong>profile</strong> (buyer or seller, individual, company or trust), a
+      <strong>property</strong> (for sellers), and a <strong>buy-intent</strong> (for buyers: budget, locations, timing,
+      finance posture) — and, on the professional side, a <strong>broker practice</strong> (credit licence, aggregator accreditation, lender panel). Verification runs asynchronously against the official rails and is continuously
+      monitored, not re-run per deal.
+    </p>
+
+    <div class="cards">
+      <div class="card">
+        <h4><span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5"/></svg></span>The buyer tick</h4>
+        <p><strong>Identity</strong> — biometric + DVS document check to the ARNECC VOI standard, via an insured Identity-Agent arrangement (valid 2 years).</p>
+        <p><strong>Clean-party status</strong> — PEP, sanctions and adverse-media screening with ongoing delta monitoring (Tranche 2 CDD, shareable under reliance agreements).</p>
+        <p><strong>Funds capacity</strong> — consent-based open-banking (CDR) verification of deposits and lender pre-approval status, auto-refreshed.</p>
+        <p><strong>FIRB status</strong> — citizenship/residency screening up front; foreign buyers routed to the approval path before they fall in love with an established dwelling they cannot legally buy (banned to mid-2029).</p>
+      </div>
+      <div class="card">
+        <h4><span class="icon"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v9h14v-9"/><path d="M10 19v-5h4v5"/></svg></span>The property tick</h4>
+        <p><strong>Ownership</strong> — title search confirming the registered proprietor matches the verified seller identity: the core anti-fraud check, done at listing rather than mid-conveyance.</p>
+        <p><strong>Disclosure pack</strong> — the state-specific vendor pack (NSW draft contract, VIC s32, QLD Form 2 certificates) auto-assembled from registry, council, and water APIs, with staleness tracking and re-verification at contract time.</p>
+        <p><strong>Encumbrance watch</strong> — caveats, mortgages, and dealings monitored for change between listing and settlement.</p>
+        <p><strong>Settlement account verification</strong> — bank-account ownership pre-verified to shut down payment-redirection fraud, the top scam vector in conveyancing.</p>
+      </div>
+      <div class="card" style="grid-column:1 / -1;">
+        <h4><span class="icon"><svg viewBox="0 0 24 24"><path d="M19 5L5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></span>The broker tick — finance inside the network</h4>
+        <p><strong>Verified brokers</strong> — credit licence, aggregator accreditation and clean-party status verified once; brokers carry the same counterparty-visible tick as everyone else on the platform.</p>
+        <p><strong>Panel pricing against the band</strong> — with the buyer’s consent, brokers price a specific listing across their lender panel against the verified funds band — serviceability, carded rates, discretion outlook — without ever seeing balances or documents. Buyers compare multiple brokers; brokers reach multiple verified buyers.</p>
+        <p><strong>Portable approval</strong> — the resulting approval in principle attaches to the buyer’s offer as a verified credential, and the loan hands off into the same deal room through settlement and drawdown.</p>
+        <p><strong>Best Interests Duty as exhaust</strong> — every scenario change and considered-product set is logged; the broker’s BID evidence pack assembles itself from the file.</p>
+      </div>
+    </div>
+
+    <h3>Honest scope: what can be pre-done, and what cannot</h3>
+    <p class="body">
+      Asynchronous verification is not hand-waving — each element has a specific legal anchor. Equally,
+      some steps are contemporaneous by law and stay inside the transaction. Veristate pre-fills and
+      orchestrates those; it does not pretend to remove them.
+    </p>
+
+    <div class="tablecard">
+      <table>
+        <thead><tr><th>Step</th><th>Pre-verifiable?</th><th>Basis / limit</th></tr></thead>
+        <tbody>
+          <tr><td>Identity (VOI)</td><td><span class="pill yes">Yes</span></td><td>ARNECC VOI valid 2 years; platform operates under insured Identity-Agent appointments.<sup class="cite" data-cite="arnecc"></sup></td></tr>
+          <tr><td>AML/CTF due diligence</td><td><span class="pill yes">Yes</span></td><td>Statutory reliance provisions — one reporting entity may accept another's CDD under written agreement. Veristate is the network of those agreements.<sup class="cite" data-cite="infotrack-reliance"></sup></td></tr>
+          <tr><td>Sanctions / PEP screening</td><td><span class="pill yes">Yes</span></td><td>Continuous delta-monitoring on enrolled users beats per-deal re-screening.</td></tr>
+          <tr><td>Funds capacity</td><td><span class="pill part">Capacity only</span></td><td>CDR data and pre-approvals verify capacity and auto-refresh; unconditional approval still requires a valuation of the specific property.</td></tr>
+          <tr><td>Broker panel match &amp; AIP</td><td><span class="pill part">Pre-priced</span></td><td>The verified band lets brokers run serviceability and secure approval in principle pre-contract; the final approval still needs the property valuation. BID evidence generated from the scenario log.</td></tr>
+          <tr><td>Company / trust structures</td><td><span class="pill yes">Yes</span></td><td>ASIC/ABR extracts + beneficial-ownership mapping, cached with change monitoring.</td></tr>
+          <tr><td>FIRB screening</td><td><span class="pill yes">Yes</span></td><td>Residency status determined pre-offer; 30-day approval clock can start via exemption certificates before a specific contract.<sup class="cite" data-cite="firb"></sup></td></tr>
+          <tr><td>Seller ownership check</td><td><span class="pill yes">Yes</span></td><td>Title search at listing; monitored thereafter.</td></tr>
+          <tr><td>Vendor disclosure pack</td><td><span class="pill part">Mostly</span></td><td>Legally required <em>before</em> the buyer signs in all three states — inherently pre-transaction; certificates must be re-checked for freshness at contract.</td></tr>
+          <tr><td>Contract exchange &amp; cooling-off</td><td><span class="pill no">No</span></td><td>Statutory periods run from exchange. Veristate orchestrates (e.g. s66W certificate prepared), never bypasses.</td></tr>
+          <tr><td>Duty assessment &amp; e-stamping</td><td><span class="pill part">Pre-filled</span></td><td>Assessed on the actual dutiable transaction; Veristate pre-populates EDR / Duties Online / QRO forms from verified data.</td></tr>
+          <tr><td>Settlement (PEXA workspace)</td><td><span class="pill no">No</span></td><td>Inherently at completion. Veristate hands off cleanly to practitioners' PEXA workflow — it does not compete with the ELNO.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="usecases">
+  <div class="wrap">
+    <div class="secnum">04 · Exemplar use cases</div>
+    <h2>What it feels like when trust is already there</h2>
+    <p class="lede">
+      Six scenarios, spanning the five surfaces the platform ships on. Steps marked
+      <span style="color:var(--series-3); font-weight:600;">green</span> happened asynchronously, before the deal;
+      <span style="color:var(--series-1); font-weight:600;">blue</span> is the marketplace moment;
+      <span style="color:var(--series-2); font-weight:600;">orange</span> is automated downstream orchestration.
+    </p>
+
+    <div class="cards">
+      <div class="card uc">
+        <div class="who">Consumer webapp · Buyer side</div>
+        <h4>The pre-verified first-home buyers</h4>
+        <p>Priya and Dan are hunting in Brisbane, where contracts bind on signing and everything moves at auction speed. Three weeks before they start inspecting, they register a buy-intent on Veristate.</p>
+        <ul class="ucsteps">
+          <li class="pre">Identity verified to VOI standard from their phones; CDR consent proves their deposit; lender pre-approval linked and auto-refreshed. Blue tick issued.</li>
+          <li>They offer on a Form 2-complete verified listing. The seller's agent sees two ticks and a verified funds-capacity band — and recommends their offer over a higher, unverified one.</li>
+          <li class="auto">Their pre-selected solicitor already holds reusable VOI; the 14-day finance clause runs against a valuation only; duty forms arrive pre-filled.</li>
+        </ul>
+        <p class="quote">"The agent told us the tick is why we won. The other buyer was still finding a solicitor."</p>
+      </div>
+
+      <div class="card uc">
+        <div class="who">Consumer webapp · Seller side</div>
+        <h4>The trusted listing</h4>
+        <p>Margaret is downsizing in Sydney after 30 years. Her great fears: the sale dragging, and the horror stories — seller impersonation fraud and buyers who vanish in the gazumping window.</p>
+        <ul class="ucsteps">
+          <li class="pre">Veristate matches her VOI against the registered proprietor on title — her listing carries a property tick no fraudster can fake. Her disclosure pack assembles itself from registry and council APIs in days, not weeks.</li>
+          <li>She accepts only tick-holding offers, and picks a conveyancer from the platform's panel with fixed, published pricing.</li>
+          <li class="auto">Exchange happens in 48 hours — the buyer was ready — collapsing the window in which she could have been tempted to gazump, or the buyer to walk.</li>
+        </ul>
+        <p class="quote">"I knew who I was dealing with before I let them past the front gate."</p>
+      </div>
+
+      <div class="card uc">
+        <div class="who">Broker workspace · Finance side</div>
+        <h4>The broker who quotes in 22 minutes</h4>
+        <p>Mia runs a two-person brokerage with a 32-lender panel. Priya and Dan share their verified band with her — consent-gated, scoped to one property, every access logged.</p>
+        <ul class="ucsteps">
+          <li class="pre">Her practice was verified at enrolment — licence, accreditation, clean-party — and the lead arrives with identity, band and target property already attested. No fact-find, no payslips.</li>
+          <li>She re-prices the scenario live across the panel — serviceability buffers, carded rates, discretion outlook — and quotes Macquarie with an AIP achievable in two days. The buyers compare her against two rival brokers, on the merits.</li>
+          <li class="auto">The AIP travels with the offer; the loan joins the deal room through drawdown; her Best Interests Duty evidence pack — considered set, exclusions, rationale — assembles itself from the file.</li>
+        </ul>
+        <p class="quote">"I spent the morning advising instead of chasing documents — and won the file against two other brokers on structure, not on who called back first."</p>
+      </div>
+
+      <div class="card uc">
+        <div class="who">Co-branded white-label · B2B</div>
+        <h4>The compliant franchise</h4>
+        <p>A 40-office agency network wakes up on 1 July 2026 as an AUSTRAC reporting entity: risk programs, customer due diligence on every vendor and buyer, suspicious-matter reporting, 7-year records. Its principals did not become agents to run a compliance function.</p>
+        <ul class="ucsteps">
+          <li class="pre">The network deploys "Verified — powered by Veristate" under its own brand. Every vendor and buyer flows through the same verification network; CDD is done once and legally relied on across offices.</li>
+          <li>Verified buyer pools become a listing-presentation weapon: "we bring you buyers who can actually settle."</li>
+          <li class="auto">AML program, screening, monitoring and audit trail run under the hood; the annual AUSTRAC compliance report drops out of the system.</li>
+        </ul>
+        <p class="quote">"We sell houses. Veristate does our AML homework and hands us better buyers."</p>
+      </div>
+
+      <div class="card uc">
+        <div class="who">API / MCP · AI-assisted</div>
+        <h4>The expat purchase, run by an AI agent</h4>
+        <p>Arjun, an Australian citizen working in Singapore, asks Claude to help him buy an investment property in Melbourne. Claude speaks to Veristate over MCP.</p>
+        <ul class="ucsteps">
+          <li class="pre">Claude checks his FIRB position via the API (citizen — no approval needed), walks him through remote VOI enrolment, and registers a buy-intent with his budget and CDR-verified capacity.</li>
+          <li>Claude monitors verified listings matching the intent, compares disclosure packs, and books video inspections — every counterparty already tick-verified.</li>
+          <li class="auto">When Arjun offers, Claude initiates the exchange workflow: his Melbourne solicitor is appointed through the panel API, holding VOI that was done months ago in Singapore.</li>
+        </ul>
+        <p class="quote">"I bought a house from 6,000 km away, and the paperwork was the easy part."</p>
+      </div>
+    </div>
+
+    <div class="card uc" style="margin-top:2px;">
+      <div class="who">Agent-harness plugin · Professional teams</div>
+      <h4>The buyer's agency running on Cowork</h4>
+      <p>A buyer's agency manages 30 concurrent clients inside Claude Cowork with the Veristate plugin installed. Each morning the team asks for a pipeline brief: which clients' ticks or pre-approvals expire this month, which new verified listings match open buy-intents, which vendors' disclosure packs changed overnight (a new caveat on one — flagged red). Offers, panel appointments, and reliance paperwork are initiated from the same session, with the plugin holding the audit trail. The agency's Tranche 2 obligations are discharged as a side effect of doing its ordinary work.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="landscape">
+  <div class="wrap">
+    <div class="secnum">05 · Competitive landscape</div>
+    <h2>Everyone verifies; nobody makes verification portable — or visible</h2>
+    <p class="lede">
+      We verified this against the market as of July 2026. Australia has deep VOI vendors, AML compliance
+      platforms, offer platforms, portals, and a settlement monopoly — but every verification event is
+      business-initiated, per-transaction, and invisible to the other side of the deal. The quadrant that
+      combines official-source verification with whole-journey coverage is empty.
+    </p>
+
+    <figure class="viz">
+      <figcaption>
+        <div class="viz-title">Australian players, positioned — verification depth × journey coverage</div>
+        <div class="viz-sub">Placement is our qualitative assessment from public product documentation (July 2026). Hover any point.</div>
+      </figcaption>
+      <svg viewBox="0 0 900 480" width="100%" style="max-width:900px; display:block;" role="img" aria-label="Scatter plot of Australian property-tech players by verification depth and journey coverage; the top-right quadrant, deep and portable verification across the whole journey, is empty except Veristate.">
+        <!-- whitespace wash -->
+        <rect x="465" y="40" width="395" height="190" rx="10" fill="var(--wash)"/>
+        <text x="662" y="66" text-anchor="middle" class="axis-label" style="font-weight:700; letter-spacing:.08em; text-transform:uppercase; fill:var(--accent-deep);">Unoccupied in Australia</text>
+        <!-- gridlines -->
+        <line x1="70" y1="230" x2="860" y2="230" stroke="var(--grid)" stroke-width="1"/>
+        <line x1="465" y1="40" x2="465" y2="420" stroke="var(--grid)" stroke-width="1"/>
+        <!-- axes -->
+        <line x1="70" y1="420" x2="860" y2="420" stroke="var(--baseline)" stroke-width="1"/>
+        <line x1="70" y1="40" x2="70" y2="420" stroke="var(--baseline)" stroke-width="1"/>
+        <text x="70" y="444" class="axis-label">Self-declared / per-transaction</text>
+        <text x="860" y="444" text-anchor="end" class="axis-label">Official-source &amp; portable</text>
+        <text x="58" y="420" text-anchor="end" class="axis-label" transform="rotate(-90 58 420)">Single step</text>
+        <text x="58" y="40" text-anchor="start" class="axis-label" transform="rotate(-90 58 40)" style="text-anchor:end;"></text>
+        <text x="44" y="52" class="axis-label" transform="rotate(-90 44 52)" text-anchor="end">Whole journey</text>
+        <!-- gray incumbents -->
+        <g>
+          <circle cx="149" cy="306" r="7" fill="var(--deemph)" stroke="var(--surface-1)" stroke-width="2" data-cite="realtair" data-tip="<span class='t'>realestate.com.au / Domain</span><div class='d'>Own the audience and discovery; no buyer/seller verification surfaced. REA holds the pieces (Realtair, Mortgage Choice) — the fast-follow threat.</div>"/>
+          <text x="149" y="290" text-anchor="middle" class="pt-label">REA · Domain</text>
+          <circle cx="275" cy="283" r="7" fill="var(--deemph)" stroke="var(--surface-1)" stroke-width="2" data-cite="openn-admin" data-tip="<span class='t'>Openn</span><div class='d'>Transparent offers/auctions; 'qualified bidder' = agent sign-off, not official-source verification. Recapitalised 2024 after administration.</div>"/>
+          <text x="275" y="267" text-anchor="middle" class="pt-label">Openn</text>
+          <circle cx="339" cy="260" r="7" fill="var(--deemph)" stroke="var(--surface-1)" stroke-width="2" data-cite="propps" data-tip="<span class='t'>Propps</span><div class='d'>Digital offers for agents with a buyer-ID-verification feature — checkbox depth, agent-scoped, no portable badge, no seller-side verification.</div>"/>
+          <text x="339" y="244" text-anchor="middle" class="pt-label">Propps</text>
+          <circle cx="228" cy="230" r="7" fill="var(--deemph)" stroke="var(--surface-1)" stroke-width="2" data-cite="realtair" data-tip="<span class='t'>Realtair (REA Group)</span><div class='d'>Agent workflow end-to-end: pitch, sign, sell, deposits. No party verification; the chassis a verified layer could bolt onto.</div>"/>
+          <text x="228" y="214" text-anchor="middle" class="pt-label">Realtair</text>
+          <circle cx="426" cy="367" r="7" fill="var(--deemph)" stroke="var(--surface-1)" stroke-width="2" data-cite="pexa-fy25" data-tip="<span class='t'>PEXA</span><div class='d'>~90% of transfers; settlement and lodgment only, post-contract. The rail Veristate hands off to — not a marketplace competitor today.</div>"/>
+          <text x="426" y="351" text-anchor="middle" class="pt-label">PEXA</text>
+          <circle cx="560" cy="374" r="7" fill="var(--deemph)" stroke="var(--surface-1)" stroke-width="2" data-cite="infotrackid" data-tip="<span class='t'>VOI vendors — Livesign, InfoTrackID, Scantek</span><div class='d'>Deep biometric verification, but practitioner-initiated and matter-scoped. InfoTrackID deletes data at 90 days; Scantek's reuse is locked to one agency.</div>"/>
+          <text x="560" y="358" text-anchor="middle" class="pt-label">VOI vendors</text>
+          <circle cx="497" cy="329" r="7" fill="var(--deemph)" stroke="var(--surface-1)" stroke-width="2" data-tip="<span class='t'>AMLHUB · First AML</span><div class='d'>Tranche 2 compliance workflow for agencies and firms; verification stays inside each subscriber's four walls.</div>"/>
+          <text x="497" y="313" text-anchor="middle" class="pt-label">AML platforms</text>
+          <circle cx="670" cy="344" r="7" fill="var(--deemph)" stroke="var(--surface-1)" stroke-width="2" data-cite="verifime" data-tip="<span class='t'>VerifiMe</span><div class='d'>Closest on verification: a reusable consumer KYC wallet sold into real estate. But pure compliance utility — no marketplace, no property verification, no badge the counterparty can see.</div>"/>
+          <text x="670" y="328" text-anchor="middle" class="pt-label">VerifiMe</text>
+          <circle cx="623" cy="397" r="7" fill="var(--deemph)" stroke="var(--surface-1)" stroke-width="2" data-cite="connectid-pilot" data-tip="<span class='t'>ConnectID (AP+)</span><div class='d'>Bank-anchored identity rail, live in rentals. A substrate Veristate builds on — and a commoditisation risk if credentials become accepted CDD evidence.</div>"/>
+          <text x="623" y="381" text-anchor="middle" class="pt-label">ConnectID</text>
+          <circle cx="528" cy="184" r="7" fill="none" stroke="var(--deemph)" stroke-width="2" stroke-dasharray="3 3" data-cite="coadjute" data-tip="<span class='t'>Coadjute · Moverly (UK)</span><div class='d'>Digital property packs with government backing — the overseas proof of the property-side concept. No Australian equivalent exists.</div>"/>
+          <text x="528" y="168" text-anchor="middle" class="pt-label" style="font-style:italic;">UK property packs</text>
+        </g>
+        <!-- Veristate -->
+        <g data-tip="<span class='t'>Veristate</span><div class='d'>Official-source, portable, counterparty-visible verification across the whole journey — marketplace in front, orchestration behind.</div>">
+          <circle cx="765" cy="97" r="10" fill="var(--series-1)" stroke="var(--surface-1)" stroke-width="2"/>
+          <path d="M760.5 97l3 3 6-6.5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="765" y="76" text-anchor="middle" class="pt-label" style="fill:var(--accent-deep); font-weight:700;">Veristate</text>
+        </g>
+      </svg>
+      <div class="legend">
+        <span class="key"><span class="sw" style="background:var(--series-1);"></span>Veristate (proposed)</span>
+        <span class="key"><span class="sw" style="background:var(--deemph);"></span>Existing players</span>
+        <span class="key"><span class="sw" style="border:2px dashed var(--deemph); background:transparent; width:8px; height:8px;"></span>Overseas reference</span>
+      </div>
+    </figure>
+
+    <p class="body">
+      Five findings matter most. <strong>First</strong>, no Australian product lets a consumer get verified before
+      entering the market and carry that status between agents, listings, or platforms — VOI results are
+      matter-scoped, and one leading provider deletes the data after 90 days.<sup class="cite" data-cite="infotrackid"></sup> <strong>Second</strong>, no listing or
+      offer surface anywhere in Australia displays an official-source verification badge; "qualified buyer"
+      today means an agent clicked approve. <strong>Third</strong>, nobody verifies sellers or assembles property
+      packs — the clearest structural gap, and the one with a proven overseas template. <strong>Fourth</strong>,
+      the downstream chain (contract → duty → settlement → legal) is fragmented across five vendor categories
+      with no orchestrator; the collapse of the ELNO-interoperability program (March 2026)<sup class="cite" data-cite="sympli"></sup> means orchestration
+      simply integrates PEXA rather than fighting it. <strong>Fifth</strong>, finance is a parallel silo: broker platforms and aggregators (Lendi Group, REA’s Mortgage Choice) match borrowers to lenders at scale, but outside the transaction — no verified funds band, no per-property pricing, nothing the seller can see, no handoff into the deal. Finance kills more struck deals than anything else precisely because it lives in a different system.
+    </p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="surfaces">
+  <div class="wrap">
+    <div class="secnum">06 · Distribution</div>
+    <h2>One verification network, five surfaces</h2>
+    <p class="lede">
+      The asset is the network: verified profiles, reliance agreements, and official-rail integrations.
+      Everything above it is a distribution surface — and shipping all five turns would-be competitors
+      into channels.
+    </p>
+    <div class="cards">
+      <div class="card">
+        <h4><span class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>1 · Branded webapp</h4>
+        <p>The flagship marketplace at veristate.com.au: register, verify, list, match, transact. Owns the consumer relationship and the blue-tick brand — the tick only has value if the market recognises it, and the flagship is where that recognition is built. First to ship; the design prototype starts here.</p>
+      </div>
+      <div class="card">
+        <h4><span class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/><path d="M11 17H7a4 4 0 01-4-4v-2M13 7h4a4 4 0 014 4v2"/></svg></span>2 · Co-branded white-label</h4>
+        <p>"Verified — powered by Veristate" for agency networks, franchise groups, developers, and even the portals. The Tranche 2 compliance burden is the door-opener; every white-label tenant seeds more verified profiles into the shared network. Their brand, our trust graph.</p>
+      </div>
+      <div class="card">
+        <h4><span class="icon"><svg viewBox="0 0 24 24"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13 5l-2 14"/></svg></span>3 · API &amp; MCP</h4>
+        <p>Every capability — verify, search, match, initiate — exposed as a clean API and as an MCP server, so Claude, ChatGPT, and every agentic assistant can act on the property market through us. As buying journeys move into AI assistants, Veristate becomes the trust layer those assistants require: an AI can compare listings anywhere, but it can only <em>transact safely</em> where the counterparty is verified.</p>
+      </div>
+      <div class="card">
+        <h4><span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg></span>4 · Agent-harness plugin</h4>
+        <p>A packaged plugin (skills + MCP + workflows) for Claude Cowork and similar harnesses, aimed at professional teams: buyer's agencies, conveyancing firms, agency back offices. Their daily pipeline work runs inside the harness; verification, compliance evidence, and orchestration ride along automatically.</p>
+      </div>
+      <div class="card" style="grid-column:1 / -1;">
+        <h4><span class="icon"><svg viewBox="0 0 24 24"><path d="M19 5L5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></span>5 · Broker workspace</h4>
+        <p>A professional seat for verified mortgage brokers: consented buyer leads arriving with verified bands (never balances), live panel matching — serviceability, carded rates, discretion outlook — a quote-to-AIP workflow, and Best Interests Duty evidence generated from the scenario log. Brokers pay for the seat; every quote deepens the network’s finance graph and every settled loan lands back in the shared deal room.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="model">
+  <div class="wrap">
+    <div class="secnum">07 · Business model</div>
+    <h2>Paid by the businesses whose costs we remove — free for consumers to join</h2>
+    <p class="lede">
+      Consumers must never pay to get verified — the network needs them. Revenue comes from the regulated
+      businesses for whom each verified profile is a direct cost saving, and from the transaction itself.
+    </p>
+    <div class="kpis">
+      <div class="tile" data-cite="pexa-fy25" data-tip="<span class='t'>Illustrative pool</span><div class='d'>~722K settlements × two represented sides × a $100–$200 verification/orchestration take across the parties who currently each pay to re-verify.</div>">
+        <div class="label">Verification &amp; orchestration pool</div>
+        <div class="value">~$220M<span style="font-size:16px; color:var(--text-muted);">/yr</span></div>
+        <div class="sub">est. at $150 avg take per side, current volumes</div>
+      </div>
+      <div class="tile" data-cite="biometric" data-tip="<span class='t'>Illustrative pool</span><div class='d'>100K+ newly regulated entities; assume 60K addressable agencies/firms × $2K–$6K/yr compliance SaaS.</div>">
+        <div class="label">Tranche 2 compliance SaaS pool</div>
+        <div class="value">~$240M<span style="font-size:16px; color:var(--text-muted);">/yr</span></div>
+        <div class="sub">est. at 60K entities × $4K average</div>
+      </div>
+      <div class="tile" data-cite="fees" data-tip="<span class='t'>Illustrative pool</span><div class='d'>~1.4M sides/yr × $1,650–$3,350 conveyancing spend; panel referral or fulfilment share of 10–15% on a fraction of flow.</div>">
+        <div class="label">Legal-panel referral pool</div>
+        <div class="value">~$3.5B<span style="font-size:16px; color:var(--text-muted);"> spend</span></div>
+        <div class="sub">platform takes a single-digit share of routed flow</div>
+      </div>
+      <div class="tile" data-cite="ibis" data-tip="<span class='t'>Context</span><div class='d'>IBISWorld estimate of Australian real-estate-services industry revenue, 2026.</div>">
+        <div class="label">AU real-estate services industry</div>
+        <div class="value">$31.5B</div>
+        <div class="sub">the ecosystem the trust layer sits under</div>
+      </div>
+    </div>
+    <p class="body">
+      Sequenced honestly: <strong>compliance SaaS first</strong> (white-label + plugin surfaces sell today, against a
+      legal deadline that has already passed for many), <strong>per-verification and orchestration fees second</strong>
+      as marketplace volume grows, <strong>panel referral and API metering third</strong>. The pools above are
+      sourced estimates to size the opportunity, not forecasts; the model for the seed round is the wedge,
+      not the endgame. The broker side adds a fourth engine: brokers write ~81% of new home loans<sup class="cite" data-cite="mfaa-share"></sup> under a Best Interests Duty that demands documented comparison, so Veristate sells the <strong>broker seat</strong> (workspace + BID-evidence automation) and meters <strong>consented-lead access</strong> — and takes <strong>no share of lender commissions</strong>, which stay between broker, lender and client, disclosed on every quote, so the platform’s ranking has nothing to sell.
+    </p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="risks">
+  <div class="wrap">
+    <div class="secnum">08 · Honest assessment</div>
+    <h2>What has to be true, and what could kill it</h2>
+    <p class="lede">
+      This section is deliberately unvarnished. The concept survives contact with the evidence — but only
+      on a specific path, and these are the risks an investor should price.
+    </p>
+
+    <div class="cards">
+      <div class="card risk">
+        <h4>⚠ The REA fast-follow</h4>
+        <p><strong>The biggest threat.</strong> REA owns the buyer audience, an agent transaction chassis (Realtair),<sup class="cite" data-cite="realtair"></sup> and a finance arm (Mortgage Choice). A "verified buyer" badge on realestate.com.au is one product decision away and would commoditise our buyer-side distribution overnight.</p>
+        <p><strong>Mitigation:</strong> lead with what portals structurally under-serve — seller/property verification, cross-brand reliance plumbing, and agency compliance — and design to be the neutral network the portals' rivals (and eventually the portals themselves) white-label rather than fight. Neutrality is a feature a portal cannot copy.</p>
+      </div>
+      <div class="card risk">
+        <h4>⚠ Two-sided cold start</h4>
+        <p>A marketplace with no verified listings attracts no verified buyers, and vice versa. "Airbnb for real estate" dies here if launched as a naked marketplace — and listings are locked up by agents who owe their inventory to the portal duopoly.</p>
+        <p><strong>Mitigation:</strong> don't launch as a marketplace. Launch as the compliance tool agencies now legally need (Tranche 2 passed three weeks ago; 78% of practitioners unprepared<sup class="cite" data-cite="pexa-survey"></sup>), which quietly fills the network with verified parties. The marketplace surfaces once density exists — the Airbnb move in reverse.</p>
+      </div>
+      <div class="card risk">
+        <h4>⚠ Verification commoditises</h4>
+        <p>If ConnectID or government digital ID becomes accepted CDD evidence, raw identity checks trend toward free. A business that is only "KYC as a service" gets squeezed (VerifiMe's exposure).<sup class="cite" data-cite="verifime"></sup></p>
+        <p><strong>Mitigation:</strong> treat identity rails as suppliers, not moats. The durable assets are the <em>reliance-agreement network</em> (legal plumbing between regulated businesses), the <em>property-side pack</em> (no AU player, proven in the UK), the <em>counterparty-visible badge</em>, and downstream orchestration. Commodity identity actually lowers our costs.</p>
+      </div>
+      <div class="card risk">
+        <h4>⚠ Regulatory and fragmentation drag</h4>
+        <p>Property law is state-by-state (QLD has no licensed conveyancers; cooling-off differs everywhere); ARNECC's VOI safe harbour is still face-to-face; acting as an Identity Agent needs insurance and appointments; holding CDD data makes us a honeypot with 7-year retention duties.</p>
+        <p><strong>Mitigation:</strong> single-state pilot first (QLD: binding contracts + new Form 2 disclosure regime make pre-verification most valuable there); insured Identity-Agent structure from day one; privacy-by-design with credentials over data copies wherever possible. State fragmentation cuts both ways — it is also why no incumbent has built national plumbing.</p>
+      </div>
+      <div class="card risk" style="grid-column:1 / -1;">
+        <h4>⚠ Broker remuneration scrutiny</h4>
+        <p>Broker commissions are periodically re-examined — the Royal Commission recommended borrower-pays; government kept lender-paid commissions and imposed a Best Interests Duty instead. A platform whose broker marketplace looked commission-driven would inherit that scrutiny, and conflicted-remuneration rules constrain how finance can be surfaced.</p>
+        <p><strong>Mitigation:</strong> platform revenue is seats and network fees, never a commission share; broker ranking comes from the logged scenario model, with commission disclosed on every quote; and the auto-generated BID evidence pack makes brokers <em>more</em> defensible under review — regulatory scrutiny sells the product rather than threatening it.</p>
+      </div>
+    </div>
+
+    <h3>Why we still believe it</h3>
+    <p class="body">
+      Strip the buzzwords and the bet is narrow and checkable: <strong>(1)</strong> the law now forces verification
+      on every sale; <strong>(2)</strong> the law now permits that verification to be shared; <strong>(3)</strong> every
+      official source needed to pre-verify is already digital; <strong>(4)</strong> no player connects them, and the
+      two best-positioned incumbents (REA, PEXA) are each anchored to a phase of the journey they profitably
+      dominate — the classic reason incumbents leave a seam open. The "Uber for real estate" framing
+      undersells what this actually is: <strong>infrastructure that makes trust portable</strong>, wearing a
+      marketplace as its front door.
+    </p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="roadmap">
+  <div class="wrap">
+    <div class="secnum">09 · Roadmap</div>
+    <h2>From this paper to a market</h2>
+    <div class="tablecard">
+      <table>
+        <thead><tr><th>Phase</th><th>Scope</th><th>Proof point</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>0 · Prototype<br><span style="font-weight:400; color:var(--text-muted); font-size:12px;">weeks, not months</span></td>
+            <td>Clickable webapp prototype from this paper: registration, async verification states, blue-tick profiles, verified listing with disclosure pack, offer flow between two verified parties. Mocked rails behind a real API shape (the same API that later becomes the MCP surface).</td>
+            <td>Design partners react to a thing, not a deck; seed conversations anchored on product.</td>
+          </tr>
+          <tr>
+            <td>1 · Compliance wedge</td>
+            <td>Live verification (DVS + biometrics via a licensed IDV supplier, sanctions screening, CDR proof-of-funds) sold as Tranche 2 tooling to 10–20 QLD agencies + a conveyancing panel, white-label from day one. Reliance-agreement framework drafted with a specialist firm.</td>
+            <td>Paying agencies; thousands of verified profiles; measured CDD cost-per-file vs incumbents.</td>
+          </tr>
+          <tr>
+            <td>2 · Marketplace &amp; badge</td>
+            <td>Consumer webapp opens on the seeded network: verified listings, property search with a verified-only switch, buy-intents, tick-to-tick offers. Verified brokers price listings against buyer bands — consent-gated connect, quotes, AIP-backed offers. Property packs launch (the Coadjute move, localised). Legal and broker panels live.</td>
+            <td>First tick-to-tick transactions; first AIP-backed offers won against higher unverified bids; offer→exchange time measurably compressed vs state baseline.</td>
+          </tr>
+          <tr>
+            <td>3 · Platform</td>
+            <td>Public API + MCP server + Cowork plugin GA; orchestration into duty pre-fill and practitioner PEXA handoff; second and third states; portal/franchise co-brand deals.</td>
+            <td>Third-party surfaces transacting through the network; national coverage of the trust graph.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="body" style="margin-top:10px;">
+      The immediate next step is Phase 0: this paper's use cases become the prototype's user journeys,
+      screen by screen.
+    </p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="sources">
+  <div class="wrap">
+    <div class="secnum">10 · Sources</div>
+    <h2 style="font-size:22px;">Key sources</h2>
+    <ul class="sources">
+      <li>PEXA Group — FY25 Property Insights: ~722K settlements, $726.6B aggregate value; on-time settlement rates. <a href="https://www.pexa-group.com/content-hub/property-insights-and-reports/property-insights-fy25/">pexa-group.com</a></li>
+      <li>PEXA-commissioned AML readiness survey (n=337, Apr–May 2025): 69% / 77% / 78% figures. <a href="https://www.pexa-group.com/content-hub/news/new-anti-money-laundering-reforms-industry-concerns/">pexa-group.com</a></li>
+      <li>AUSTRAC / REIA — Tranche 2 commencement 1 July 2026; enrolment from 31 Mar 2026, deadline 28 days post-commencement. <a href="https://www.reia.com.au/aml-ctf">reia.com.au</a></li>
+      <li>Gadens — AML/CTF obligations for real estate from 1 July 2026 (designated services, program, CDD, SMR, 7-yr records). <a href="https://www.gadens.com/legal-insights/new-aml-ctf-obligations-for-real-estate-businesses-from-1-july-2026-its-time-to-start-getting-ready/">gadens.com</a></li>
+      <li>Property Council / Biometric Update — >100,000 newly regulated businesses. <a href="https://www.biometricupdate.com/202607/australia-expands-aml-rules-widening-market-for-digital-identity-verification">biometricupdate.com</a></li>
+      <li>ARNECC — Model Participation Rules: VOI standard, 2-year validity, Identity Agents, Client Authorisation. <a href="https://www.arnecc.gov.au/wp-content/uploads/2021/08/mpr-guidance-note-2-verification-of-identity.pdf">arnecc.gov.au</a></li>
+      <li>InfoTrack — AML/CTF reliance provisions explained. <a href="https://www.infotrack.com.au/news-and-insights/aml-ctf-reliance-explained-what-it-is-and-how-law-firms-are-using-it-to-grow-their-business/">infotrack.com.au</a></li>
+      <li>NSW Government — contracts, cooling-off, ~6 weeks exchange→settlement; 100% eConveyancing since Oct 2021. <a href="https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/buying-property-nsw/contracts-and-deposits">nsw.gov.au</a> · <a href="https://www.registrargeneral.nsw.gov.au/property-and-conveyancing/eConveyancing/eConveyancing">registrargeneral.nsw.gov.au</a></li>
+      <li>Holding Redlich — QLD Form 2 seller disclosure (1 Aug 2025); QLD eConveyancing mandate (Feb 2023). <a href="https://www.holdingredlich.com/queensland-s-property-law-act-new-seller-disclosure-requirements-from-1-august-2025">holdingredlich.com</a></li>
+      <li>Days on market by state; 3–6 month end-to-end journey. <a href="https://whichrealestateagent.com.au/sell-property/how-long-to-sell-a-property/">whichrealestateagent.com.au</a></li>
+      <li>Conveyancing fees 2025 (~$1,650–$3,350 all-in per side). <a href="https://titlespace.com.au/blog/conveyancing/conveyancing-cost-2025/">titlespace.com.au</a></li>
+      <li>FIRB — established-dwelling ban 1 Apr 2025 – 30 Jun 2029; fees; 30-day decision period. <a href="https://conveyancing.com/information-centre/firb-thresholds">conveyancing.com</a></li>
+      <li>Openn — qualified-bidder process; 2024 administration &amp; recapitalisation. <a href="https://www.openn.com/en/knowledge/how-to-place-a-bid-and-become-a-qualified-bidder">openn.com</a> · <a href="https://www.businessnewsaustralia.com/articles/openn-negotiation-calls-administrators-a-week-after--1-3m-bid-for-prop-tech-proffer-group.html">businessnewsaustralia.com</a></li>
+      <li>Propps — buyer qualification features. <a href="https://propps.com/">propps.com</a></li>
+      <li>Realtair — acquired 100% by REA Group, June 2024. <a href="https://realtair.com/resources/news/realtair-acquired-by-rea-group/">realtair.com</a></li>
+      <li>VerifiMe — reusable KYC wallet targeting real-estate professionals. <a href="https://www.verifime.com/solutions">verifime.com</a></li>
+      <li>Scantek — real-estate verification with multi-year record reuse. <a href="https://scantek.com/real-estate-verification/">scantek.com</a></li>
+      <li>InfoTrackID — VOI with 90-day data deletion. <a href="https://www.infotrack.com.au/infotrackid/">infotrack.com.au</a></li>
+      <li>ConnectID — bank-anchored digital ID; rentals pilot with IDVerse/CDR. <a href="https://www.auspayplus.com.au/solutions/connectid">auspayplus.com.au</a> · <a href="https://www.biometricupdate.com/202510/idverse-connectid-chosen-to-trial-australias-digital-id-for-property-rentals">biometricupdate.com</a></li>
+      <li>Coadjute — UK Digital Property Data Packs. <a href="https://todaysconveyancer.co.uk/coadjute-launches-digital-property-data-packs-bid-streamline-transactions/">todaysconveyancer.co.uk</a> · Moverly — UK Smart Data Challenge winner. <a href="https://www.gov.uk/government/news/smart-data-challenge-prize-selects-moverlys-digital-property-pack-as-winner">gov.uk</a></li>
+      <li>ASX sale of Sympli stake / ARNECC interoperability program not proceeding (2026). <a href="https://www.brokerdaily.au/property/21605-asx-to-sell-sympli-stake-to-ati-group">brokerdaily.au</a></li>
+      <li>IBISWorld — AU Real Estate Services industry revenue $31.5B (2026). <a href="https://www.ibisworld.com/australia/market-size/real-estate-services/539/">ibisworld.com</a></li>
+      <li>PEXA — on-time settlement rate 88.1% (Q4 2022). <a href="https://www.pexa.com.au/content-hub/settlement-timeframes-remain-steady-for-australian-consumers/">pexa.com.au</a></li>
+      <li>MFAA / The Adviser — mortgage brokers wrote 81% of new residential home loans (March 2026 quarter). <a href="https://www.theadviser.com.au/broker/48534-broker-market-share-surges-to-new-record-high">theadviser.com.au</a></li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Veristate — proposal draft v2 · July 2026 · v2 adds property search and the verified mortgage-broker network · Sources current as at 21 July 2026. This document contains market estimates and interpretations of regulation; it is not legal or financial advice.
+  </div>
+</footer>
+
+<script>
+(function () {
+  /* ---------- source registry (numbered in order of first appearance) ---------- */
+  var SRC = {
+    'pexa-fy25':        { t: 'PEXA Property Insights FY25 — settlement volumes & value', u: 'https://www.pexa-group.com/content-hub/property-insights-and-reports/property-insights-fy25/' },
+    'pexa-ontime':      { t: 'PEXA — on-time settlement rates (Q4 2022)', u: 'https://www.pexa.com.au/content-hub/settlement-timeframes-remain-steady-for-australian-consumers/' },
+    'pexa-survey':      { t: 'PEXA-commissioned AML readiness survey, n=337 (2025)', u: 'https://www.pexa-group.com/content-hub/news/new-anti-money-laundering-reforms-industry-concerns/' },
+    'reia':             { t: 'REIA — AML/CTF hub (enrolment dates & obligations)', u: 'https://www.reia.com.au/aml-ctf' },
+    'gadens':           { t: 'Gadens — AML/CTF obligations for real estate from 1 July 2026', u: 'https://www.gadens.com/legal-insights/new-aml-ctf-obligations-for-real-estate-businesses-from-1-july-2026-its-time-to-start-getting-ready/' },
+    'biometric':        { t: 'Biometric Update — Australia expands AML rules (100K+ businesses)', u: 'https://www.biometricupdate.com/202607/australia-expands-aml-rules-widening-market-for-digital-identity-verification' },
+    'arnecc':           { t: 'ARNECC — Verification of Identity guidance (Model Participation Rules)', u: 'https://www.arnecc.gov.au/wp-content/uploads/2021/08/mpr-guidance-note-2-verification-of-identity.pdf' },
+    'infotrack-reliance': { t: 'InfoTrack — AML/CTF reliance provisions explained', u: 'https://www.infotrack.com.au/news-and-insights/aml-ctf-reliance-explained-what-it-is-and-how-law-firms-are-using-it-to-grow-their-business/' },
+    'nsw':              { t: 'NSW Government — contracts, cooling-off, exchange & settlement', u: 'https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/buying-property-nsw/contracts-and-deposits' },
+    'nsw-rg':           { t: 'NSW Registrar General — 100% eConveyancing since Oct 2021', u: 'https://www.registrargeneral.nsw.gov.au/property-and-conveyancing/eConveyancing/eConveyancing' },
+    'hr-qld':           { t: 'Holding Redlich — QLD Form 2 seller disclosure (from 1 Aug 2025)', u: 'https://www.holdingredlich.com/queensland-s-property-law-act-new-seller-disclosure-requirements-from-1-august-2025' },
+    'days':             { t: 'whichrealestateagent.com.au — median days on market by state', u: 'https://whichrealestateagent.com.au/sell-property/how-long-to-sell-a-property/' },
+    'fees':             { t: 'titlespace — conveyancing costs 2025 (~$1,650–$3,350 all-in per side)', u: 'https://titlespace.com.au/blog/conveyancing/conveyancing-cost-2025/' },
+    'firb':             { t: 'conveyancing.com — FIRB thresholds, fees & established-dwelling ban', u: 'https://conveyancing.com/information-centre/firb-thresholds' },
+    'openn-admin':      { t: 'Business News Australia — Openn administration & recapitalisation', u: 'https://www.businessnewsaustralia.com/articles/openn-negotiation-calls-administrators-a-week-after--1-3m-bid-for-prop-tech-proffer-group.html' },
+    'propps':           { t: 'Propps — digital offers & buyer qualification', u: 'https://propps.com/' },
+    'realtair':         { t: 'Realtair — acquired 100% by REA Group (June 2024)', u: 'https://realtair.com/resources/news/realtair-acquired-by-rea-group/' },
+    'verifime':         { t: 'VerifiMe — reusable KYC wallet for real-estate professionals', u: 'https://www.verifime.com/solutions' },
+    'infotrackid':      { t: 'InfoTrackID — VOI product (data deleted after 90 days)', u: 'https://www.infotrack.com.au/infotrackid/' },
+    'connectid':        { t: 'ConnectID — Australian Payments Plus digital identity', u: 'https://www.auspayplus.com.au/solutions/connectid' },
+    'connectid-pilot':  { t: 'Biometric Update — IDVerse + ConnectID chosen for rental digital-ID pilot', u: 'https://www.biometricupdate.com/202510/idverse-connectid-chosen-to-trial-australias-digital-id-for-property-rentals' },
+    'coadjute':         { t: "Today's Conveyancer — Coadjute launches Digital Property Data Packs", u: 'https://todaysconveyancer.co.uk/coadjute-launches-digital-property-data-packs-bid-streamline-transactions/' },
+    'sympli':           { t: 'Broker Daily — ASX sells Sympli stake; interoperability program halted', u: 'https://www.brokerdaily.au/property/21605-asx-to-sell-sympli-stake-to-ati-group' },
+    'ibis':             { t: 'IBISWorld — AU Real Estate Services industry revenue (2026)', u: 'https://www.ibisworld.com/australia/market-size/real-estate-services/539/' },
+    'mfaa-share':       { t: 'MFAA / The Adviser — brokers wrote 81% of new home loans (March 2026 quarter)', u: 'https://www.theadviser.com.au/broker/48534-broker-market-share-surges-to-new-record-high' }
+  };
+
+  /* ---------- glossary (longest-first matching; first occurrence per section) ---------- */
+  var GLOSSARY = [
+    ['Verification of Identity', 'The formal identity check required in Australian property dealings, performed to a national standard set by ARNECC. Once completed it is valid for two years.'],
+    ['reliance provisions', 'Rules in the new AML/CTF Act that let one regulated business formally accept another’s completed customer checks (under a written agreement) instead of repeating them.'],
+    ['reliance agreements', 'Written agreements under the new AML/CTF Act by which one regulated business formally accepts another’s completed customer checks instead of repeating them.'],
+    ['reliance-agreement', 'Relating to written agreements under the new AML/CTF Act by which one regulated business formally accepts another’s customer checks instead of repeating them.'],
+    ['beneficial-ownership', 'Identifying the real people who ultimately own or control a company or trust — AML law requires verifying them, not just the entity.'],
+    ['beneficial ownership', 'The real people who ultimately own or control a company or trust. AML law requires identifying them, not just the entity that signs the contract.'],
+    ['customer due diligence', 'The checks a regulated business must run on a customer under AML law: identity, beneficial ownership, risk screening, and ongoing monitoring.'],
+    ['suspicious-matter report', 'A report a regulated business must file with AUSTRAC when it suspects a customer or transaction is linked to crime.'],
+    ['Identity Agent', 'A person or business formally appointed under ARNECC rules to conduct Verification of Identity on a practitioner’s behalf — insured, competent, and auditable.'],
+    ['Client Authorisation', 'The signed form that lets a lawyer or conveyancer digitally sign and lodge documents on a party’s behalf.'],
+    ['transfer duty', 'The state tax on property purchases (commonly called stamp duty), which must be assessed and paid before the transfer can be registered.'],
+    ['stamp duty', 'The state tax on property purchases (formally “transfer duty”), assessed and paid before the transfer can be registered.'],
+    ['e-stamping', 'Assessing and paying transfer duty electronically through state revenue-office systems rather than on paper.'],
+    ['eConveyancing', 'Completing the legal transfer of property digitally — lodgment and settlement done electronically. Mandatory in NSW, VIC and QLD.'],
+    ['e-conveyancing', 'Completing the legal transfer of property digitally — lodgment and settlement done electronically. Mandatory in NSW, VIC and QLD.'],
+    ['conveyancing', 'The legal process of transferring property from seller to buyer: searches, contract review, duty, and settlement.'],
+    ['conveyancer', 'A licensed specialist (not necessarily a lawyer) who handles the legal transfer of property. In QLD and the ACT only solicitors may do this work.'],
+    ['private treaty', 'A sale negotiated directly between buyer and seller through the agent — as opposed to an auction.'],
+    ['cooling-off', 'A short statutory window after signing in which the buyer may withdraw for a small penalty (e.g. 5 business days / 0.25% of the price in NSW).'],
+    ['gazumping', 'When a seller accepts a buyer’s offer, then takes a better offer from someone else before contracts are exchanged. Legal in NSW, because nothing binds either party until exchange.'],
+    ['encumbrance', 'Anything registered against a property’s title that limits it — mortgages, caveats, easements.'],
+    ['settlement', 'The final step of a property deal: the money moves, the title transfers, and keys change hands. Typically 30–90 days after contracts are exchanged.'],
+    ['exchange', 'The moment signed contracts are swapped and the deal becomes legally binding on both sides.'],
+    ['caveat', 'A notice recorded on a property’s title flagging that someone claims an interest in it — a red flag requiring investigation before purchase.'],
+    ['Best Interests Duty', 'The legal duty (since 2021) requiring mortgage brokers to act in the borrower’s best interests and document why the recommended loan beats the alternatives considered.'],
+    ['approval in principle', 'A lender’s conditional commitment to lend based on the borrower’s verified circumstances — everything except a valuation of the specific property.'],
+    ['discretion outlook', 'The likelihood a lender will approve a below-card pricing request for a given borrower profile, estimated from past pricing outcomes.'],
+    ['conflicted remuneration', 'Payments that could sway financial advice — regulated to stop commissions from steering recommendations against the client’s interest.'],
+    ['serviceability', 'A lender’s assessment of whether a borrower can afford repayments, stress-tested with a regulatory buffer above the actual rate.'],
+    ['lender panel', 'The set of lenders a mortgage broker is accredited to write loans with — typically 20–40, arranged through their aggregator.'],
+    ['carded rate', 'A lender’s published interest rate before any negotiated (discretionary) discount.'],
+    ['aggregator', 'The wholesale platform a mortgage broker operates under — lender accreditations, software and compliance infrastructure.'],
+    ['drawdown', 'The moment the lender actually advances the loan funds at settlement.'],
+    ['AIP', 'Approval in principle — a lender’s conditional commitment based on verified circumstances; everything except the property valuation.'],
+    ['LVR', 'Loan-to-value ratio — the loan as a percentage of the property’s value; above 80% usually triggers lenders mortgage insurance.'],
+    ['BID', 'Best Interests Duty — the broker’s legal duty to act in the borrower’s best interests and document the comparison behind the recommendation.'],
+    ['buy-intent', 'A Veristate profile of what a buyer wants to buy — budget, locations, timing — paired with their verified capacity to buy it.'],
+    ['white-label', 'A product built by one company and rebranded by another to run as its own.'],
+    ['Tranche 2', 'The second wave of Australia’s anti-money-laundering law, in force from 1 July 2026, extending obligations from banks to real estate agents, conveyancers, lawyers and accountants.'],
+    ['AML/CTF', 'Anti-Money-Laundering / Counter-Terrorism-Financing — the law requiring businesses to verify who their customers are and report suspicious transactions.'],
+    ['AUSTRAC', 'Australia’s financial-crime regulator (Australian Transaction Reports and Analysis Centre). Regulated businesses must enrol with it, run customer checks, and report suspicious matters.'],
+    ['ARNECC', 'The Australian Registrars’ National Electronic Conveyancing Council — the state land-registry heads who set the national rules for electronic conveyancing, including the VOI standard.'],
+    ['PEXA', 'Property Exchange Australia — the electronic platform on which roughly 90% of Australian property settlements are completed by lawyers, conveyancers and banks.'],
+    ['ELNO', 'Electronic Lodgment Network Operator — a licensed operator of the digital settlement rails. PEXA is the dominant one.'],
+    ['Sympli', 'The second licensed e-settlement operator (ELNO), marginalised after the interoperability program was halted in 2026.'],
+    ['FIRB', 'The Foreign Investment Review Board — approves foreign purchases of Australian property. Foreign buyers face application fees, a 30-day decision clock, and (until mid-2029) a ban on buying established homes.'],
+    ['VOI', 'Verification of Identity — the formal identity check required in property dealings, done to the national ARNECC standard. Valid for two years once completed.'],
+    ['CDD', 'Customer due diligence — the checks a regulated business must run on a customer under AML law: identity, beneficial ownership, risk screening, ongoing monitoring.'],
+    ['KYC', '“Know Your Customer” — the identity and background checks a bank runs before providing services.'],
+    ['PEP', 'Politically Exposed Person — someone holding (or close to someone holding) public office, who attracts extra scrutiny under AML rules.'],
+    ['DVS', 'The federal Document Verification Service — checks in real time whether an identity document (passport, driver licence) matches the issuing agency’s own records.'],
+    ['CDR', 'The Consumer Data Right (“open banking”) — lets a consumer consent to share verified bank data (balances, income, loans) with an accredited service.'],
+    ['ASIC', 'The Australian Securities and Investments Commission — the corporate regulator; its registers verify companies and their officers.'],
+    ['ABR', 'The Australian Business Register — the government register of businesses and ABNs.'],
+    ['EDR', 'Electronic Duties Returns — Revenue NSW’s system letting practitioners self-assess and pay transfer duty online.'],
+    ['QRO', 'The Queensland Revenue Office, which assesses transfer duty in QLD.'],
+    ['Duties Online', 'The Victorian State Revenue Office’s online system for assessing and paying transfer duty.'],
+    ['s32', 'Section 32 statement — the vendor disclosure document Victorian sellers must give buyers before they sign.'],
+    ['Form 2', 'Queensland’s mandatory seller-disclosure statement (from August 2025) — title, body-corporate and planning certificates handed to the buyer before signing.'],
+    ['s66W', 'A NSW lawyer’s certificate that waives the buyer’s cooling-off period so exchange is immediately binding.'],
+    ['MCP', 'Model Context Protocol — an open standard that lets AI assistants like Claude securely call external tools and services, such as the Veristate API.'],
+    ['SaaS', 'Software-as-a-Service — software sold as an ongoing subscription.'],
+    ['IDV', 'Identity-verification (technology) — e.g. biometric document-checking suppliers.'],
+    ['AML', 'Anti-money-laundering — the body of law requiring businesses to verify customers and report suspicious transactions.'],
+    ['Torrens', 'The Torrens system — Australia’s state-guaranteed land-title register, invented in South Australia in 1858.'],
+    ['vendor', 'The seller of the property.']
+  ];
+
+  /* ---------- interactive tooltip ---------- */
+  var tip = document.getElementById('tip');
+  var hideTimer = null, currentEl = null;
+
+  function place(el) {
+    var r = el.getBoundingClientRect();
+    tip.style.left = '0px'; tip.style.top = '0px';
+    tip.style.display = 'block';
+    var tr = tip.getBoundingClientRect();
+    var x = r.left + r.width / 2 - tr.width / 2;
+    x = Math.max(8, Math.min(x, window.innerWidth - tr.width - 8));
+    var y = r.bottom + 8;
+    if (y + tr.height > window.innerHeight - 8) y = r.top - tr.height - 8;
+    if (y < 8) y = 8;
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  }
+  function show(el, html) {
+    clearTimeout(hideTimer);
+    currentEl = el;
+    tip.innerHTML = html;
+    place(el);
+  }
+  function scheduleHide() {
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(function () { tip.style.display = 'none'; currentEl = null; }, 260);
+  }
+  tip.addEventListener('mouseenter', function () { clearTimeout(hideTimer); });
+  tip.addEventListener('mouseleave', scheduleHide);
+
+  function srcLine(key) {
+    var s = SRC[key];
+    if (!s) return '';
+    return "<div class='src'>Source: <a href='" + s.u + "' target='_blank' rel='noopener'>" + s.t + " ↗</a></div>";
+  }
+  function bind(el, htmlFn) {
+    el.addEventListener('mouseenter', function () { show(el, htmlFn()); });
+    el.addEventListener('mouseleave', scheduleHide);
+    el.addEventListener('click', function (e) {
+      if (el.tagName !== 'SUP' && !(e.target.closest && e.target.closest('a'))) {
+        if (currentEl === el && tip.style.display === 'block') { scheduleHide(); }
+        else show(el, htmlFn());
+      }
+    });
+  }
+
+  /* data-tip elements (charts, tiles) — append source link when data-cite present */
+  document.querySelectorAll('[data-tip]').forEach(function (el) {
+    bind(el, function () {
+      return el.getAttribute('data-tip') + (el.getAttribute('data-cite') ? srcLine(el.getAttribute('data-cite')) : '');
+    });
+  });
+
+  /* citation superscripts — numbered by first appearance; click opens the source */
+  var order = [];
+  document.querySelectorAll('sup.cite[data-cite]').forEach(function (el) {
+    var key = el.getAttribute('data-cite');
+    if (!SRC[key]) return;
+    if (order.indexOf(key) === -1) order.push(key);
+    var n = order.indexOf(key) + 1;
+    el.textContent = '[' + n + ']';
+    el.setAttribute('title', '');
+    bind(el, function () {
+      return "<span class='t'>Source [" + n + "]</span>" + srcLine(key).replace("Source: ", "");
+    });
+    el.addEventListener('click', function () { window.open(SRC[key].u, '_blank', 'noopener'); });
+  });
+
+  /* ---------- glossary auto-annotation: first occurrence per section ---------- */
+  var SKIP = 'a, script, style, svg, sup.cite, .term, h1, h2, .brand, .kicker, .secnum, .hero-meta';
+  function annotate(root) {
+    GLOSSARY.forEach(function (entry) {
+      var term = entry[0], def = entry[1];
+      var re = new RegExp('(^|[^\\w-])(' + term.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&') + ')($|[^\\w-])');
+      var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode: function (node) {
+          if (!node.nodeValue || node.nodeValue.indexOf(term.charAt(0)) === -1 && node.nodeValue.indexOf(term) === -1) {}
+          var p = node.parentElement;
+          if (!p) return NodeFilter.FILTER_REJECT;
+          if (p.closest(SKIP) || p.closest('[data-tip]')) return NodeFilter.FILTER_REJECT;
+          return re.test(node.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+        }
+      });
+      var node = walker.nextNode();
+      if (!node) return;
+      var m = node.nodeValue.match(re);
+      if (!m) return;
+      var idx = m.index + m[1].length;
+      var after = node.splitText(idx);
+      after.nodeValue = after.nodeValue.slice(term.length);
+      var span = document.createElement('span');
+      span.className = 'term';
+      span.textContent = term;
+      node.parentNode.insertBefore(span, after);
+      bind(span, function () {
+        return "<span class='t'>" + span.textContent + "</span><div class='d'>" + def + "</div>";
+      });
+    });
+  }
+  document.querySelectorAll('header.hero, section:not(#sources)').forEach(annotate);
+
+  /* dismiss on outside tap (touch devices) */
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('#tip') && !e.target.closest('.term') && !e.target.closest('[data-tip]') && !e.target.closest('sup.cite')) {
+      tip.style.display = 'none';
+    }
+  });
+})();
+</script>
+</body>
+</html>

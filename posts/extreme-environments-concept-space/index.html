@@ -3,127 +3,135 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Problem Statement 4 — Concept Space</title>
+<title>Hardware for Extreme Environments — Concept Evaluation</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:#0F1317; --panel:#171D24; --panel2:#1D2530; --line:#2A3440;
-  --text:#E9EEF3; --muted:#8C99A8; --faint:#5B6875;
-  --h1:#2A0E5E; --h2:#7A1B7E; --h3:#CF2F58; --h4:#F07028; --h5:#FFD54A;
-  --glowhot:rgba(240,112,40,.35);
+  --paper:#FDFDFB; --panel:#FFFFFF; --panel2:#F6F5F1; --line:#D9D6CE; --rule:#22242A;
+  --text:#1C1E24; --muted:#4E545E; --faint:#8A8F99;
+  --h1c:#3B2273; --h2c:#8A2B85; --h3c:#C9345C; --h4c:#E2701F; --h5c:#F2B705;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto} *,*::before,*::after{animation:none!important;transition:none!important}}
-body{background:var(--ink);color:var(--text);font-family:'Archivo',sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1060px;margin:0 auto;padding:0 24px}
+body{background:var(--paper);color:var(--text);font-family:'Source Serif 4',Georgia,serif;font-size:16.5px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:920px;margin:0 auto;padding:0 26px}
 
-/* ---------- hero ---------- */
-header{padding:72px 0 48px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
-.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.22em;color:var(--h4);text-transform:uppercase;margin-bottom:20px}
-h1{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:clamp(34px,5.4vw,58px);line-height:1.06;letter-spacing:-.01em;max-width:19ch}
-h1 .dim{color:var(--muted)}
-.thermobar{height:10px;width:min(520px,100%);margin:28px 0 24px;border-radius:5px;
-  background:linear-gradient(90deg,var(--h1),var(--h2),var(--h3),var(--h4),var(--h5));
-  position:relative}
-.thermobar::after{content:"COLD · 1";position:absolute;left:0;top:16px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--faint)}
-.thermobar::before{content:"5 · HOT";position:absolute;right:0;top:16px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--faint)}
-.lede{max-width:64ch;color:var(--muted);margin-top:30px;font-size:17px}
-.lede b{color:var(--text);font-weight:600}
-.meta{display:flex;gap:28px;flex-wrap:wrap;margin-top:26px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--faint);letter-spacing:.06em}
+/* ---------- masthead ---------- */
+header{padding:56px 0 34px;border-bottom:2px solid var(--rule)}
+.journalline{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;color:var(--muted);
+  text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:30px}
+h1{font-weight:700;font-size:clamp(28px,4.4vw,42px);line-height:1.18;letter-spacing:-.005em;max-width:26ch}
+.subtitle{font-size:19px;font-style:italic;color:var(--muted);margin-top:10px;max-width:60ch}
+.absblock{margin-top:28px;padding:20px 22px;background:var(--panel2);border-left:3px solid var(--rule)}
+.absblock h2{font-family:'Source Sans 3',sans-serif;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--text);margin-bottom:8px}
+.absblock p{font-size:15.5px;color:var(--muted)}
+.absblock b{color:var(--text);font-weight:600}
+.figure{margin-top:26px}
+.thermobar{height:12px;width:min(480px,100%);border-radius:2px;
+  background:linear-gradient(90deg,var(--h1c),var(--h2c),var(--h3c),var(--h4c),var(--h5c));
+  border:1px solid var(--line)}
+.figcap{font-family:'Source Sans 3',sans-serif;font-size:13px;color:var(--muted);margin-top:8px;max-width:70ch}
+.figcap b{font-weight:700;color:var(--text)}
+.meta{display:flex;gap:26px;flex-wrap:wrap;margin-top:22px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);letter-spacing:.06em}
 .meta span b{color:var(--text);font-weight:600}
 
-/* ---------- capability strip ---------- */
-.caps{display:flex;flex-wrap:wrap;gap:8px;padding:22px 0;border-bottom:1px solid var(--line)}
-.cap{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.04em;color:var(--muted);
-  border:1px solid var(--line);border-radius:3px;padding:5px 10px;background:var(--panel)}
-.cap i{font-style:normal;color:var(--h4);margin-right:6px}
+/* ---------- capabilities ---------- */
+.capsec{padding:24px 0;border-bottom:1px solid var(--line)}
+.capsec h3{font-family:'Source Sans 3',sans-serif;font-size:12px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:12px}
+.caps{display:flex;flex-wrap:wrap;gap:8px}
+.cap{font-family:'Source Sans 3',sans-serif;font-size:13px;color:var(--muted);
+  border:1px solid var(--line);border-radius:2px;padding:5px 11px;background:var(--panel)}
+.cap i{font-style:normal;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--h4c);margin-right:7px;font-weight:600}
 
 /* ---------- filter ---------- */
-.filterrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:26px 0 8px}
-.filterlabel{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;color:var(--faint);text-transform:uppercase;margin-right:6px}
-.fbtn{font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.05em;color:var(--muted);
-  background:none;border:1px solid var(--line);border-radius:3px;padding:7px 14px;cursor:pointer;transition:all .18s ease}
+.filterrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:24px 0 6px}
+.filterlabel{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.2em;color:var(--faint);text-transform:uppercase;margin-right:4px}
+.fbtn{font-family:'Source Sans 3',sans-serif;font-size:13.5px;color:var(--muted);
+  background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:6px 14px;cursor:pointer;transition:all .15s ease}
 .fbtn:hover{color:var(--text);border-color:var(--faint)}
-.fbtn.active{color:var(--ink);background:var(--h4);border-color:var(--h4);font-weight:600}
-.fbtn:focus-visible,.card-head:focus-visible{outline:2px solid var(--h5);outline-offset:2px}
+.fbtn.active{color:#fff;background:var(--rule);border-color:var(--rule);font-weight:600}
+.fbtn:focus-visible,.card-head:focus-visible{outline:2px solid var(--h4c);outline-offset:2px}
 
 /* ---------- section titles ---------- */
-.sect{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:13px;letter-spacing:.24em;
-  text-transform:uppercase;color:var(--faint);margin:44px 0 18px;display:flex;align-items:center;gap:14px}
-.sect::after{content:"";flex:1;height:1px;background:var(--line)}
-.sect em{font-style:normal;color:var(--h4)}
+.sect{font-family:'Source Sans 3',sans-serif;font-weight:700;font-size:14px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--text);margin:42px 0 16px;display:flex;align-items:baseline;gap:14px}
+.sect::after{content:"";flex:1;height:1px;background:var(--line);align-self:center}
+.sect em{font-style:normal;font-weight:400;color:var(--muted);letter-spacing:.06em;text-transform:none;font-size:14px}
 
 /* ---------- cards ---------- */
-.card{border:1px solid var(--line);border-radius:6px;background:var(--panel);margin-bottom:14px;overflow:hidden;transition:border-color .18s ease}
-.card:hover{border-color:#3A4756}
+.card{border:1px solid var(--line);border-radius:3px;background:var(--panel);margin-bottom:14px;overflow:hidden}
 .card.hidden{display:none}
-.card-head{display:grid;grid-template-columns:52px 1fr auto;gap:16px;align-items:center;
-  padding:18px 20px;cursor:pointer;background:none;border:none;width:100%;text-align:left;color:inherit;font:inherit}
-.rank{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;color:var(--faint)}
-.card.tier1 .rank{color:var(--h5)}
-.tname{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:19px;letter-spacing:.01em}
-.tsub{color:var(--muted);font-size:14px;margin-top:3px}
-.headright{display:flex;align-items:center;gap:14px}
-.tier-tag{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:var(--muted);
-  border:1px solid var(--line);border-radius:3px;padding:3px 8px;white-space:nowrap}
-.total{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:22px;min-width:60px;text-align:center;
-  border-radius:4px;padding:6px 0;color:var(--ink)}
-.chev{color:var(--faint);font-family:'IBM Plex Mono',monospace;font-size:14px;transition:transform .22s ease}
+.card-head{display:grid;grid-template-columns:50px 1fr auto;gap:16px;align-items:center;
+  padding:16px 20px;cursor:pointer;background:none;border:none;width:100%;text-align:left;color:inherit;font:inherit}
+.card-head:hover{background:var(--panel2)}
+.rank{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;color:var(--faint)}
+.card.tier1 .rank{color:var(--h4c)}
+.tname{font-weight:700;font-size:19px;letter-spacing:0}
+.tsub{color:var(--muted);font-size:14px;margin-top:2px;font-family:'Source Sans 3',sans-serif}
+.headright{display:flex;align-items:center;gap:12px}
+.tier-tag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--muted);
+  border:1px solid var(--line);border-radius:2px;padding:3px 8px;white-space:nowrap;background:var(--panel2)}
+.total{font-family:'Source Sans 3',sans-serif;font-weight:700;font-size:19px;min-width:56px;text-align:center;
+  border-radius:2px;padding:5px 0}
+.chev{color:var(--faint);font-family:'IBM Plex Mono',monospace;font-size:14px;transition:transform .2s ease}
 .card.open .chev{transform:rotate(90deg)}
 
 /* score strip */
 .scores{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line)}
-.scell{background:var(--panel2);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
-.slab{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:var(--faint)}
-.sval{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:15px;width:28px;height:28px;border-radius:3px;
+.scell{background:var(--panel2);padding:9px 14px;display:flex;justify-content:space-between;align-items:center}
+.slab{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--muted)}
+.sval{font-family:'Source Sans 3',sans-serif;font-weight:700;font-size:14px;width:27px;height:27px;border-radius:2px;
   display:flex;align-items:center;justify-content:center}
-.s1{background:var(--h1);color:#CBB8F0}.s2{background:var(--h2);color:#F2CFF0}
-.s3{background:var(--h3);color:#FFE3EA}.s4{background:var(--h4);color:#231206}.s5{background:var(--h5);color:#231206}
+.s1{background:var(--h1c);color:#EDE6FA}.s2{background:var(--h2c);color:#F9E6F8}
+.s3{background:var(--h3c);color:#FDEBF0}.s4{background:var(--h4c);color:#FFF6EC}.s5{background:var(--h5c);color:#3A2B00}
 
 /* body */
 .card-body{max-height:0;overflow:hidden;transition:max-height .3s ease}
-.card.open .card-body{max-height:2400px}
-.body-inner{padding:24px 22px 26px;border-top:1px solid var(--line);display:grid;gap:20px}
-.field{display:grid;grid-template-columns:118px 1fr;gap:18px}
-.flabel{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;color:var(--h4);text-transform:uppercase;padding-top:3px}
-.fbody{color:#C7D1DB;font-size:15px}
+.card.open .card-body{max-height:2600px}
+.body-inner{padding:22px 22px 24px;border-top:1px solid var(--line);display:grid;gap:18px}
+.field{display:grid;grid-template-columns:150px 1fr;gap:18px}
+.flabel{font-family:'Source Sans 3',sans-serif;font-weight:700;font-size:11.5px;letter-spacing:.14em;color:var(--text);text-transform:uppercase;padding-top:4px}
+.fbody{color:var(--muted);font-size:15.5px}
 .fbody b{color:var(--text);font-weight:600}
-.verdict{border-left:3px solid var(--h4);background:var(--panel2);padding:14px 16px;border-radius:0 4px 4px 0;color:var(--text);font-size:15px}
-.verdict .vlab{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.18em;color:var(--h4);display:block;margin-bottom:5px}
+.verdict{border-left:3px solid var(--h4c);background:var(--panel2);padding:13px 16px;color:var(--text);font-size:15px}
+.verdict .vlab{font-family:'Source Sans 3',sans-serif;font-weight:700;font-size:10.5px;letter-spacing:.18em;color:var(--h4c);display:block;margin-bottom:4px;text-transform:uppercase}
 
 /* ---------- matrix ---------- */
-.matrix{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel)}
-.mrow{display:grid;grid-template-columns:34px 1fr 176px 64px;gap:0;align-items:center;border-bottom:1px solid var(--line);padding:12px 16px}
+.tablecap{font-family:'Source Sans 3',sans-serif;font-size:13px;color:var(--muted);margin:-6px 0 12px;max-width:76ch}
+.tablecap b{color:var(--text);font-weight:700}
+.matrix{border:1px solid var(--line);border-radius:3px;overflow:hidden;background:var(--panel)}
+.mrow{display:grid;grid-template-columns:34px 1fr 176px 64px;gap:0;align-items:center;border-bottom:1px solid var(--line);padding:11px 16px}
 .mrow:last-child{border-bottom:none}
-.mrow.mhead{background:var(--panel2);font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:var(--faint);text-transform:uppercase;padding:10px 16px}
-.mrank{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--faint)}
-.mname{font-size:14.5px;font-weight:500;padding-right:12px}
-.mname small{display:block;color:var(--faint);font-size:11.5px;font-weight:400;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em}
+.mrow.mhead{background:var(--panel2);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;padding:9px 16px}
+.mrank{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--faint)}
+.mname{font-size:15px;font-weight:600;padding-right:12px}
+.mname small{display:block;color:var(--muted);font-size:12.5px;font-weight:400;font-family:'Source Sans 3',sans-serif}
 .mcells{display:grid;grid-template-columns:repeat(4,40px);gap:4px}
-.mc{width:40px;height:26px;border-radius:3px;display:flex;align-items:center;justify-content:center;
-  font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600}
+.mc{width:40px;height:25px;border-radius:2px;display:flex;align-items:center;justify-content:center;
+  font-family:'Source Sans 3',sans-serif;font-size:12.5px;font-weight:700}
 .mtotal{text-align:right}
-.mbarwrap{grid-column:2/5;height:5px;background:var(--panel2);border-radius:3px;margin-top:9px;overflow:hidden}
-.mbar{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--h2),var(--h3),var(--h4),var(--h5))}
-.mtotal b{font-family:'Chakra Petch',sans-serif;font-size:18px;font-weight:700}
-.legendrow{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--faint);letter-spacing:.08em}
+.mbarwrap{grid-column:2/5;height:5px;background:var(--panel2);border-radius:2px;margin-top:8px;overflow:hidden;border:1px solid var(--line)}
+.mbar{height:100%;background:linear-gradient(90deg,var(--h2c),var(--h3c),var(--h4c),var(--h5c))}
+.mtotal b{font-size:17px;font-weight:700;font-family:'Source Sans 3',sans-serif}
+.legendrow{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-family:'Source Sans 3',sans-serif;font-size:12.5px;color:var(--muted)}
 
-/* ---------- convergence + exclusions ---------- */
-.thesis{border:1px solid var(--h4);border-radius:6px;padding:26px 26px;background:linear-gradient(180deg,rgba(240,112,40,.07),rgba(240,112,40,.02));margin-top:8px}
-.thesis h3{font-family:'Chakra Petch',sans-serif;font-size:18px;font-weight:600;margin-bottom:10px}
-.thesis p{color:#C7D1DB;font-size:15px;max-width:78ch}
+/* ---------- discussion + exclusions ---------- */
+.thesis{border:1px solid var(--line);border-left:3px solid var(--rule);padding:24px 26px;background:var(--panel2);margin-top:6px}
+.thesis h3{font-size:18px;font-weight:700;margin-bottom:10px}
+.thesis p{color:var(--muted);font-size:15.5px;max-width:80ch}
 .thesis p b{color:var(--text)}
-.excl{color:var(--muted);font-size:14px;max-width:80ch}
+.excl{color:var(--muted);font-size:15px;max-width:82ch}
 .excl b{color:var(--text);font-weight:600}
-footer{padding:40px 0 60px;color:var(--faint);font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.06em;border-top:1px solid var(--line);margin-top:52px}
+footer{padding:34px 0 56px;color:var(--faint);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;border-top:2px solid var(--rule);margin-top:50px}
 
 @media (max-width:720px){
-  .card-head{grid-template-columns:38px 1fr;grid-template-rows:auto auto}
+  .card-head{grid-template-columns:36px 1fr;grid-template-rows:auto auto}
   .headright{grid-column:1/3;justify-content:flex-start}
   .scores{grid-template-columns:repeat(2,1fr)}
-  .field{grid-template-columns:1fr;gap:6px}
+  .field{grid-template-columns:1fr;gap:5px}
   .mrow{grid-template-columns:26px 1fr 60px;row-gap:8px}
   .mcells{grid-column:1/4;grid-template-columns:repeat(4,1fr)}
   .mc{width:auto}
@@ -135,41 +143,51 @@ footer{padding:40px 0 60px;color:var(--faint);font-family:'IBM Plex Mono',monosp
 
 <header>
   <div class="wrap">
-    <div class="eyebrow">Problem Statement 4 · Breakout Team · Jul 2026</div>
-    <h1>Hardware for extreme environments<span class="dim">: the full concept space, read like a thermal image.</span></h1>
-    <div class="thermobar" role="img" aria-label="Thermal scale from cold (score 1) to hot (score 5)"></div>
-    <p class="lede">Ten concepts with credible team fit, each scored on <b>fit, urgency, feasibility, and defensibility</b> and rendered in thermographic color — because subsurface thermography is this team's rarest capability, and reading heat where others see surface is the whole thesis. Concepts with no team fit are excluded and justified at the end.</p>
+    <div class="journalline"><span>Problem Statement 4 · Working Analysis</span><span>Breakout Team · July 2026</span></div>
+    <h1>Hardware for Extreme Environments: A Capability-Constrained Enumeration and Evaluation of Venture Concepts</h1>
+    <p class="subtitle">Ten candidate concepts assessed against four criteria, restricted to the demonstrated capabilities of a six-member founding team.</p>
+    <div class="absblock">
+      <h2>Abstract</h2>
+      <p>This analysis enumerates the space of venture concepts admissible under Problem Statement 4 — compute and sensing hardware for environments in which standard consumer electronics fail — subject to a team-capability constraint. Concepts requiring capabilities absent from the team (semiconductor process development, spacecraft buses, deep-subsea pressure vessels, downhole tooling) are excluded, with rationale provided in §5. Each admitted concept is documented under a uniform schema (operating environment and failure modes; hardware specification; buyer and procurement pathway; enabling conditions; capability alignment) and scored on four criteria: <b>capability fit, buyer urgency, qualification feasibility, and defensibility</b> (1–5 each; maximum 20). Team capabilities referenced throughout: aerial robotics with natural-language mission orchestration and vision-model fine-tuning; active thermography and composites non-destructive testing; Monte Carlo simulation under uncertainty; agentic systems engineering with deterministic verification; enterprise business development; and unit-economics modeling.</p>
+    </div>
+    <div class="figure">
+      <div class="thermobar" role="img" aria-label="Score encoding from 1 (violet) to 5 (yellow)"></div>
+      <p class="figcap"><b>Figure 1.</b> Score encoding. Criterion scores are rendered on a five-step thermographic (ironbow) scale from 1 (violet) to 5 (yellow). The encoding is chosen deliberately: subsurface thermography is the team's most differentiated capability and recurs as the sensing modality across the highest-ranked concepts.</p>
+    </div>
     <div class="meta">
-      <span>CONCEPTS <b>10</b></span><span>TIERS <b>3</b></span><span>MAX SCORE <b>20</b></span><span>TOP SCORE <b>18</b></span>
+      <span>CONCEPTS <b>n = 10</b></span><span>TIERS <b>3</b></span><span>CRITERIA <b>4</b></span><span>MAX SCORE <b>20</b></span><span>HIGHEST OBSERVED <b>18</b></span>
     </div>
   </div>
 </header>
 
 <div class="wrap">
-  <div class="caps" aria-label="Team capabilities">
-    <span class="cap"><i>×3</i>Aerial robotics · NL mission orchestration · vision fine-tuning</span>
-    <span class="cap"><i>PhD</i>Active thermography · composites NDT · production-scaled</span>
-    <span class="cap"><i>SIM</i>Monte Carlo simulation under uncertainty</span>
-    <span class="cap"><i>AI</i>Agentic engineering · deterministic verification</span>
-    <span class="cap"><i>BD</i>Enterprise GTM · banking &amp; crypto</span>
-    <span class="cap"><i>ECON</i>Unit-economics modeling</span>
+  <div class="capsec">
+    <h3>§1 · Team capability inventory</h3>
+    <div class="caps" aria-label="Team capabilities">
+      <span class="cap"><i>×3</i>Aerial robotics; natural-language mission orchestration; vision-model fine-tuning</span>
+      <span class="cap"><i>PhD</i>Active thermography; composites NDT; production deployment history</span>
+      <span class="cap"><i>SIM</i>Monte Carlo simulation under uncertainty</span>
+      <span class="cap"><i>AI</i>Agentic systems engineering; deterministic verification</span>
+      <span class="cap"><i>BD</i>Enterprise business development</span>
+      <span class="cap"><i>ECON</i>Unit-economics modeling</span>
+    </div>
   </div>
 
   <div class="filterrow" role="group" aria-label="Filter by tier">
-    <span class="filterlabel">Filter</span>
-    <button class="fbtn active" data-f="all">All 10</button>
-    <button class="fbtn" data-f="tier1">Tier 1 · Lead</button>
-    <button class="fbtn" data-f="tier2">Tier 2 · Wedge</button>
-    <button class="fbtn" data-f="tier3">Tier 3 · Stretch</button>
+    <span class="filterlabel">View</span>
+    <button class="fbtn active" data-f="all">All (n = 10)</button>
+    <button class="fbtn" data-f="tier1">Tier 1</button>
+    <button class="fbtn" data-f="tier2">Tier 2</button>
+    <button class="fbtn" data-f="tier3">Tier 3</button>
   </div>
 
-  <div class="sect">Tier 1 — <em>Lead candidates</em></div>
+  <div class="sect">§2.1 · Tier 1 <em>Primary candidates</em></div>
 
   <!-- 1 EMBERHAWK -->
   <article class="card tier1 open" data-tier="tier1">
     <button class="card-head" aria-expanded="true">
       <span class="rank">01</span>
-      <span><span class="tname">Emberhawk</span><span class="tsub">Fire-hardened aerial sensing for active fireground operations</span></span>
+      <span><span class="tname">Emberhawk</span><span class="tsub">Thermally hardened aerial sensing for active fireground operations</span></span>
       <span class="headright"><span class="tier-tag">TIER 1</span><span class="total s5">18</span><span class="chev">›</span></span>
     </button>
     <div class="scores">
@@ -179,12 +197,12 @@ footer{padding:40px 0 60px;color:var(--faint);font-family:'IBM Plex Mono',monosp
       <div class="scell"><span class="slab">DEFENSIBILITY</span><span class="sval s4">4</span></div>
     </div>
     <div class="card-body"><div class="body-inner">
-      <div class="field"><span class="flabel">Setting</span><p class="fbody">Active bushfire firegrounds: heat beyond consumer drone ratings (~40°C ambient ceilings), LiPo derating and runaway risk, IMU/barometric drift in thermal gradients, smoke defeating optical navigation, ash ingress, fire-generated turbulence, GPS/comms degradation — an offline environment for hours to days.</p></div>
-      <div class="field"><span class="flabel">Hardware</span><p class="fbody">High-temperature composite airframe; sealed avionics bay with <b>phase-change thermal buffering</b> ("guaranteed minutes over the fire" — the downhole-tooling pattern); radiometric thermal + multispectral payload with edge inference for spot-fire and ember-attack detection; mesh radio with store-and-forward to a hardened ground node.</p></div>
-      <div class="field"><span class="flabel">Buyer</span><p class="fbody">State fire agencies (NSW RFS, CFA, QFES) and utilities under mandated bushfire inspection obligations. Procurement precedent the team knows firsthand: <b>NSW's ~$40M shark-monitoring drone program</b> proves agencies buy drone surveillance as a service. Insurers are the second-order data customer.</p></div>
-      <div class="field"><span class="flabel">Why now</span><p class="fbody">Post-Black-Summer funding; lengthening fire seasons; CASA BVLOS pathways maturing; radiometric thermal + edge-AI cost collapse. None of the four held five years ago.</p></div>
-      <div class="field"><span class="flabel">Team fit</span><p class="fbody">The only concept where <b>every member is load-bearing</b>: drone pair (platform, orchestration, vision), PhD (airframe, thermal payload, qualification), simulation (Monte Carlo fire behavior = the answer to "test what you can't replicate," alongside prescribed burns), agentic engineer (auditable deterministic autonomy), commercial (government motion), economics (service vs. crewed-aircraft cost case).</p></div>
-      <div class="verdict"><span class="vlab">Verdict</span>Lead pitch. Highest urgency + total fit; emotionally resonant and sovereign-relevant, with a named procurement precedent.</div>
+      <div class="field"><span class="flabel">Environment</span><p class="fbody">Active bushfire firegrounds. Documented failure modes of consumer platforms: ambient temperatures exceeding typical ~40°C operating ceilings; lithium-polymer derating and thermal-runaway risk; inertial and barometric drift in strong thermal gradients; optical navigation defeated by dense smoke; particulate ingress; fire-generated turbulence; degradation of GPS and control links, rendering the fireground an offline environment for hours to days.</p></div>
+      <div class="field"><span class="flabel">Hardware</span><p class="fbody">High-temperature composite airframe; sealed avionics enclosure with <b>phase-change thermal buffering</b>, yielding a bounded and quantifiable survival window over the fire (a design pattern adapted from downhole tooling); radiometric thermal and multispectral payload with onboard edge inference for spot-fire and ember-attack detection; mesh radio with store-and-forward delivery to a hardened ground node.</p></div>
+      <div class="field"><span class="flabel">Buyer</span><p class="fbody">State fire agencies (NSW RFS, CFA, QFES) and electricity utilities operating under mandated bushfire inspection obligations. A directly relevant procurement precedent exists: the NSW Government's approximately <b>$40M beach shark-monitoring drone program</b>, indicating that state agencies procure drone surveillance as a service. Insurers constitute a secondary data customer.</p></div>
+      <div class="field"><span class="flabel">Enabling conditions</span><p class="fbody">Sustained post-2020 public expenditure on fire capability; lengthening and increasingly overlapping fire seasons; maturation of CASA beyond-visual-line-of-sight approval pathways; substantial cost reduction in radiometric thermal sensors and edge inference hardware. None of these conditions held five years prior.</p></div>
+      <div class="field"><span class="flabel">Capability alignment</span><p class="fbody">The sole concept in which <b>all six members contribute materially</b>: aerial-robotics members (platform, orchestration, vision models); thermography specialist (airframe, payload, qualification methodology); simulation member (Monte Carlo fire-behavior modeling, which — together with prescribed burns as scheduled field access — addresses the qualification question for conditions that cannot be replicated); agentic engineer (deterministic, auditable autonomy suited to safety-case procurement); commercial member (government and utility channel); economics member (cost comparison against crewed aerial operations).</p></div>
+      <div class="verdict"><span class="vlab">Assessment</span>Ranked first (18/20). Highest combined urgency and capability alignment in the set; a documented procurement precedent reduces market risk.</div>
     </div></div>
   </article>
 
@@ -192,7 +210,7 @@ footer{padding:40px 0 60px;color:var(--faint);font-family:'IBM Plex Mono',monosp
   <article class="card tier1" data-tier="tier1">
     <button class="card-head" aria-expanded="false">
       <span class="rank">02</span>
-      <span><span class="tname">Offshore wind blade NDT</span><span class="tsub">Marinized aerial thermography for subsurface blade defects</span></span>
+      <span><span class="tname">Offshore wind blade NDT</span><span class="tsub">Marinized aerial thermography for subsurface blade defect detection</span></span>
       <span class="headright"><span class="tier-tag">TIER 1</span><span class="total s5">17</span><span class="chev">›</span></span>
     </button>
     <div class="scores">
@@ -202,12 +220,12 @@ footer{padding:40px 0 60px;color:var(--faint);font-family:'IBM Plex Mono',monosp
       <div class="scell"><span class="slab">DEFENSIBILITY</span><span class="sval s5">5</span></div>
     </div>
     <div class="card-body"><div class="body-inner">
-      <div class="field"><span class="flabel">Setting</span><p class="fbody">Offshore wind farms: salt-fog corrosion destroying unsealed electronics and connectors, sustained winds beyond consumer control authority, spray ingress, long over-water transits with no recovery — and crewed visits priced in vessel day-rates and weather windows.</p></div>
-      <div class="field"><span class="flabel">Hardware</span><p class="fbody">Marinized, corrosion-protected inspection UAV carrying an <b>active thermography payload</b> for subsurface composite defects — delamination, bond-line voids, lightning damage — before they surface. The single strongest capability-to-market transplant available to this team: the PhD's exact research and production domain.</p></div>
-      <div class="field"><span class="flabel">Buyer</span><p class="fbody">Offshore developers/operators, O&amp;M contractors, and blade OEMs under warranty exposure. Blade failures rank among the costliest O&amp;M events; today's inspection is rope access or visual-only drone imagery — surface methods blind to exactly what thermography sees.</p></div>
-      <div class="field"><span class="flabel">Why now</span><p class="fbody">Global offshore capacity compounding; Australia's declared zones (Gippsland, Hunter) moving into feasibility licensing — a sovereign beachhead before construction; ship-launched/nest drone logistics proven; visual incumbents educated the market, leaving subsurface NDT the open layer above.</p></div>
-      <div class="field"><span class="flabel">Team fit</span><p class="fbody">Deepest technical moat in the list. Drone pair: marinized platform + orchestration. Simulation member's decarbonization identity aligns with the customer's mission. Weakness: harshest qualification environment, Australian offshore revenue 2–4 years out — so near-term GTM is <b>onshore wind, exported offshore</b>.</p></div>
-      <div class="verdict"><span class="vlab">Verdict</span>The sleeper. Highest defensibility of any concept; lead with it if the pitch judges reward moat over story.</div>
+      <div class="field"><span class="flabel">Environment</span><p class="fbody">Offshore wind installations: salt-fog corrosion of unsealed electronics and connectors; sustained wind loads exceeding consumer control authority; spray and precipitation ingress; extended over-water transits without recovery options; crewed access constrained by vessel day-rates and weather windows.</p></div>
+      <div class="field"><span class="flabel">Hardware</span><p class="fbody">Marinized (ingress-protected, corrosion-resistant) inspection UAV carrying an <b>active thermography payload</b> for subsurface composite defect detection — delamination, bond-line voids, lightning damage — prior to surface manifestation. This constitutes the most direct capability-to-market transfer available to the team: the thermography specialist's documented research and production domain (autonomous drone inspection of aircraft and wind turbines; thermography on composite manufacturing lines).</p></div>
+      <div class="field"><span class="flabel">Buyer</span><p class="fbody">Offshore developers and operators, O&amp;M contractors, and blade OEMs carrying warranty exposure. Blade failures rank among the most costly offshore O&amp;M events; current practice is rope-access inspection or visual-only drone imagery — surface methods that do not detect the subsurface defect classes thermography resolves.</p></div>
+      <div class="field"><span class="flabel">Enabling conditions</span><p class="fbody">Compounding global offshore capacity; Australia's declared offshore zones (Gippsland, Hunter) progressing toward feasibility licensing, providing a domestic entry point ahead of construction; ship-launched and nest-based drone logistics demonstrated at scale; visual-inspection incumbents have established the category, leaving subsurface NDT unoccupied.</p></div>
+      <div class="field"><span class="flabel">Capability alignment</span><p class="fbody">The strongest technical moat in the set. Aerial-robotics members supply the marinized platform and orchestration; the simulation member's decarbonization focus corresponds to the customer segment's mission. Principal limitations: the most demanding qualification environment among admitted concepts, and Australian offshore revenue an estimated 2–4 years distant — implying an onshore-wind entry strategy with subsequent offshore extension.</p></div>
+      <div class="verdict"><span class="vlab">Assessment</span>Ranked second (17/20). Highest defensibility score in the set; preferred where evaluation criteria weight technical moat over near-term market accessibility.</div>
     </div></div>
   </article>
 
@@ -215,7 +233,7 @@ footer{padding:40px 0 60px;color:var(--faint);font-family:'IBM Plex Mono',monosp
   <article class="card tier1" data-tier="tier1">
     <button class="card-head" aria-expanded="false">
       <span class="rank">03</span>
-      <span><span class="tname">Deepsight</span><span class="tsub">GPS-denied inspection hardware for underground &amp; remote mining</span></span>
+      <span><span class="tname">Deepsight</span><span class="tsub">GPS-denied inspection hardware for underground and remote mining</span></span>
       <span class="headright"><span class="tier-tag">TIER 1</span><span class="total s5">17</span><span class="chev">›</span></span>
     </button>
     <div class="scores">
@@ -225,22 +243,22 @@ footer{padding:40px 0 60px;color:var(--faint);font-family:'IBM Plex Mono',monosp
       <div class="scell"><span class="slab">DEFENSIBILITY</span><span class="sval s4">4</span></div>
     </div>
     <div class="card-body"><div class="body-inner">
-      <div class="field"><span class="flabel">Setting</span><p class="fbody">Underground workings and remote hot sites: geothermal + machinery heat, Pilbara ambients of 45–50°C plus enclosure solar load, blast vibration and abrasive dust, GPS- and network-denied by definition, IECEx explosive-atmosphere zones consumer hardware can never enter.</p></div>
-      <div class="field"><span class="flabel">Hardware</span><p class="fbody">Sealed, vibration-rated autonomous unit (UAV underground; fixed/vehicle pod on surface) with LiDAR/SLAM navigation, onboard edge inference, <b>data-mule offline sync</b>, and thermography for conveyor delamination, mill-liner and refractory wear, bearing and electrical hotspots.</p></div>
-      <div class="field"><span class="flabel">Buyer</span><p class="fbody">BHP, Rio Tinto, Fortescue and the METS layer, via paid site trials into enterprise contracts. <b>Emesent's Hovermap proves miners buy GPS-denied drone autonomy — for mapping.</b> The defect-detection layer above mapping is open; their traction validates the buyer.</p></div>
-      <div class="field"><span class="flabel">Why now</span><p class="fbody">Automation capex rising as inspection labor falls; SLAM only recently industrial-grade; edge AI enables on-device inference where data can be neither streamed nor processed remotely.</p></div>
-      <div class="field"><span class="flabel">Team fit</span><p class="fbody">Thermography as moat, drones as platform, NL orchestration as the "no robotics engineers on site" pitch, deterministic verification for safety cases, Monte Carlo for degradation/inspection-interval risk in CFO language, strong local channel.</p></div>
-      <div class="verdict"><span class="vlab">Verdict</span>Most revenue-realistic: private budgets, year-round demand, fastest path to paid trials.</div>
+      <div class="field"><span class="flabel">Environment</span><p class="fbody">Underground workings and remote hot surface sites: geothermal and machinery heat; Pilbara ambient temperatures of 45–50°C with additional enclosure solar load; blast vibration and abrasive dust; GPS- and network-denied conditions by definition; IECEx explosive-atmosphere zones from which uncertified consumer hardware is categorically excluded.</p></div>
+      <div class="field"><span class="flabel">Hardware</span><p class="fbody">Sealed, thermally managed, vibration-rated autonomous inspection unit (UAV underground; fixed or vehicle-mounted pod on surface assets) with LiDAR/SLAM navigation, onboard edge inference, <b>store-and-forward ("data mule") synchronization</b>, and thermography for conveyor delamination, mill-liner and refractory wear, and bearing and electrical thermal anomalies.</p></div>
+      <div class="field"><span class="flabel">Buyer</span><p class="fbody">Mining majors (BHP, Rio Tinto, Fortescue) and the METS services layer, procured through paid site trials progressing to enterprise contracts. Emesent's Hovermap constitutes market validation: Australian miners demonstrably purchase GPS-denied drone autonomy for <b>mapping</b>; the defect-detection and condition-intelligence layer above mapping remains unoccupied.</p></div>
+      <div class="field"><span class="flabel">Enabling conditions</span><p class="fbody">Rising automation capital expenditure concurrent with declining inspection labor supply; SLAM-based autonomy reaching industrial reliability only in recent years; edge inference enabling on-device processing in environments where data can be neither streamed nor processed remotely.</p></div>
+      <div class="field"><span class="flabel">Capability alignment</span><p class="fbody">Thermography as the technical moat; aerial robotics as platform; natural-language orchestration removing the requirement for robotics engineers on site; deterministic verification supporting safety cases; Monte Carlo modeling of degradation and inspection intervals expressed in financial terms; established local commercial channel.</p></div>
+      <div class="verdict"><span class="vlab">Assessment</span>Ranked equal second (17/20). Highest revenue realism: private-sector budgets, year-round demand, shortest path to paid trials.</div>
     </div></div>
   </article>
 
-  <div class="sect">Tier 2 — <em>Strong, focused wedges</em></div>
+  <div class="sect">§2.2 · Tier 2 <em>Focused wedges</em></div>
 
   <!-- 4 TAILINGS -->
   <article class="card" data-tier="tier2">
     <button class="card-head" aria-expanded="false">
       <span class="rank">04</span>
-      <span><span class="tname">Tailings &amp; geotech monitoring</span><span class="tsub">GISTM-compliance sensing: hardened fixed stations + scheduled aerial survey</span></span>
+      <span><span class="tname">Tailings and geotechnical monitoring</span><span class="tsub">GISTM-compliance sensing: hardened fixed stations with scheduled aerial survey</span></span>
       <span class="headright"><span class="tier-tag">TIER 2</span><span class="total s4">16</span><span class="chev">›</span></span>
     </button>
     <div class="scores">
@@ -250,11 +268,11 @@ footer{padding:40px 0 60px;color:var(--faint);font-family:'IBM Plex Mono',monosp
       <div class="scell"><span class="slab">DEFENSIBILITY</span><span class="sval s3">3</span></div>
     </div>
     <div class="card-body"><div class="body-inner">
-      <div class="field"><span class="flabel">Setting</span><p class="fbody">Tailings storage facilities: remote, hot, dusty, off-network — requiring continuous unattended monitoring between rare human visits.</p></div>
-      <div class="field"><span class="flabel">Hardware</span><p class="fbody">Solar-powered, passively cooled, cyclone-rated fixed sensing stations (thermal + optical + environmental) fused with scheduled drone survey from a ruggedized nest; thermography is a recognized seepage-detection modality.</p></div>
-      <div class="field"><span class="flabel">Buyer / Why now</span><p class="fbody">Every major with tailings facilities, under the post-Brumadinho <b>Global Industry Standard on Tailings Management</b> — compliance-mandated, recurring, board-visible monitoring with funded budgets and conformance deadlines. Mining insurers as second buyer.</p></div>
-      <div class="field"><span class="flabel">Team fit</span><p class="fbody">Deepsight's stack with a sharper regulatory wedge and simpler autonomy; Monte Carlo failure-probability modeling speaks GISTM's risk-disclosure language directly.</p></div>
-      <div class="verdict"><span class="vlab">Verdict</span>Best as Deepsight's compliance-mandated beachhead module, not a standalone company — hence Tier 2.</div>
+      <div class="field"><span class="flabel">Environment</span><p class="fbody">Tailings storage facilities: remote, hot, dusty, off-network sites requiring continuous unattended monitoring between infrequent human visits.</p></div>
+      <div class="field"><span class="flabel">Hardware</span><p class="fbody">Solar-powered, passively cooled, cyclone-rated fixed sensing stations (thermal, optical, environmental) fused with scheduled drone survey from a ruggedized nest; thermography is an established modality for seepage detection.</p></div>
+      <div class="field"><span class="flabel">Buyer / Conditions</span><p class="fbody">All majors operating tailings facilities, under the post-Brumadinho <b>Global Industry Standard on Tailings Management</b> — a compliance-mandated, recurring, board-visible monitoring obligation with funded budgets and conformance deadlines. Mining insurers constitute a secondary buyer.</p></div>
+      <div class="field"><span class="flabel">Capability alignment</span><p class="fbody">The Deepsight technical stack with a narrower regulatory wedge and reduced autonomy complexity (scheduled survey rather than exploration); Monte Carlo failure-probability modeling corresponds directly to GISTM risk-disclosure requirements.</p></div>
+      <div class="verdict"><span class="vlab">Assessment</span>16/20. Product surface is narrow; better positioned as the compliance-mandated entry module of concept 03 than as an independent venture.</div>
     </div></div>
   </article>
 
@@ -262,7 +280,7 @@ footer{padding:40px 0 60px;color:var(--faint);font-family:'IBM Plex Mono',monosp
   <article class="card" data-tier="tier2">
     <button class="card-head" aria-expanded="false">
       <span class="rank">05</span>
-      <span><span class="tname">Fire-front sensor pods</span><span class="tsub">Air-dropped hardened ground sensing — the "pyrosonde" network</span></span>
+      <span><span class="tname">Fire-front sensor pods</span><span class="tsub">Air-deployed hardened ground sensing ("pyrosonde" network)</span></span>
       <span class="headright"><span class="tier-tag">TIER 2</span><span class="total s4">15</span><span class="chev">›</span></span>
     </button>
     <div class="scores">
@@ -272,11 +290,11 @@ footer{padding:40px 0 60px;color:var(--faint);font-family:'IBM Plex Mono',monosp
       <div class="scell"><span class="slab">DEFENSIBILITY</span><span class="sval s4">4</span></div>
     </div>
     <div class="card-body"><div class="body-inner">
-      <div class="field"><span class="flabel">Setting</span><p class="fbody">Inside the path of an advancing fire front — the one place no aircraft loiters and no consumer device survives: direct flame contact, then continued post-front operation.</p></div>
-      <div class="field"><span class="flabel">Hardware</span><p class="fbody">Low-cost, drone-deployable, intumescent/ceramic-protected pods (temperature, radiant flux, wind, gas) logging through front passage, reporting via mesh/satellite. The aerial-robotics inverse: the drone is the delivery system; <b>the survivable pod is the product</b>.</p></div>
-      <div class="field"><span class="flabel">Buyer / Why now</span><p class="fbody">Fire-science agencies (AFAC, CSIRO, universities), RFS tactical use, and insurers/cat-modelers pricing fire risk with almost no in-fire ground truth. Fire-behavior models are calibration-starved; every prescribed burn is a paying deployment.</p></div>
-      <div class="field"><span class="flabel">Team fit</span><p class="fbody">Drone delivery + thermal-survival packaging + the elegant part: the data's whole value is feeding the simulation member's Monte Carlo fire models — a sensing-to-simulation loop no competitor offers.</p></div>
-      <div class="verdict"><span class="vlab">Verdict</span>Modest standalone market; strongest as Emberhawk's data-moat companion product.</div>
+      <div class="field"><span class="flabel">Environment</span><p class="fbody">The path of an advancing fire front — a region in which no aircraft loiters and no consumer device survives: direct flame contact followed by required post-front operation.</p></div>
+      <div class="field"><span class="flabel">Hardware</span><p class="fbody">Low-cost, drone-deployable, intumescent- or ceramic-protected sensor pods (temperature, radiant flux, wind, gas composition) logging through front passage and reporting via mesh or satellite link. The configuration inverts the aerial-robotics arrangement: the drone serves as delivery system; <b>the survivable pod is the product</b>.</p></div>
+      <div class="field"><span class="flabel">Buyer / Conditions</span><p class="fbody">Fire-science agencies (AFAC, CSIRO, universities), fire services for tactical fire-behavior data, and insurers and catastrophe modelers, whose fire-risk pricing currently proceeds with minimal in-fire ground truth. Fire-behavior models are calibration-limited; prescribed burns provide recurring deployment opportunities.</p></div>
+      <div class="field"><span class="flabel">Capability alignment</span><p class="fbody">Drone delivery and thermal-survival packaging within team capability; the collected data directly serves the simulation member's Monte Carlo fire models, closing a sensing-to-simulation loop not offered by existing providers.</p></div>
+      <div class="verdict"><span class="vlab">Assessment</span>15/20. Standalone market is limited; strongest as the data-acquisition companion to concept 01.</div>
     </div></div>
   </article>
 
@@ -284,7 +302,7 @@ footer{padding:40px 0 60px;color:var(--faint);font-family:'IBM Plex Mono',monosp
   <article class="card" data-tier="tier2">
     <button class="card-head" aria-expanded="false">
       <span class="rank">06</span>
-      <span><span class="tname">Desert solar inspection</span><span class="tsub">Heat/dust-hardened autonomous nest + PV thermography</span></span>
+      <span><span class="tname">Desert solar inspection</span><span class="tsub">Heat- and dust-hardened autonomous nest with photovoltaic thermography</span></span>
       <span class="headright"><span class="tier-tag">TIER 2</span><span class="total s4">14</span><span class="chev">›</span></span>
     </button>
     <div class="scores">
@@ -294,11 +312,11 @@ footer{padding:40px 0 60px;color:var(--faint);font-family:'IBM Plex Mono',monosp
       <div class="scell"><span class="slab">DEFENSIBILITY</span><span class="sval s3">3</span></div>
     </div>
     <div class="card-body"><div class="body-inner">
-      <div class="field"><span class="flabel">Setting</span><p class="fbody">Utility-scale arid-zone solar: sustained 45–50°C, dust storms, UV — where the <b>resident nest</b>, not the drone, is the extreme-environment engineering problem: a box surviving years of desert exposure while keeping batteries and compute in range.</p></div>
-      <div class="field"><span class="flabel">Hardware</span><p class="fbody">Passively/hybrid-cooled, dust-sealed autonomous nest + UAV with radiometric thermal payload. Aerial IR inspection of PV plants is standardized (<b>IEC TS 62446-3</b>): hotspot cells, diode failures, string faults at fleet scale.</p></div>
-      <div class="field"><span class="flabel">Buyer / Why now</span><p class="fbody">Solar owners and O&amp;M contractors — losses are directly revenue-linked; Australia's utility build-out continues; drone-in-a-box momentum proves the model, but incumbents built nests for temperate markets.</p></div>
-      <div class="field"><span class="flabel">Team fit</span><p class="fbody">Thermography central; sustainability member's decarbonization thesis is literally the customer's business; orchestration makes multi-site fleets operable by O&amp;M staff.</p></div>
-      <div class="verdict"><span class="vlab">Verdict</span>Most competitive inspection niche in the list — differentiation rests on the hardened nest and orchestration, not the sensing.</div>
+      <div class="field"><span class="flabel">Environment</span><p class="fbody">Utility-scale arid-zone solar: sustained 45–50°C ambient, dust storms, and UV exposure. The <b>resident nest</b>, rather than the aircraft, constitutes the extreme-environment engineering problem: an enclosure required to survive years of desert exposure while maintaining batteries and compute within operating range.</p></div>
+      <div class="field"><span class="flabel">Hardware</span><p class="fbody">Passively or hybrid-cooled, dust-sealed autonomous nest with inspection UAV and radiometric thermal payload. Aerial infrared inspection of photovoltaic plants is standardized (<b>IEC TS 62446-3</b>), resolving hotspot cells, diode failures, and string faults at fleet scale.</p></div>
+      <div class="field"><span class="flabel">Buyer / Conditions</span><p class="fbody">Solar asset owners and O&amp;M contractors; performance losses are directly revenue-linked and the Australian utility-scale build-out continues. Drone-in-a-box category growth validates the delivery model; incumbent nests were engineered for temperate markets.</p></div>
+      <div class="field"><span class="flabel">Capability alignment</span><p class="fbody">Thermography central; the simulation member's decarbonization focus corresponds to the customer's business; orchestration enables multi-site fleet operation by O&amp;M personnel.</p></div>
+      <div class="verdict"><span class="vlab">Assessment</span>14/20. The most competitive inspection segment in the set; differentiation depends on the hardened nest and fleet orchestration rather than the sensing modality.</div>
     </div></div>
   </article>
 
@@ -306,7 +324,7 @@ footer{padding:40px 0 60px;color:var(--faint);font-family:'IBM Plex Mono',monosp
   <article class="card" data-tier="tier2">
     <button class="card-head" aria-expanded="false">
       <span class="rank">07</span>
-      <span><span class="tname">Utility corridor inspection</span><span class="tsub">Resident hardened drones in fire-risk transmission terrain</span></span>
+      <span><span class="tname">Utility corridor inspection</span><span class="tsub">Resident hardened drone systems in fire-risk transmission terrain</span></span>
       <span class="headright"><span class="tier-tag">TIER 2</span><span class="total s4">14</span><span class="chev">›</span></span>
     </button>
     <div class="scores">
@@ -316,21 +334,21 @@ footer{padding:40px 0 60px;color:var(--faint);font-family:'IBM Plex Mono',monosp
       <div class="scell"><span class="slab">DEFENSIBILITY</span><span class="sval s3">3</span></div>
     </div>
     <div class="card-body"><div class="body-inner">
-      <div class="field"><span class="flabel">Setting</span><p class="fbody">Remote transmission corridors in fire-prone, hot, comms-poor terrain; the inspection hardware must live on-site through extreme heat days, storms, and smoke seasons.</p></div>
-      <div class="field"><span class="flabel">Hardware</span><p class="fbody">Ruggedized resident nest + UAV with thermal payload catching failing conductors, connectors, and vegetation encroachment — the ignition precursors driving utility liability.</p></div>
-      <div class="field"><span class="flabel">Buyer / Why now</span><p class="fbody">Utilities under mandated bushfire inspection regimes and post-catastrophe liability precedents; regulators demand evidenced inspection; BVLOS maturity makes corridor-scale autonomy newly lawful.</p></div>
-      <div class="field"><span class="flabel">Team fit</span><p class="fbody">Full-stack fit — but slow utility procurement and entrenched helicopter/LiDAR incumbents.</p></div>
-      <div class="verdict"><span class="vlab">Verdict</span>Enter as Emberhawk's off-season revenue line, sharing the same fleet.</div>
+      <div class="field"><span class="flabel">Environment</span><p class="fbody">Remote transmission corridors in fire-prone, hot, communications-poor terrain; inspection hardware must remain resident on site through extreme heat, storms, and smoke seasons.</p></div>
+      <div class="field"><span class="flabel">Hardware</span><p class="fbody">Ruggedized resident nest and UAV with thermal payload detecting failing conductors, connectors, and vegetation encroachment — the ignition precursors underlying utility liability.</p></div>
+      <div class="field"><span class="flabel">Buyer / Conditions</span><p class="fbody">Transmission and distribution utilities under mandated bushfire inspection regimes and post-catastrophe liability precedents; regulators increasingly require evidenced inspection; BVLOS maturation renders corridor-scale autonomous operation newly permissible.</p></div>
+      <div class="field"><span class="flabel">Capability alignment</span><p class="fbody">Full-stack alignment, offset by slow utility procurement cycles and entrenched helicopter and LiDAR contracting incumbents.</p></div>
+      <div class="verdict"><span class="vlab">Assessment</span>14/20. Most efficiently entered as the counter-seasonal revenue line of concept 01, operating shared fleet assets.</div>
     </div></div>
   </article>
 
-  <div class="sect">Tier 3 — <em>Credible stretch</em></div>
+  <div class="sect">§2.3 · Tier 3 <em>Credible extensions</em></div>
 
   <!-- 8 COASTAL -->
   <article class="card" data-tier="tier3">
     <button class="card-head" aria-expanded="false">
       <span class="rank">08</span>
-      <span><span class="tname">Marinized coastal platform</span><span class="tsub">From the shark program to maritime domain awareness</span></span>
+      <span><span class="tname">Marinized coastal platform</span><span class="tsub">Extension from coastal surveillance to maritime domain awareness</span></span>
       <span class="headright"><span class="tier-tag">TIER 3</span><span class="total s3">13</span><span class="chev">›</span></span>
     </button>
     <div class="scores">
@@ -340,10 +358,10 @@ footer{padding:40px 0 60px;color:var(--faint);font-family:'IBM Plex Mono',monosp
       <div class="scell"><span class="slab">DEFENSIBILITY</span><span class="sval s3">3</span></div>
     </div>
     <div class="card-body"><div class="body-inner">
-      <div class="field"><span class="flabel">Setting / Hardware</span><p class="fbody">Sustained over-water operations — salt-fog corrosion, spray ingress, wind, offline transits. Corrosion-hardened long-endurance maritime UAV; detection models from sharks today to vessels, cable-landing anomalies, and SAR targets tomorrow.</p></div>
-      <div class="field"><span class="flabel">Buyer / Why now</span><p class="fbody">Direct expansion of the NSW shark program the team knows; then border/fisheries and defense-adjacent maritime awareness, where seabed-infrastructure protection budgets are growing globally after high-profile cable incidents.</p></div>
-      <div class="field"><span class="flabel">Team fit</span><p class="fbody">Leverages the team's most concrete existing use case and vision pipeline — but defense/government maritime procurement is slow and crowded with funded UAS primes.</p></div>
-      <div class="verdict"><span class="vlab">Verdict</span>The wedge is the proven civil program, not the defense endgame.</div>
+      <div class="field"><span class="flabel">Environment / Hardware</span><p class="fbody">Sustained over-water coastal operations: salt-fog corrosion, spray ingress, wind loading, and extended offline transits. Corrosion-hardened, long-endurance maritime UAV; detection models extensible from marine fauna to vessels, cable-landing anomalies, and search-and-rescue targets.</p></div>
+      <div class="field"><span class="flabel">Buyer / Conditions</span><p class="fbody">A direct extension of the NSW coastal surveillance program with which the team is familiar; subsequently border and fisheries agencies and defense-adjacent maritime awareness, where seabed-infrastructure protection budgets have grown internationally following documented submarine-cable incidents.</p></div>
+      <div class="field"><span class="flabel">Capability alignment</span><p class="fbody">Builds on the team's most concrete existing use case and vision pipeline; however, defense and government maritime procurement is slow and occupied by funded UAS primes.</p></div>
+      <div class="verdict"><span class="vlab">Assessment</span>13/20. The defensible entry is the demonstrated civil program; the defense market is the extension, not the entry.</div>
     </div></div>
   </article>
 
@@ -351,7 +369,7 @@ footer{padding:40px 0 60px;color:var(--faint);font-family:'IBM Plex Mono',monosp
   <article class="card" data-tier="tier3">
     <button class="card-head" aria-expanded="false">
       <span class="rank">09</span>
-      <span><span class="tname">Radiation-mapping UAS</span><span class="tsub">Dose-aware drones for nuclear decommissioning (export play)</span></span>
+      <span><span class="tname">Radiation-mapping UAS</span><span class="tsub">Dose-aware unmanned systems for nuclear decommissioning (export market)</span></span>
       <span class="headright"><span class="tier-tag">TIER 3</span><span class="total s4">14</span><span class="chev">›</span></span>
     </button>
     <div class="scores">
@@ -361,11 +379,11 @@ footer{padding:40px 0 60px;color:var(--faint);font-family:'IBM Plex Mono',monosp
       <div class="scell"><span class="slab">DEFENSIBILITY</span><span class="sval s4">4</span></div>
     </div>
     <div class="card-body"><div class="body-inner">
-      <div class="field"><span class="flabel">Setting</span><p class="fbody">Decommissioning sites: cumulative gamma dose degrading COTS electronics — with the failure hierarchy established in the literature (a KUKA arm under cobalt-60 failed first at its <b>optical encoder, at 164.55 Gy</b>; cameras and power converters follow). At decommissioning dose rates this is engineering, not a physics wall.</p></div>
-      <div class="field"><span class="flabel">Hardware</span><p class="fbody">Shielded-COTS UAV with gamma spectrometry payload, <b>dose-budgeted mission planning</b> (autonomy that tracks its own accumulated damage), and hot-swap architecture for first-to-fail components.</p></div>
-      <div class="field"><span class="flabel">Buyer / Why now</span><p class="fbody">UK NDA ecosystem (<b>Sellafield's cleanup: ~£136B to ~2125</b>), Fukushima, and fusion remote-maintenance programs — multi-decade government demand, thin competition; UAV radiation mapping already proven at Chernobyl and Fukushima.</p></div>
-      <div class="field"><span class="flabel">Team fit</span><p class="fbody">Drones + orchestration + dose-aware deterministic autonomy fit well; radiation engineering is learnable but new, there's no Australian domestic market, and sales cycles are the slowest in the list.</p></div>
-      <div class="verdict"><span class="vlab">Verdict</span>Pitch as evidence of platform breadth, not as the beachhead.</div>
+      <div class="field"><span class="flabel">Environment</span><p class="fbody">Decommissioning sites: cumulative gamma dose degrading commercial off-the-shelf electronics. The component failure hierarchy is established in the literature: a commercial robotic arm under cobalt-60 exposure failed first at its <b>optical encoder, at a cumulative dose of 164.55 Gy</b> (Frontiers in Robotics and AI, 2020), with camera sensors and power converters as subsequent failure points. At decommissioning dose rates, survivability is an engineering problem rather than a physical limit.</p></div>
+      <div class="field"><span class="flabel">Hardware</span><p class="fbody">Shielded-COTS UAV with gamma spectrometry and dose-mapping payload; <b>dose-budgeted mission planning</b> in which the autonomy stack tracks accumulated damage and plans within a dose budget; hot-swap architecture for first-to-fail components.</p></div>
+      <div class="field"><span class="flabel">Buyer / Conditions</span><p class="fbody">The UK NDA ecosystem (the Sellafield remediation alone is costed at approximately <b>£136B through ~2125</b>; UK Parliament Public Accounts Committee, 2025), the Fukushima program, and fusion remote-maintenance programs — multi-decade, government-anchored demand with limited competition. UAV radiation mapping has been demonstrated at Chernobyl and Fukushima.</p></div>
+      <div class="field"><span class="flabel">Capability alignment</span><p class="fbody">Aerial robotics, orchestration, and dose-aware deterministic autonomy align with existing capability; radiation engineering is acquirable at these dose levels but is new to the team, no Australian domestic market exists, and procurement cycles are the longest in the set.</p></div>
+      <div class="verdict"><span class="vlab">Assessment</span>14/20. Appropriately presented as evidence of platform generality rather than as the entry market.</div>
     </div></div>
   </article>
 
@@ -383,48 +401,47 @@ footer{padding:40px 0 60px;color:var(--faint);font-family:'IBM Plex Mono',monosp
       <div class="scell"><span class="slab">DEFENSIBILITY</span><span class="sval s2">2</span></div>
     </div>
     <div class="card-body"><div class="body-inner">
-      <div class="field"><span class="flabel">Setting / Hardware</span><p class="fbody">Remote mining, agricultural, and defense sites with no connectivity and heat/dust/vibration that kill standard servers. Sealed, passively cooled, solar-capable edge-AI nodes running local models — sovereign, offline AI where cloud inference is impossible by physics, not policy.</p></div>
-      <div class="field"><span class="flabel">Buyer / Why now</span><p class="fbody">Operators and government users with data-sovereignty and disconnection constraints; the sovereign-AI procurement narrative is cresting and low-power inference silicon now fits a passive envelope.</p></div>
-      <div class="field"><span class="flabel">Team fit</span><p class="fbody">Strongest alignment with the agentic engineer's "skills → sovereign models" thesis — but the enclosure/thermal/power hardware is the simplest in the list, and the least defensible <i>as hardware</i>.</p></div>
-      <div class="verdict"><span class="vlab">Verdict</span>Pitches better as the compute layer inside concepts 1–7 than as a standalone company.</div>
+      <div class="field"><span class="flabel">Environment / Hardware</span><p class="fbody">Remote mining, agricultural, and defense sites lacking connectivity, with heat, dust, and vibration conditions outside standard server and consumer edge-device ratings. Sealed, passively cooled, solar-capable edge inference nodes executing locally hosted models — offline operation imposed by physics rather than policy.</p></div>
+      <div class="field"><span class="flabel">Buyer / Conditions</span><p class="fbody">Operators and government users with data-sovereignty and disconnection constraints; sovereign-AI procurement interest in Australia is increasing, and current low-power inference silicon fits within a passively cooled envelope.</p></div>
+      <div class="field"><span class="flabel">Capability alignment</span><p class="fbody">Strongest correspondence with the agentic engineer's model-abstraction and sovereign-deployment work; however, the enclosure, thermal, and power engineering is the simplest in the set and the least defensible as hardware.</p></div>
+      <div class="verdict"><span class="vlab">Assessment</span>13/20. More appropriately positioned as the compute layer within concepts 01–07 than as an independent venture.</div>
     </div></div>
   </article>
 
-  <div class="sect">Scoring matrix — <em>the option space as a thermal image</em></div>
-
+  <div class="sect">§3 · Scoring summary <em>Table 1</em></div>
+  <p class="tablecap"><b>Table 1.</b> Criterion scores and totals for all admitted concepts, ordered by total score. Cell color follows the encoding of Figure 1. FIT = capability fit; URG = buyer urgency; FEAS = qualification feasibility; DEF = defensibility. Bar length is proportional to total score (maximum 20).</p>
   <div class="matrix" id="matrix">
     <div class="mrow mhead"><span></span><span>Concept</span><span style="text-align:center">FIT · URG · FEAS · DEF</span><span style="text-align:right">Total</span></div>
   </div>
   <div class="legendrow">
-    <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--h1);vertical-align:-1px"></span> 1</span>
-    <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--h2);vertical-align:-1px"></span> 2</span>
-    <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--h3);vertical-align:-1px"></span> 3</span>
-    <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--h4);vertical-align:-1px"></span> 4</span>
-    <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--h5);vertical-align:-1px"></span> 5</span>
-    <span style="margin-left:auto">BAR = TOTAL / 20</span>
+    <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--h1c);vertical-align:-1px"></span> 1</span>
+    <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--h2c);vertical-align:-1px"></span> 2</span>
+    <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--h3c);vertical-align:-1px"></span> 3</span>
+    <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--h4c);vertical-align:-1px"></span> 4</span>
+    <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--h5c);vertical-align:-1px"></span> 5</span>
   </div>
 
-  <div class="sect">The convergence — <em>strategic finding</em></div>
+  <div class="sect">§4 · Discussion <em>Architectural convergence</em></div>
   <div class="thesis">
-    <h3>The top three are one platform wearing different clothes.</h3>
-    <p>Emberhawk, offshore wind NDT, and Deepsight share a single architecture: a <b>hardened aerial/resident sensing platform</b>, a <b>thermography-anchored payload</b>, <b>deterministic natural-language orchestration</b>, and <b>simulation-driven analytics</b>. The team's best pitch is one platform company — <i>sensing hardware for places that destroy electronics</i> — choosing among three beachheads, with Tier 2 as expansion modules (4 extends Deepsight, 5 extends Emberhawk, 6–7 share the resident nest) and Tier 3 as breadth evidence. The business charges for retrieved intelligence, not deployed mass.</p>
+    <h3>The three highest-ranked concepts share a common architecture.</h3>
+    <p>Concepts 01, 02, and 03 comprise the same four elements: a <b>hardened aerial or resident sensing platform</b>; a <b>thermography-anchored payload</b>; <b>deterministic natural-language mission orchestration</b>; and <b>simulation-driven analytics</b>. This convergence suggests the appropriate venture structure is a single platform organization — sensing hardware for environments that exceed consumer electronics ratings — selecting among three entry markets, with Tier 2 concepts functioning as extension modules (04 extends 03; 05 extends 01; 06 and 07 share the resident-nest hardware) and Tier 3 concepts as evidence of platform generality. Under this structure, revenue derives from retrieved data and analysis rather than from deployed hardware mass — consistent with the business-model observation recorded in the source discussion of Problem Statement 4.</p>
   </div>
 
-  <div class="sect">Excluded — <em>no team fit</em></div>
-  <p class="excl"><b>Rad-hard / space-grade silicon, orbital compute hardware, radiation-testing infrastructure</b> — no semiconductor, spacecraft, or accelerator capability in the team; the orbital enthusiasm is best deployed as unit-economics rigor inside the chosen pitch. <b>High-temperature downhole electronics for geothermal</b> — requires SiC/Ga₂O₃ device and packaging expertise, and the field is tilting toward fiber-optic sensing with surface compute. <b>Deep-subsea pressure vessels and underwater data centers</b> — marine engineering the team lacks; the real subsea openings favor acoustics specialists. <b>Antarctic/polar instrumentation</b> — real gap, tiny procurement base, no edge over incumbent polar programs.</p>
+  <div class="sect">§5 · Scope exclusions <em>Concepts without capability fit</em></div>
+  <p class="excl"><b>Radiation-hardened and space-grade silicon, orbital compute hardware, and radiation-testing infrastructure</b> — excluded for absence of semiconductor, spacecraft, and accelerator capability; the team's orbital-economics interest is more productively applied as unit-economics analysis within the selected concept. <b>High-temperature downhole electronics for geothermal applications</b> — excluded as requiring SiC/Ga₂O₃ device and packaging expertise; the field is additionally shifting toward fiber-optic distributed sensing with surface-located compute, which reduces the value of the wedge. <b>Deep-subsea pressure vessels and underwater data centers</b> — excluded for absence of marine engineering capability; the observable subsea openings favor acoustics specialists. <b>Antarctic and polar instrumentation</b> — a genuine capability gap, but with a small procurement base and no team advantage relative to incumbent polar programs.</p>
 
-  <footer>PROBLEM STATEMENT 4 · TEAM-FIT-FILTERED CONCEPT SPACE · SCORES 1–5 PER CRITERION · MAX 20</footer>
+  <footer>PROBLEM STATEMENT 4 · CAPABILITY-CONSTRAINED CONCEPT EVALUATION · SCORES 1–5 PER CRITERION · MAXIMUM 20 · JULY 2026</footer>
 </div>
 
 <script>
-// ---- matrix build ----
+// ---- Table 1 build ----
 const data = [
-  ["01","Emberhawk","Fireground sensing",5,5,4,4],
+  ["01","Emberhawk","Fireground aerial sensing",5,5,4,4],
   ["02","Offshore wind blade NDT","Marinized thermography",5,4,3,5],
   ["03","Deepsight","Mining inspection",5,4,4,4],
   ["04","Tailings / GISTM monitoring","Compliance sensing",4,5,4,3],
   ["05","Fire-front sensor pods","Pyrosonde network",4,3,4,4],
-  ["06","Desert solar inspection","Hardened nest + PV IR",4,3,4,3],
+  ["06","Desert solar inspection","Hardened nest, PV infrared",4,3,4,3],
   ["07","Utility corridor inspection","Resident fleet",4,4,3,3],
   ["09","Radiation-mapping UAS","Decommissioning export",3,4,3,4],
   ["08","Marinized coastal platform","Maritime awareness",4,3,3,3],
@@ -439,7 +456,7 @@ data.forEach(d=>{
   row.innerHTML =
     `<span class="mrank">${d[0]}</span>
      <span class="mname">${d[1]}<small>${d[2]}</small></span>
-     <span class="mcells">${[d[3],d[4],d[5],d[6]].map(v=>`<span class="mc ${cls(v)}" style="color:${v>=4?'#231206':'#EFDFF5'}">${v}</span>`).join("")}</span>
+     <span class="mcells">${[d[3],d[4],d[5],d[6]].map(v=>`<span class="mc ${cls(v)}" style="color:${v>=4?'#3A2B00':'#F5EDFB'}">${v}</span>`).join("")}</span>
      <span class="mtotal"><b>${total}</b><span style="color:var(--faint);font-size:11px">/20</span></span>
      <span class="mbarwrap"><span class="mbar" style="width:${total/20*100}%"></span></span>`;
   matrix.appendChild(row);

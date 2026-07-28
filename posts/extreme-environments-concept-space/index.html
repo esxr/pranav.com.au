@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Problem Statement 4 — Concept Space</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0F1317; --panel:#171D24; --panel2:#1D2530; --line:#2A3440;
+  --text:#E9EEF3; --muted:#8C99A8; --faint:#5B6875;
+  --h1:#2A0E5E; --h2:#7A1B7E; --h3:#CF2F58; --h4:#F07028; --h5:#FFD54A;
+  --glowhot:rgba(240,112,40,.35);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto} *,*::before,*::after{animation:none!important;transition:none!important}}
+body{background:var(--ink);color:var(--text);font-family:'Archivo',sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1060px;margin:0 auto;padding:0 24px}
+
+/* ---------- hero ---------- */
+header{padding:72px 0 48px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.22em;color:var(--h4);text-transform:uppercase;margin-bottom:20px}
+h1{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:clamp(34px,5.4vw,58px);line-height:1.06;letter-spacing:-.01em;max-width:19ch}
+h1 .dim{color:var(--muted)}
+.thermobar{height:10px;width:min(520px,100%);margin:28px 0 24px;border-radius:5px;
+  background:linear-gradient(90deg,var(--h1),var(--h2),var(--h3),var(--h4),var(--h5));
+  position:relative}
+.thermobar::after{content:"COLD · 1";position:absolute;left:0;top:16px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--faint)}
+.thermobar::before{content:"5 · HOT";position:absolute;right:0;top:16px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--faint)}
+.lede{max-width:64ch;color:var(--muted);margin-top:30px;font-size:17px}
+.lede b{color:var(--text);font-weight:600}
+.meta{display:flex;gap:28px;flex-wrap:wrap;margin-top:26px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--faint);letter-spacing:.06em}
+.meta span b{color:var(--text);font-weight:600}
+
+/* ---------- capability strip ---------- */
+.caps{display:flex;flex-wrap:wrap;gap:8px;padding:22px 0;border-bottom:1px solid var(--line)}
+.cap{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.04em;color:var(--muted);
+  border:1px solid var(--line);border-radius:3px;padding:5px 10px;background:var(--panel)}
+.cap i{font-style:normal;color:var(--h4);margin-right:6px}
+
+/* ---------- filter ---------- */
+.filterrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:26px 0 8px}
+.filterlabel{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;color:var(--faint);text-transform:uppercase;margin-right:6px}
+.fbtn{font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.05em;color:var(--muted);
+  background:none;border:1px solid var(--line);border-radius:3px;padding:7px 14px;cursor:pointer;transition:all .18s ease}
+.fbtn:hover{color:var(--text);border-color:var(--faint)}
+.fbtn.active{color:var(--ink);background:var(--h4);border-color:var(--h4);font-weight:600}
+.fbtn:focus-visible,.card-head:focus-visible{outline:2px solid var(--h5);outline-offset:2px}
+
+/* ---------- section titles ---------- */
+.sect{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:13px;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--faint);margin:44px 0 18px;display:flex;align-items:center;gap:14px}
+.sect::after{content:"";flex:1;height:1px;background:var(--line)}
+.sect em{font-style:normal;color:var(--h4)}
+
+/* ---------- cards ---------- */
+.card{border:1px solid var(--line);border-radius:6px;background:var(--panel);margin-bottom:14px;overflow:hidden;transition:border-color .18s ease}
+.card:hover{border-color:#3A4756}
+.card.hidden{display:none}
+.card-head{display:grid;grid-template-columns:52px 1fr auto;gap:16px;align-items:center;
+  padding:18px 20px;cursor:pointer;background:none;border:none;width:100%;text-align:left;color:inherit;font:inherit}
+.rank{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;color:var(--faint)}
+.card.tier1 .rank{color:var(--h5)}
+.tname{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:19px;letter-spacing:.01em}
+.tsub{color:var(--muted);font-size:14px;margin-top:3px}
+.headright{display:flex;align-items:center;gap:14px}
+.tier-tag{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:var(--muted);
+  border:1px solid var(--line);border-radius:3px;padding:3px 8px;white-space:nowrap}
+.total{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:22px;min-width:60px;text-align:center;
+  border-radius:4px;padding:6px 0;color:var(--ink)}
+.chev{color:var(--faint);font-family:'IBM Plex Mono',monospace;font-size:14px;transition:transform .22s ease}
+.card.open .chev{transform:rotate(90deg)}
+
+/* score strip */
+.scores{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line)}
+.scell{background:var(--panel2);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.slab{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:var(--faint)}
+.sval{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:15px;width:28px;height:28px;border-radius:3px;
+  display:flex;align-items:center;justify-content:center}
+.s1{background:var(--h1);color:#CBB8F0}.s2{background:var(--h2);color:#F2CFF0}
+.s3{background:var(--h3);color:#FFE3EA}.s4{background:var(--h4);color:#231206}.s5{background:var(--h5);color:#231206}
+
+/* body */
+.card-body{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.card.open .card-body{max-height:2400px}
+.body-inner{padding:24px 22px 26px;border-top:1px solid var(--line);display:grid;gap:20px}
+.field{display:grid;grid-template-columns:118px 1fr;gap:18px}
+.flabel{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;color:var(--h4);text-transform:uppercase;padding-top:3px}
+.fbody{color:#C7D1DB;font-size:15px}
+.fbody b{color:var(--text);font-weight:600}
+.verdict{border-left:3px solid var(--h4);background:var(--panel2);padding:14px 16px;border-radius:0 4px 4px 0;color:var(--text);font-size:15px}
+.verdict .vlab{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.18em;color:var(--h4);display:block;margin-bottom:5px}
+
+/* ---------- matrix ---------- */
+.matrix{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel)}
+.mrow{display:grid;grid-template-columns:34px 1fr 176px 64px;gap:0;align-items:center;border-bottom:1px solid var(--line);padding:12px 16px}
+.mrow:last-child{border-bottom:none}
+.mrow.mhead{background:var(--panel2);font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:var(--faint);text-transform:uppercase;padding:10px 16px}
+.mrank{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--faint)}
+.mname{font-size:14.5px;font-weight:500;padding-right:12px}
+.mname small{display:block;color:var(--faint);font-size:11.5px;font-weight:400;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em}
+.mcells{display:grid;grid-template-columns:repeat(4,40px);gap:4px}
+.mc{width:40px;height:26px;border-radius:3px;display:flex;align-items:center;justify-content:center;
+  font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600}
+.mtotal{text-align:right}
+.mbarwrap{grid-column:2/5;height:5px;background:var(--panel2);border-radius:3px;margin-top:9px;overflow:hidden}
+.mbar{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--h2),var(--h3),var(--h4),var(--h5))}
+.mtotal b{font-family:'Chakra Petch',sans-serif;font-size:18px;font-weight:700}
+.legendrow{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--faint);letter-spacing:.08em}
+
+/* ---------- convergence + exclusions ---------- */
+.thesis{border:1px solid var(--h4);border-radius:6px;padding:26px 26px;background:linear-gradient(180deg,rgba(240,112,40,.07),rgba(240,112,40,.02));margin-top:8px}
+.thesis h3{font-family:'Chakra Petch',sans-serif;font-size:18px;font-weight:600;margin-bottom:10px}
+.thesis p{color:#C7D1DB;font-size:15px;max-width:78ch}
+.thesis p b{color:var(--text)}
+.excl{color:var(--muted);font-size:14px;max-width:80ch}
+.excl b{color:var(--text);font-weight:600}
+footer{padding:40px 0 60px;color:var(--faint);font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.06em;border-top:1px solid var(--line);margin-top:52px}
+
+@media (max-width:720px){
+  .card-head{grid-template-columns:38px 1fr;grid-template-rows:auto auto}
+  .headright{grid-column:1/3;justify-content:flex-start}
+  .scores{grid-template-columns:repeat(2,1fr)}
+  .field{grid-template-columns:1fr;gap:6px}
+  .mrow{grid-template-columns:26px 1fr 60px;row-gap:8px}
+  .mcells{grid-column:1/4;grid-template-columns:repeat(4,1fr)}
+  .mc{width:auto}
+  .mbarwrap{grid-column:1/4}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow">Problem Statement 4 · Breakout Team · Jul 2026</div>
+    <h1>Hardware for extreme environments<span class="dim">: the full concept space, read like a thermal image.</span></h1>
+    <div class="thermobar" role="img" aria-label="Thermal scale from cold (score 1) to hot (score 5)"></div>
+    <p class="lede">Ten concepts with credible team fit, each scored on <b>fit, urgency, feasibility, and defensibility</b> and rendered in thermographic color — because subsurface thermography is this team's rarest capability, and reading heat where others see surface is the whole thesis. Concepts with no team fit are excluded and justified at the end.</p>
+    <div class="meta">
+      <span>CONCEPTS <b>10</b></span><span>TIERS <b>3</b></span><span>MAX SCORE <b>20</b></span><span>TOP SCORE <b>18</b></span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="caps" aria-label="Team capabilities">
+    <span class="cap"><i>×3</i>Aerial robotics · NL mission orchestration · vision fine-tuning</span>
+    <span class="cap"><i>PhD</i>Active thermography · composites NDT · production-scaled</span>
+    <span class="cap"><i>SIM</i>Monte Carlo simulation under uncertainty</span>
+    <span class="cap"><i>AI</i>Agentic engineering · deterministic verification</span>
+    <span class="cap"><i>BD</i>Enterprise GTM · banking &amp; crypto</span>
+    <span class="cap"><i>ECON</i>Unit-economics modeling</span>
+  </div>
+
+  <div class="filterrow" role="group" aria-label="Filter by tier">
+    <span class="filterlabel">Filter</span>
+    <button class="fbtn active" data-f="all">All 10</button>
+    <button class="fbtn" data-f="tier1">Tier 1 · Lead</button>
+    <button class="fbtn" data-f="tier2">Tier 2 · Wedge</button>
+    <button class="fbtn" data-f="tier3">Tier 3 · Stretch</button>
+  </div>
+
+  <div class="sect">Tier 1 — <em>Lead candidates</em></div>
+
+  <!-- 1 EMBERHAWK -->
+  <article class="card tier1 open" data-tier="tier1">
+    <button class="card-head" aria-expanded="true">
+      <span class="rank">01</span>
+      <span><span class="tname">Emberhawk</span><span class="tsub">Fire-hardened aerial sensing for active fireground operations</span></span>
+      <span class="headright"><span class="tier-tag">TIER 1</span><span class="total s5">18</span><span class="chev">›</span></span>
+    </button>
+    <div class="scores">
+      <div class="scell"><span class="slab">FIT</span><span class="sval s5">5</span></div>
+      <div class="scell"><span class="slab">URGENCY</span><span class="sval s5">5</span></div>
+      <div class="scell"><span class="slab">FEASIBILITY</span><span class="sval s4">4</span></div>
+      <div class="scell"><span class="slab">DEFENSIBILITY</span><span class="sval s4">4</span></div>
+    </div>
+    <div class="card-body"><div class="body-inner">
+      <div class="field"><span class="flabel">Setting</span><p class="fbody">Active bushfire firegrounds: heat beyond consumer drone ratings (~40°C ambient ceilings), LiPo derating and runaway risk, IMU/barometric drift in thermal gradients, smoke defeating optical navigation, ash ingress, fire-generated turbulence, GPS/comms degradation — an offline environment for hours to days.</p></div>
+      <div class="field"><span class="flabel">Hardware</span><p class="fbody">High-temperature composite airframe; sealed avionics bay with <b>phase-change thermal buffering</b> ("guaranteed minutes over the fire" — the downhole-tooling pattern); radiometric thermal + multispectral payload with edge inference for spot-fire and ember-attack detection; mesh radio with store-and-forward to a hardened ground node.</p></div>
+      <div class="field"><span class="flabel">Buyer</span><p class="fbody">State fire agencies (NSW RFS, CFA, QFES) and utilities under mandated bushfire inspection obligations. Procurement precedent the team knows firsthand: <b>NSW's ~$40M shark-monitoring drone program</b> proves agencies buy drone surveillance as a service. Insurers are the second-order data customer.</p></div>
+      <div class="field"><span class="flabel">Why now</span><p class="fbody">Post-Black-Summer funding; lengthening fire seasons; CASA BVLOS pathways maturing; radiometric thermal + edge-AI cost collapse. None of the four held five years ago.</p></div>
+      <div class="field"><span class="flabel">Team fit</span><p class="fbody">The only concept where <b>every member is load-bearing</b>: drone pair (platform, orchestration, vision), PhD (airframe, thermal payload, qualification), simulation (Monte Carlo fire behavior = the answer to "test what you can't replicate," alongside prescribed burns), agentic engineer (auditable deterministic autonomy), commercial (government motion), economics (service vs. crewed-aircraft cost case).</p></div>
+      <div class="verdict"><span class="vlab">Verdict</span>Lead pitch. Highest urgency + total fit; emotionally resonant and sovereign-relevant, with a named procurement precedent.</div>
+    </div></div>
+  </article>
+
+  <!-- 2 OFFSHORE WIND -->
+  <article class="card tier1" data-tier="tier1">
+    <button class="card-head" aria-expanded="false">
+      <span class="rank">02</span>
+      <span><span class="tname">Offshore wind blade NDT</span><span class="tsub">Marinized aerial thermography for subsurface blade defects</span></span>
+      <span class="headright"><span class="tier-tag">TIER 1</span><span class="total s5">17</span><span class="chev">›</span></span>
+    </button>
+    <div class="scores">
+      <div class="scell"><span class="slab">FIT</span><span class="sval s5">5</span></div>
+      <div class="scell"><span class="slab">URGENCY</span><span class="sval s4">4</span></div>
+      <div class="scell"><span class="slab">FEASIBILITY</span><span class="sval s3">3</span></div>
+      <div class="scell"><span class="slab">DEFENSIBILITY</span><span class="sval s5">5</span></div>
+    </div>
+    <div class="card-body"><div class="body-inner">
+      <div class="field"><span class="flabel">Setting</span><p class="fbody">Offshore wind farms: salt-fog corrosion destroying unsealed electronics and connectors, sustained winds beyond consumer control authority, spray ingress, long over-water transits with no recovery — and crewed visits priced in vessel day-rates and weather windows.</p></div>
+      <div class="field"><span class="flabel">Hardware</span><p class="fbody">Marinized, corrosion-protected inspection UAV carrying an <b>active thermography payload</b> for subsurface composite defects — delamination, bond-line voids, lightning damage — before they surface. The single strongest capability-to-market transplant available to this team: the PhD's exact research and production domain.</p></div>
+      <div class="field"><span class="flabel">Buyer</span><p class="fbody">Offshore developers/operators, O&amp;M contractors, and blade OEMs under warranty exposure. Blade failures rank among the costliest O&amp;M events; today's inspection is rope access or visual-only drone imagery — surface methods blind to exactly what thermography sees.</p></div>
+      <div class="field"><span class="flabel">Why now</span><p class="fbody">Global offshore capacity compounding; Australia's declared zones (Gippsland, Hunter) moving into feasibility licensing — a sovereign beachhead before construction; ship-launched/nest drone logistics proven; visual incumbents educated the market, leaving subsurface NDT the open layer above.</p></div>
+      <div class="field"><span class="flabel">Team fit</span><p class="fbody">Deepest technical moat in the list. Drone pair: marinized platform + orchestration. Simulation member's decarbonization identity aligns with the customer's mission. Weakness: harshest qualification environment, Australian offshore revenue 2–4 years out — so near-term GTM is <b>onshore wind, exported offshore</b>.</p></div>
+      <div class="verdict"><span class="vlab">Verdict</span>The sleeper. Highest defensibility of any concept; lead with it if the pitch judges reward moat over story.</div>
+    </div></div>
+  </article>
+
+  <!-- 3 DEEPSIGHT -->
+  <article class="card tier1" data-tier="tier1">
+    <button class="card-head" aria-expanded="false">
+      <span class="rank">03</span>
+      <span><span class="tname">Deepsight</span><span class="tsub">GPS-denied inspection hardware for underground &amp; remote mining</span></span>
+      <span class="headright"><span class="tier-tag">TIER 1</span><span class="total s5">17</span><span class="chev">›</span></span>
+    </button>
+    <div class="scores">
+      <div class="scell"><span class="slab">FIT</span><span class="sval s5">5</span></div>
+      <div class="scell"><span class="slab">URGENCY</span><span class="sval s4">4</span></div>
+      <div class="scell"><span class="slab">FEASIBILITY</span><span class="sval s4">4</span></div>
+      <div class="scell"><span class="slab">DEFENSIBILITY</span><span class="sval s4">4</span></div>
+    </div>
+    <div class="card-body"><div class="body-inner">
+      <div class="field"><span class="flabel">Setting</span><p class="fbody">Underground workings and remote hot sites: geothermal + machinery heat, Pilbara ambients of 45–50°C plus enclosure solar load, blast vibration and abrasive dust, GPS- and network-denied by definition, IECEx explosive-atmosphere zones consumer hardware can never enter.</p></div>
+      <div class="field"><span class="flabel">Hardware</span><p class="fbody">Sealed, vibration-rated autonomous unit (UAV underground; fixed/vehicle pod on surface) with LiDAR/SLAM navigation, onboard edge inference, <b>data-mule offline sync</b>, and thermography for conveyor delamination, mill-liner and refractory wear, bearing and electrical hotspots.</p></div>
+      <div class="field"><span class="flabel">Buyer</span><p class="fbody">BHP, Rio Tinto, Fortescue and the METS layer, via paid site trials into enterprise contracts. <b>Emesent's Hovermap proves miners buy GPS-denied drone autonomy — for mapping.</b> The defect-detection layer above mapping is open; their traction validates the buyer.</p></div>
+      <div class="field"><span class="flabel">Why now</span><p class="fbody">Automation capex rising as inspection labor falls; SLAM only recently industrial-grade; edge AI enables on-device inference where data can be neither streamed nor processed remotely.</p></div>
+      <div class="field"><span class="flabel">Team fit</span><p class="fbody">Thermography as moat, drones as platform, NL orchestration as the "no robotics engineers on site" pitch, deterministic verification for safety cases, Monte Carlo for degradation/inspection-interval risk in CFO language, strong local channel.</p></div>
+      <div class="verdict"><span class="vlab">Verdict</span>Most revenue-realistic: private budgets, year-round demand, fastest path to paid trials.</div>
+    </div></div>
+  </article>
+
+  <div class="sect">Tier 2 — <em>Strong, focused wedges</em></div>
+
+  <!-- 4 TAILINGS -->
+  <article class="card" data-tier="tier2">
+    <button class="card-head" aria-expanded="false">
+      <span class="rank">04</span>
+      <span><span class="tname">Tailings &amp; geotech monitoring</span><span class="tsub">GISTM-compliance sensing: hardened fixed stations + scheduled aerial survey</span></span>
+      <span class="headright"><span class="tier-tag">TIER 2</span><span class="total s4">16</span><span class="chev">›</span></span>
+    </button>
+    <div class="scores">
+      <div class="scell"><span class="slab">FIT</span><span class="sval s4">4</span></div>
+      <div class="scell"><span class="slab">URGENCY</span><span class="sval s5">5</span></div>
+      <div class="scell"><span class="slab">FEASIBILITY</span><span class="sval s4">4</span></div>
+      <div class="scell"><span class="slab">DEFENSIBILITY</span><span class="sval s3">3</span></div>
+    </div>
+    <div class="card-body"><div class="body-inner">
+      <div class="field"><span class="flabel">Setting</span><p class="fbody">Tailings storage facilities: remote, hot, dusty, off-network — requiring continuous unattended monitoring between rare human visits.</p></div>
+      <div class="field"><span class="flabel">Hardware</span><p class="fbody">Solar-powered, passively cooled, cyclone-rated fixed sensing stations (thermal + optical + environmental) fused with scheduled drone survey from a ruggedized nest; thermography is a recognized seepage-detection modality.</p></div>
+      <div class="field"><span class="flabel">Buyer / Why now</span><p class="fbody">Every major with tailings facilities, under the post-Brumadinho <b>Global Industry Standard on Tailings Management</b> — compliance-mandated, recurring, board-visible monitoring with funded budgets and conformance deadlines. Mining insurers as second buyer.</p></div>
+      <div class="field"><span class="flabel">Team fit</span><p class="fbody">Deepsight's stack with a sharper regulatory wedge and simpler autonomy; Monte Carlo failure-probability modeling speaks GISTM's risk-disclosure language directly.</p></div>
+      <div class="verdict"><span class="vlab">Verdict</span>Best as Deepsight's compliance-mandated beachhead module, not a standalone company — hence Tier 2.</div>
+    </div></div>
+  </article>
+
+  <!-- 5 PYROSONDE -->
+  <article class="card" data-tier="tier2">
+    <button class="card-head" aria-expanded="false">
+      <span class="rank">05</span>
+      <span><span class="tname">Fire-front sensor pods</span><span class="tsub">Air-dropped hardened ground sensing — the "pyrosonde" network</span></span>
+      <span class="headright"><span class="tier-tag">TIER 2</span><span class="total s4">15</span><span class="chev">›</span></span>
+    </button>
+    <div class="scores">
+      <div class="scell"><span class="slab">FIT</span><span class="sval s4">4</span></div>
+      <div class="scell"><span class="slab">URGENCY</span><span class="sval s3">3</span></div>
+      <div class="scell"><span class="slab">FEASIBILITY</span><span class="sval s4">4</span></div>
+      <div class="scell"><span class="slab">DEFENSIBILITY</span><span class="sval s4">4</span></div>
+    </div>
+    <div class="card-body"><div class="body-inner">
+      <div class="field"><span class="flabel">Setting</span><p class="fbody">Inside the path of an advancing fire front — the one place no aircraft loiters and no consumer device survives: direct flame contact, then continued post-front operation.</p></div>
+      <div class="field"><span class="flabel">Hardware</span><p class="fbody">Low-cost, drone-deployable, intumescent/ceramic-protected pods (temperature, radiant flux, wind, gas) logging through front passage, reporting via mesh/satellite. The aerial-robotics inverse: the drone is the delivery system; <b>the survivable pod is the product</b>.</p></div>
+      <div class="field"><span class="flabel">Buyer / Why now</span><p class="fbody">Fire-science agencies (AFAC, CSIRO, universities), RFS tactical use, and insurers/cat-modelers pricing fire risk with almost no in-fire ground truth. Fire-behavior models are calibration-starved; every prescribed burn is a paying deployment.</p></div>
+      <div class="field"><span class="flabel">Team fit</span><p class="fbody">Drone delivery + thermal-survival packaging + the elegant part: the data's whole value is feeding the simulation member's Monte Carlo fire models — a sensing-to-simulation loop no competitor offers.</p></div>
+      <div class="verdict"><span class="vlab">Verdict</span>Modest standalone market; strongest as Emberhawk's data-moat companion product.</div>
+    </div></div>
+  </article>
+
+  <!-- 6 DESERT SOLAR -->
+  <article class="card" data-tier="tier2">
+    <button class="card-head" aria-expanded="false">
+      <span class="rank">06</span>
+      <span><span class="tname">Desert solar inspection</span><span class="tsub">Heat/dust-hardened autonomous nest + PV thermography</span></span>
+      <span class="headright"><span class="tier-tag">TIER 2</span><span class="total s4">14</span><span class="chev">›</span></span>
+    </button>
+    <div class="scores">
+      <div class="scell"><span class="slab">FIT</span><span class="sval s4">4</span></div>
+      <div class="scell"><span class="slab">URGENCY</span><span class="sval s3">3</span></div>
+      <div class="scell"><span class="slab">FEASIBILITY</span><span class="sval s4">4</span></div>
+      <div class="scell"><span class="slab">DEFENSIBILITY</span><span class="sval s3">3</span></div>
+    </div>
+    <div class="card-body"><div class="body-inner">
+      <div class="field"><span class="flabel">Setting</span><p class="fbody">Utility-scale arid-zone solar: sustained 45–50°C, dust storms, UV — where the <b>resident nest</b>, not the drone, is the extreme-environment engineering problem: a box surviving years of desert exposure while keeping batteries and compute in range.</p></div>
+      <div class="field"><span class="flabel">Hardware</span><p class="fbody">Passively/hybrid-cooled, dust-sealed autonomous nest + UAV with radiometric thermal payload. Aerial IR inspection of PV plants is standardized (<b>IEC TS 62446-3</b>): hotspot cells, diode failures, string faults at fleet scale.</p></div>
+      <div class="field"><span class="flabel">Buyer / Why now</span><p class="fbody">Solar owners and O&amp;M contractors — losses are directly revenue-linked; Australia's utility build-out continues; drone-in-a-box momentum proves the model, but incumbents built nests for temperate markets.</p></div>
+      <div class="field"><span class="flabel">Team fit</span><p class="fbody">Thermography central; sustainability member's decarbonization thesis is literally the customer's business; orchestration makes multi-site fleets operable by O&amp;M staff.</p></div>
+      <div class="verdict"><span class="vlab">Verdict</span>Most competitive inspection niche in the list — differentiation rests on the hardened nest and orchestration, not the sensing.</div>
+    </div></div>
+  </article>
+
+  <!-- 7 UTILITY CORRIDOR -->
+  <article class="card" data-tier="tier2">
+    <button class="card-head" aria-expanded="false">
+      <span class="rank">07</span>
+      <span><span class="tname">Utility corridor inspection</span><span class="tsub">Resident hardened drones in fire-risk transmission terrain</span></span>
+      <span class="headright"><span class="tier-tag">TIER 2</span><span class="total s4">14</span><span class="chev">›</span></span>
+    </button>
+    <div class="scores">
+      <div class="scell"><span class="slab">FIT</span><span class="sval s4">4</span></div>
+      <div class="scell"><span class="slab">URGENCY</span><span class="sval s4">4</span></div>
+      <div class="scell"><span class="slab">FEASIBILITY</span><span class="sval s3">3</span></div>
+      <div class="scell"><span class="slab">DEFENSIBILITY</span><span class="sval s3">3</span></div>
+    </div>
+    <div class="card-body"><div class="body-inner">
+      <div class="field"><span class="flabel">Setting</span><p class="fbody">Remote transmission corridors in fire-prone, hot, comms-poor terrain; the inspection hardware must live on-site through extreme heat days, storms, and smoke seasons.</p></div>
+      <div class="field"><span class="flabel">Hardware</span><p class="fbody">Ruggedized resident nest + UAV with thermal payload catching failing conductors, connectors, and vegetation encroachment — the ignition precursors driving utility liability.</p></div>
+      <div class="field"><span class="flabel">Buyer / Why now</span><p class="fbody">Utilities under mandated bushfire inspection regimes and post-catastrophe liability precedents; regulators demand evidenced inspection; BVLOS maturity makes corridor-scale autonomy newly lawful.</p></div>
+      <div class="field"><span class="flabel">Team fit</span><p class="fbody">Full-stack fit — but slow utility procurement and entrenched helicopter/LiDAR incumbents.</p></div>
+      <div class="verdict"><span class="vlab">Verdict</span>Enter as Emberhawk's off-season revenue line, sharing the same fleet.</div>
+    </div></div>
+  </article>
+
+  <div class="sect">Tier 3 — <em>Credible stretch</em></div>
+
+  <!-- 8 COASTAL -->
+  <article class="card" data-tier="tier3">
+    <button class="card-head" aria-expanded="false">
+      <span class="rank">08</span>
+      <span><span class="tname">Marinized coastal platform</span><span class="tsub">From the shark program to maritime domain awareness</span></span>
+      <span class="headright"><span class="tier-tag">TIER 3</span><span class="total s3">13</span><span class="chev">›</span></span>
+    </button>
+    <div class="scores">
+      <div class="scell"><span class="slab">FIT</span><span class="sval s4">4</span></div>
+      <div class="scell"><span class="slab">URGENCY</span><span class="sval s3">3</span></div>
+      <div class="scell"><span class="slab">FEASIBILITY</span><span class="sval s3">3</span></div>
+      <div class="scell"><span class="slab">DEFENSIBILITY</span><span class="sval s3">3</span></div>
+    </div>
+    <div class="card-body"><div class="body-inner">
+      <div class="field"><span class="flabel">Setting / Hardware</span><p class="fbody">Sustained over-water operations — salt-fog corrosion, spray ingress, wind, offline transits. Corrosion-hardened long-endurance maritime UAV; detection models from sharks today to vessels, cable-landing anomalies, and SAR targets tomorrow.</p></div>
+      <div class="field"><span class="flabel">Buyer / Why now</span><p class="fbody">Direct expansion of the NSW shark program the team knows; then border/fisheries and defense-adjacent maritime awareness, where seabed-infrastructure protection budgets are growing globally after high-profile cable incidents.</p></div>
+      <div class="field"><span class="flabel">Team fit</span><p class="fbody">Leverages the team's most concrete existing use case and vision pipeline — but defense/government maritime procurement is slow and crowded with funded UAS primes.</p></div>
+      <div class="verdict"><span class="vlab">Verdict</span>The wedge is the proven civil program, not the defense endgame.</div>
+    </div></div>
+  </article>
+
+  <!-- 9 RADIATION -->
+  <article class="card" data-tier="tier3">
+    <button class="card-head" aria-expanded="false">
+      <span class="rank">09</span>
+      <span><span class="tname">Radiation-mapping UAS</span><span class="tsub">Dose-aware drones for nuclear decommissioning (export play)</span></span>
+      <span class="headright"><span class="tier-tag">TIER 3</span><span class="total s4">14</span><span class="chev">›</span></span>
+    </button>
+    <div class="scores">
+      <div class="scell"><span class="slab">FIT</span><span class="sval s3">3</span></div>
+      <div class="scell"><span class="slab">URGENCY</span><span class="sval s4">4</span></div>
+      <div class="scell"><span class="slab">FEASIBILITY</span><span class="sval s3">3</span></div>
+      <div class="scell"><span class="slab">DEFENSIBILITY</span><span class="sval s4">4</span></div>
+    </div>
+    <div class="card-body"><div class="body-inner">
+      <div class="field"><span class="flabel">Setting</span><p class="fbody">Decommissioning sites: cumulative gamma dose degrading COTS electronics — with the failure hierarchy established in the literature (a KUKA arm under cobalt-60 failed first at its <b>optical encoder, at 164.55 Gy</b>; cameras and power converters follow). At decommissioning dose rates this is engineering, not a physics wall.</p></div>
+      <div class="field"><span class="flabel">Hardware</span><p class="fbody">Shielded-COTS UAV with gamma spectrometry payload, <b>dose-budgeted mission planning</b> (autonomy that tracks its own accumulated damage), and hot-swap architecture for first-to-fail components.</p></div>
+      <div class="field"><span class="flabel">Buyer / Why now</span><p class="fbody">UK NDA ecosystem (<b>Sellafield's cleanup: ~£136B to ~2125</b>), Fukushima, and fusion remote-maintenance programs — multi-decade government demand, thin competition; UAV radiation mapping already proven at Chernobyl and Fukushima.</p></div>
+      <div class="field"><span class="flabel">Team fit</span><p class="fbody">Drones + orchestration + dose-aware deterministic autonomy fit well; radiation engineering is learnable but new, there's no Australian domestic market, and sales cycles are the slowest in the list.</p></div>
+      <div class="verdict"><span class="vlab">Verdict</span>Pitch as evidence of platform breadth, not as the beachhead.</div>
+    </div></div>
+  </article>
+
+  <!-- 10 EDGE NODES -->
+  <article class="card" data-tier="tier3">
+    <button class="card-head" aria-expanded="false">
+      <span class="rank">10</span>
+      <span><span class="tname">Sovereign edge-AI field nodes</span><span class="tsub">Offline inference hardware for hostile sites</span></span>
+      <span class="headright"><span class="tier-tag">TIER 3</span><span class="total s3">13</span><span class="chev">›</span></span>
+    </button>
+    <div class="scores">
+      <div class="scell"><span class="slab">FIT</span><span class="sval s3">3</span></div>
+      <div class="scell"><span class="slab">URGENCY</span><span class="sval s3">3</span></div>
+      <div class="scell"><span class="slab">FEASIBILITY</span><span class="sval s5">5</span></div>
+      <div class="scell"><span class="slab">DEFENSIBILITY</span><span class="sval s2">2</span></div>
+    </div>
+    <div class="card-body"><div class="body-inner">
+      <div class="field"><span class="flabel">Setting / Hardware</span><p class="fbody">Remote mining, agricultural, and defense sites with no connectivity and heat/dust/vibration that kill standard servers. Sealed, passively cooled, solar-capable edge-AI nodes running local models — sovereign, offline AI where cloud inference is impossible by physics, not policy.</p></div>
+      <div class="field"><span class="flabel">Buyer / Why now</span><p class="fbody">Operators and government users with data-sovereignty and disconnection constraints; the sovereign-AI procurement narrative is cresting and low-power inference silicon now fits a passive envelope.</p></div>
+      <div class="field"><span class="flabel">Team fit</span><p class="fbody">Strongest alignment with the agentic engineer's "skills → sovereign models" thesis — but the enclosure/thermal/power hardware is the simplest in the list, and the least defensible <i>as hardware</i>.</p></div>
+      <div class="verdict"><span class="vlab">Verdict</span>Pitches better as the compute layer inside concepts 1–7 than as a standalone company.</div>
+    </div></div>
+  </article>
+
+  <div class="sect">Scoring matrix — <em>the option space as a thermal image</em></div>
+
+  <div class="matrix" id="matrix">
+    <div class="mrow mhead"><span></span><span>Concept</span><span style="text-align:center">FIT · URG · FEAS · DEF</span><span style="text-align:right">Total</span></div>
+  </div>
+  <div class="legendrow">
+    <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--h1);vertical-align:-1px"></span> 1</span>
+    <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--h2);vertical-align:-1px"></span> 2</span>
+    <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--h3);vertical-align:-1px"></span> 3</span>
+    <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--h4);vertical-align:-1px"></span> 4</span>
+    <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--h5);vertical-align:-1px"></span> 5</span>
+    <span style="margin-left:auto">BAR = TOTAL / 20</span>
+  </div>
+
+  <div class="sect">The convergence — <em>strategic finding</em></div>
+  <div class="thesis">
+    <h3>The top three are one platform wearing different clothes.</h3>
+    <p>Emberhawk, offshore wind NDT, and Deepsight share a single architecture: a <b>hardened aerial/resident sensing platform</b>, a <b>thermography-anchored payload</b>, <b>deterministic natural-language orchestration</b>, and <b>simulation-driven analytics</b>. The team's best pitch is one platform company — <i>sensing hardware for places that destroy electronics</i> — choosing among three beachheads, with Tier 2 as expansion modules (4 extends Deepsight, 5 extends Emberhawk, 6–7 share the resident nest) and Tier 3 as breadth evidence. The business charges for retrieved intelligence, not deployed mass.</p>
+  </div>
+
+  <div class="sect">Excluded — <em>no team fit</em></div>
+  <p class="excl"><b>Rad-hard / space-grade silicon, orbital compute hardware, radiation-testing infrastructure</b> — no semiconductor, spacecraft, or accelerator capability in the team; the orbital enthusiasm is best deployed as unit-economics rigor inside the chosen pitch. <b>High-temperature downhole electronics for geothermal</b> — requires SiC/Ga₂O₃ device and packaging expertise, and the field is tilting toward fiber-optic sensing with surface compute. <b>Deep-subsea pressure vessels and underwater data centers</b> — marine engineering the team lacks; the real subsea openings favor acoustics specialists. <b>Antarctic/polar instrumentation</b> — real gap, tiny procurement base, no edge over incumbent polar programs.</p>
+
+  <footer>PROBLEM STATEMENT 4 · TEAM-FIT-FILTERED CONCEPT SPACE · SCORES 1–5 PER CRITERION · MAX 20</footer>
+</div>
+
+<script>
+// ---- matrix build ----
+const data = [
+  ["01","Emberhawk","Fireground sensing",5,5,4,4],
+  ["02","Offshore wind blade NDT","Marinized thermography",5,4,3,5],
+  ["03","Deepsight","Mining inspection",5,4,4,4],
+  ["04","Tailings / GISTM monitoring","Compliance sensing",4,5,4,3],
+  ["05","Fire-front sensor pods","Pyrosonde network",4,3,4,4],
+  ["06","Desert solar inspection","Hardened nest + PV IR",4,3,4,3],
+  ["07","Utility corridor inspection","Resident fleet",4,4,3,3],
+  ["09","Radiation-mapping UAS","Decommissioning export",3,4,3,4],
+  ["08","Marinized coastal platform","Maritime awareness",4,3,3,3],
+  ["10","Sovereign edge nodes","Offline inference",3,3,5,2]
+];
+const cls = v => "s"+v;
+const matrix = document.getElementById("matrix");
+data.forEach(d=>{
+  const total = d[3]+d[4]+d[5]+d[6];
+  const row = document.createElement("div");
+  row.className="mrow";
+  row.innerHTML =
+    `<span class="mrank">${d[0]}</span>
+     <span class="mname">${d[1]}<small>${d[2]}</small></span>
+     <span class="mcells">${[d[3],d[4],d[5],d[6]].map(v=>`<span class="mc ${cls(v)}" style="color:${v>=4?'#231206':'#EFDFF5'}">${v}</span>`).join("")}</span>
+     <span class="mtotal"><b>${total}</b><span style="color:var(--faint);font-size:11px">/20</span></span>
+     <span class="mbarwrap"><span class="mbar" style="width:${total/20*100}%"></span></span>`;
+  matrix.appendChild(row);
+});
+
+// ---- accordion ----
+document.querySelectorAll(".card-head").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    const card = btn.closest(".card");
+    const open = card.classList.toggle("open");
+    btn.setAttribute("aria-expanded", open);
+  });
+});
+
+// ---- tier filter ----
+document.querySelectorAll(".fbtn").forEach(b=>{
+  b.addEventListener("click",()=>{
+    document.querySelectorAll(".fbtn").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    const f = b.dataset.f;
+    document.querySelectorAll(".card").forEach(c=>{
+      c.classList.toggle("hidden", f!=="all" && c.dataset.tier!==f);
+    });
+    document.querySelectorAll(".sect").forEach(s=>{
+      const label = s.textContent.toLowerCase();
+      if(label.includes("tier 1")) s.style.display = (f==="all"||f==="tier1")?"flex":"none";
+      if(label.includes("tier 2")) s.style.display = (f==="all"||f==="tier2")?"flex":"none";
+      if(label.includes("tier 3")) s.style.display = (f==="all"||f==="tier3")?"flex":"none";
+    });
+  });
+});
+</script>
+</body>
+</html>

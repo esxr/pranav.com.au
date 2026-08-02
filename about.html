@@ -402,7 +402,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       'font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;' +
       'font-size: 18px; line-height: 1.7; }' +
     '#site-nav .inner { max-width: 700px; margin: 0 auto; padding: 1rem 1.5rem 0; }' +
-    '#site-nav nav { display: flex; gap: 1.5rem; align-items: center; padding-bottom: 1rem; }' +
+    '#site-nav nav { display: flex; gap: 1.5rem; align-items: center; justify-content: center; padding-bottom: 1rem; }' +
     '#site-nav nav a { color: #6b6b6b; text-decoration: none; font-size: 0.95rem; }' +
     '#site-nav nav a:hover { color: #1a1a1a; }' +
     '#site-nav nav a.active { color: #D97706; font-weight: 600; text-decoration: underline;' +
@@ -429,7 +429,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       for (var i = 0; i < divs.length; i++) {
         var cs = getComputedStyle(divs[i]);
         if (cs.position === 'sticky' && parseInt(cs.zIndex) >= 10) {
-          divs[i].style.top = NAV_H + 'px';
+          divs[i].style.display = 'none';
           break;
         }
       }

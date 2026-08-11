@@ -1,0 +1,1365 @@
+<meta charset="utf-8">
+<title>Verify, Don't Generate — Housing Repair Scope Prediction</title>
+<style>
+  :root {
+    --bg: #F5F0E8;
+    --bg-card: #FAFAF6;
+    --text: #1C2B3A;
+    --text-secondary: #3D4A57;
+    --text-muted: #6B7785;
+    --accent: #C4652A;
+    --accent-light: rgba(196, 101, 42, 0.08);
+    --teal: #3A7D7B;
+    --teal-light: rgba(58, 125, 123, 0.08);
+    --border: rgba(28, 43, 58, 0.1);
+    --border-strong: rgba(28, 43, 58, 0.18);
+    --table-header-bg: #1C2B3A;
+    --table-header-text: #F5F0E8;
+    --table-stripe: rgba(28, 43, 58, 0.03);
+    --table-highlight: rgba(196, 101, 42, 0.06);
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --sans: "Avenir Next", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono: "SF Mono", "Cascadia Mono", Consolas, "Liberation Mono", monospace;
+
+    --chart-surface: #FAFAF6;
+    --chart-grid: rgba(28, 43, 58, 0.08);
+    --chart-axis: rgba(28, 43, 58, 0.18);
+    --chart-ink: #1C2B3A;
+    --chart-ink2: #3D4A57;
+    --chart-muted: #6B7785;
+    --s1: #2a78d6;
+    --s2: #1baf7a;
+    --s3: #eda100;
+    --s4: #008300;
+    --s-ref: #C4652A;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141C24;
+      --bg-card: #1A242F;
+      --text: #E2DDD4;
+      --text-secondary: #B8B0A5;
+      --text-muted: #8A8279;
+      --accent: #E07A3A;
+      --accent-light: rgba(224, 122, 58, 0.1);
+      --teal: #5AADAB;
+      --teal-light: rgba(90, 173, 171, 0.08);
+      --border: rgba(226, 221, 212, 0.08);
+      --border-strong: rgba(226, 221, 212, 0.14);
+      --table-header-bg: #0E1419;
+      --table-header-text: #C8C2B8;
+      --table-stripe: rgba(226, 221, 212, 0.02);
+      --table-highlight: rgba(224, 122, 58, 0.08);
+      --chart-surface: #1A242F;
+      --chart-grid: rgba(226, 221, 212, 0.06);
+      --chart-axis: rgba(226, 221, 212, 0.14);
+      --chart-ink: #E2DDD4;
+      --chart-ink2: #B8B0A5;
+      --chart-muted: #8A8279;
+      --s1: #3987e5;
+      --s2: #199e70;
+      --s3: #c98500;
+      --s4: #008300;
+      --s-ref: #E07A3A;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141C24;
+    --bg-card: #1A242F;
+    --text: #E2DDD4;
+    --text-secondary: #B8B0A5;
+    --text-muted: #8A8279;
+    --accent: #E07A3A;
+    --accent-light: rgba(224, 122, 58, 0.1);
+    --teal: #5AADAB;
+    --teal-light: rgba(90, 173, 171, 0.08);
+    --border: rgba(226, 221, 212, 0.08);
+    --border-strong: rgba(226, 221, 212, 0.14);
+    --table-header-bg: #0E1419;
+    --table-header-text: #C8C2B8;
+    --table-stripe: rgba(226, 221, 212, 0.02);
+    --table-highlight: rgba(224, 122, 58, 0.08);
+    --chart-surface: #1A242F;
+    --chart-grid: rgba(226, 221, 212, 0.06);
+    --chart-axis: rgba(226, 221, 212, 0.14);
+    --chart-ink: #E2DDD4;
+    --chart-ink2: #B8B0A5;
+    --chart-muted: #8A8279;
+    --s1: #3987e5;
+    --s2: #199e70;
+    --s3: #c98500;
+    --s4: #008300;
+    --s-ref: #E07A3A;
+  }
+  :root[data-theme="light"] {
+    --bg: #F5F0E8;
+    --bg-card: #FAFAF6;
+    --text: #1C2B3A;
+    --text-secondary: #3D4A57;
+    --text-muted: #6B7785;
+    --accent: #C4652A;
+    --accent-light: rgba(196, 101, 42, 0.08);
+    --teal: #3A7D7B;
+    --teal-light: rgba(58, 125, 123, 0.08);
+    --border: rgba(28, 43, 58, 0.1);
+    --border-strong: rgba(28, 43, 58, 0.18);
+    --table-header-bg: #1C2B3A;
+    --table-header-text: #F5F0E8;
+    --table-stripe: rgba(28, 43, 58, 0.03);
+    --table-highlight: rgba(196, 101, 42, 0.06);
+    --chart-surface: #FAFAF6;
+    --chart-grid: rgba(28, 43, 58, 0.08);
+    --chart-axis: rgba(28, 43, 58, 0.18);
+    --chart-ink: #1C2B3A;
+    --chart-ink2: #3D4A57;
+    --chart-muted: #6B7785;
+    --s1: #2a78d6;
+    --s2: #1baf7a;
+    --s3: #eda100;
+    --s4: #008300;
+    --s-ref: #C4652A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .paper {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 3.5rem 1.5rem 5rem;
+  }
+
+  .paper-header { margin-bottom: 2.8rem; }
+  .paper-label {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+  .paper-title {
+    font-family: var(--serif);
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text);
+    text-wrap: balance;
+    margin-bottom: 0.6rem;
+  }
+  .paper-subtitle {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  .paper-meta {
+    margin-top: 1rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .abstract {
+    border-left: 3px solid var(--accent);
+    padding: 1.25rem 1.5rem;
+    margin: 2.5rem 0;
+    background: var(--accent-light);
+    border-radius: 0 4px 4px 0;
+  }
+  .abstract-label {
+    font-family: var(--sans);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+  .abstract p {
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: var(--text-secondary);
+  }
+
+  .section { margin-top: 2.5rem; }
+  .section-number {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--teal);
+    letter-spacing: 0.02em;
+  }
+  .section h2 {
+    font-family: var(--serif);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1rem;
+    text-wrap: balance;
+    line-height: 1.35;
+  }
+  .section p {
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+  }
+  .section p:last-child { margin-bottom: 0; }
+
+  .pipeline {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    padding: 1rem 0;
+  }
+  .pipe-step {
+    flex-shrink: 0;
+    padding: 0.55rem 0.9rem;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-family: var(--sans);
+    white-space: nowrap;
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    color: var(--text-secondary);
+  }
+  .pipe-step.failure {
+    border-color: var(--accent);
+    background: var(--accent-light);
+    color: var(--accent);
+  }
+  .pipe-step.success {
+    border-color: var(--teal);
+    background: var(--teal-light);
+    color: var(--teal);
+  }
+  .pipe-arrow {
+    flex-shrink: 0;
+    width: 28px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    margin: 1.5rem 0;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+  }
+  thead th {
+    background: var(--table-header-bg);
+    color: var(--table-header-text);
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.7rem 0.9rem;
+    text-align: left;
+    white-space: nowrap;
+  }
+  thead th:not(:first-child) { text-align: right; }
+  tbody td {
+    padding: 0.6rem 0.9rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+  tbody td:not(:first-child) {
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+  }
+  tbody td:first-child {
+    font-weight: 500;
+    color: var(--text);
+  }
+  tbody tr:nth-child(even) { background: var(--table-stripe); }
+  tbody tr.highlight {
+    background: var(--table-highlight);
+  }
+  tbody tr.highlight td {
+    color: var(--text);
+    font-weight: 600;
+  }
+  tbody tr.highlight td:first-child { color: var(--accent); }
+
+  .metric {
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 0.92em;
+  }
+  .metric.good { color: var(--teal); }
+  .metric.bad { color: var(--accent); }
+
+  .strategies {
+    list-style: none;
+    counter-reset: strategy;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1.25rem 0;
+  }
+  .strategies li {
+    counter-increment: strategy;
+    padding-left: 2.4rem;
+    position: relative;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+  }
+  .strategies li::before {
+    content: "S" counter(strategy);
+    position: absolute;
+    left: 0;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--teal);
+    background: var(--teal-light);
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    top: 0.15rem;
+  }
+  .strategies li strong { color: var(--text); }
+
+  .finding {
+    border: 1px solid var(--teal);
+    border-left: 3px solid var(--teal);
+    background: var(--teal-light);
+    border-radius: 0 4px 4px 0;
+    padding: 1rem 1.3rem;
+    margin: 1.5rem 0;
+  }
+  .finding-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 0.35rem;
+  }
+  .finding p {
+    font-size: 0.92rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+  }
+  .finding p strong { color: var(--text); }
+
+  /* ---- Chart containers ---- */
+  .chart-block {
+    margin: 2rem 0;
+  }
+  .chart-title {
+    font-family: var(--sans);
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.15rem;
+  }
+  .chart-subtitle {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+  }
+  .chart-wrap {
+    background: var(--chart-surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem 0.5rem 0.5rem 0.5rem;
+    position: relative;
+  }
+  .chart-wrap canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+    padding: 0.6rem 0.5rem 0;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+  .chart-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .chart-legend-swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .chart-tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
+    font-family: var(--sans);
+    color: var(--text);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.12s;
+    z-index: 10;
+  }
+  .chart-tooltip.visible { opacity: 1; }
+
+  .footnotes {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 600px) {
+    .paper { padding: 2rem 1rem 3rem; }
+    .paper-title { font-size: 1.55rem; }
+    .section h2 { font-size: 1.15rem; }
+    .paper-meta { flex-direction: column; gap: 0.25rem; }
+  }
+</style>
+
+<article class="paper">
+
+  <header class="paper-header">
+    <div class="paper-label">Technical Report</div>
+    <h1 class="paper-title">Verify, Don't Generate: Recovering Dropped Recall in Insurance Repair Scope Prediction</h1>
+    <div class="paper-subtitle">A retrieve-then-verify architecture recovers the recall that retrieve-then-generate drops</div>
+    <div class="paper-meta">
+      <span>Lodgicl Engagement</span>
+      <span>August 2026</span>
+      <span>Synthetic Benchmark v1</span>
+    </div>
+  </header>
+
+  <!-- ============ ABSTRACT ============ -->
+  <div class="abstract">
+    <div class="abstract-label">Abstract</div>
+    <p>
+      Insurance repair scoping predicts a set of line items from a damage description. Each line item is a <code>{room, trade, item}</code> triple from a closed catalog. The current system retrieves the 20 most similar historical assessments. It then prompts an LLM to generate line items from that context. Retrieval accuracy is 85–90%, but recall stays at <span class="metric bad">~0.50</span>. With perfect retrieval, recall only increases to <span class="metric bad">~0.65</span>. The LLM does not re-emit items it receives. This is an architectural failure. LLMs systematically under-produce when they generate sets in one pass. We built a synthetic benchmark with 19 rooms, 20 trades, 90 items, and 2,000 jobs. We show that a retrieve-then-verify architecture lifts recall to <span class="metric good">0.90</span>. This architecture uses only a logistic regression verifier. The retrieved candidate pool already contains <span class="metric good">99.7%</span> of correct answers. The task is selection, not generation.
+    </p>
+  </div>
+
+  <!-- ============ 1. BACKGROUND ============ -->
+  <section class="section">
+    <span class="section-number">1</span>
+    <h2>Background</h2>
+    <p>
+      An insurance assessor inspects property damage and writes a free-text description. From this description, a repair scope of works must be produced. A scope of works is a set of costed line items. Each line item is a triple: a room or area, a trade, and a catalog item. The scope is priced against a schedule of rates.
+    </p>
+    <p>
+      Lodgicl automates this task. Their system embeds the damage description and retrieves the 20 most similar historical assessments by cosine similarity. It puts them in an LLM prompt. The LLM generates the line items. The system then maps these items to catalog IDs.
+    </p>
+    <p>
+      Retrieval works well. P50 accuracy is 0.90. The correct historical context is almost always available. The problem occurs in the next step. The LLM generation step drops approximately half the items it receives.
+    </p>
+  </section>
+
+  <!-- ============ 2. PROBLEM ============ -->
+  <section class="section">
+    <span class="section-number">2</span>
+    <h2>Problem Diagnosis</h2>
+
+    <p>The production metrics show the problem:</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Metric</th><th>Mean</th><th>P50</th></tr></thead>
+        <tbody>
+          <tr><td>Retrieval accuracy</td><td>0.84</td><td>0.90</td></tr>
+          <tr><td>Precision</td><td>0.72</td><td>0.67</td></tr>
+          <tr class="highlight"><td>Recall</td><td>0.50</td><td>0.50</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>
+      With oracle retrieval, recall only reaches ~0.65. Oracle retrieval puts the exactly correct historical items in context. The model does not re-emit items it was given. This failure has four causes.
+    </p>
+    <p>
+      <strong>Set-generation incompleteness.</strong> LLMs that generate a set in one pass stop early. They under-produce. In the closest analog (ICD medical coding), prompted generation scores ~18% micro-F1. Per-label verification reaches ~73% on the same data.
+    </p>
+    <p>
+      <strong>Lost-in-the-middle effect.</strong> With 20 retrieved assessments in context, the model ignores items in the middle of the prompt. The literature shows a >30% positional accuracy difference.
+    </p>
+    <p>
+      <strong>Near-miss variant errors.</strong> Free generation must reproduce exact catalog strings. Errors such as "2m3 skip" against "3m3 skip" show that a generator does a selector's job.
+    </p>
+    <p>
+      <strong>Label inconsistency ceiling.</strong> Two assessors scope the same damage differently. Our benchmark shows that 15% label noise causes 3–5 recall points of loss. Part of the gap is not measurable.
+    </p>
+
+    <div class="finding">
+      <div class="finding-label">Key Insight</div>
+      <p>
+        <strong>The candidate pool already contains almost every correct answer.</strong> The generation step discards ~40% of what retrieval found. Any architecture that verifies each candidate, instead of asking the LLM to re-generate, converts retrieval quality directly into recall.
+      </p>
+    </div>
+
+    <p>The two architectures:</p>
+
+    <p style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.4rem;">Current: Retrieve-then-Generate</p>
+    <div class="pipeline">
+      <div class="pipe-step">Embed description</div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">Top-20 neighbours</div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step failure">LLM generates items</div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">Map to catalog</div>
+    </div>
+
+    <p style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.4rem;">Proposed: Retrieve-then-Verify</p>
+    <div class="pipeline">
+      <div class="pipe-step">Embed description</div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">Top-20 neighbours</div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">Enumerate candidates</div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step success">Score each yes/no</div>
+    </div>
+  </section>
+
+  <!-- ============ 3. METHODOLOGY ============ -->
+  <section class="section">
+    <span class="section-number">3</span>
+    <h2>Methodology</h2>
+
+    <p>
+      No public dataset matches this task. Real corpora (Xactimate estimates, SOR-coded repair logs) are proprietary. We built a synthetic benchmark to isolate the architectural question.
+    </p>
+    <p>
+      <strong>Vocabulary.</strong> A closed catalog of 19 rooms and areas, 20 trades, and 90 line items. The catalog uses Australian insurance-repair terminology.
+    </p>
+    <p>
+      <strong>Scenarios.</strong> 10 peril types with causal item chains. The descriptions state only observable symptoms. Waste removal, supervision, drying, and seal-coats are implied. They do not appear in the text. This matches real assessor behavior.
+    </p>
+    <p>
+      <strong>Data generation.</strong> 2,000 jobs at approximately 10 items per job. The split is 70/15/15 (train/dev/test). A label-noise flag adds assessor inconsistency. This lets us study the measurement ceiling.
+    </p>
+    <p>
+      <strong>Retrieval.</strong> TF-IDF with bigrams over training descriptions. This is a cheap stand-in for the production embedding retrieval. It is sufficient to test the architectural question.
+    </p>
+    <p>
+      <strong>Metrics.</strong> Set precision, recall, and F1 at three levels: exact triple (room + trade + item), item only, and coarse (room + trade). We report micro-averaged and per-job percentile (P50, P90) values.
+    </p>
+
+    <p><strong>Systems tested:</strong></p>
+    <p>
+      <em>Candidate pool (oracle).</em> Predict every triple from the top-20 neighbours. This measures the recall ceiling of retrieval.
+    </p>
+    <p>
+      <em>kNN union vote.</em> Keep a candidate if it appears in more than v of the top-20 neighbours. We tune v on the dev set. This uses no learned model.
+    </p>
+    <p>
+      <em>Retrieve-then-rank.</em> A logistic regression verifier scores each candidate on seven features: vote fraction, max and mean similarity, global prior, and lexical overlap. We tune the threshold on the dev set. This is the simplest learned version of the verify architecture.
+    </p>
+  </section>
+
+  <!-- ============ 4. RESULTS ============ -->
+  <section class="section">
+    <span class="section-number">4</span>
+    <h2>Results</h2>
+
+    <p style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.6rem;">Triple-level metrics, micro-averaged (clean labels)</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>System</th><th>Precision</th><th>Recall</th><th>F1</th></tr></thead>
+        <tbody>
+          <tr><td>Lodgicl production</td><td>~0.72</td><td>~0.50</td><td>~0.59</td></tr>
+          <tr><td>Candidate pool (predict all)</td><td>0.34</td><td>0.997</td><td>0.51</td></tr>
+          <tr><td>kNN union vote</td><td>0.62</td><td>0.80</td><td>0.70</td></tr>
+          <tr><td>Retrieve-then-rank</td><td>0.64</td><td>0.87</td><td>0.74</td></tr>
+          <tr class="highlight"><td>Retrieve-then-rank (recall-oriented)</td><td>0.62</td><td>0.90</td><td>0.74</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ======== CHART 1: F1 Comparison ======== -->
+    <div class="chart-block">
+      <div class="chart-title">F1 comparison across systems</div>
+      <div class="chart-subtitle">Triple-level micro-averaged F1 — clean labels vs 15% label noise</div>
+      <div class="chart-wrap">
+        <canvas id="chart-f1" width="660" height="300"></canvas>
+        <div class="chart-tooltip" id="tip-f1"></div>
+        <div class="chart-legend">
+          <div class="chart-legend-item"><div class="chart-legend-swatch" style="background: var(--s1);"></div> Clean labels</div>
+          <div class="chart-legend-item"><div class="chart-legend-swatch" style="background: var(--s1); opacity: 0.4;"></div> 15% label noise</div>
+          <div class="chart-legend-item"><div class="chart-legend-swatch" style="background: var(--s-ref); height: 2px; width: 14px; border-radius: 0;"></div> Lodgicl production (~0.59)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== CHART 2: Recall distribution ======== -->
+    <div class="chart-block">
+      <div class="chart-title">Per-job recall distribution</div>
+      <div class="chart-subtitle">P10–P90 range with P50 median — triple-level, clean labels</div>
+      <div class="chart-wrap">
+        <canvas id="chart-recall" width="660" height="300"></canvas>
+        <div class="chart-tooltip" id="tip-recall"></div>
+        <div class="chart-legend">
+          <div class="chart-legend-item"><div class="chart-legend-swatch" style="background: var(--s3);"></div> kNN union</div>
+          <div class="chart-legend-item"><div class="chart-legend-swatch" style="background: var(--s1);"></div> Retrieve-then-rank</div>
+          <div class="chart-legend-item"><div class="chart-legend-swatch" style="background: var(--s2);"></div> Retrieve-rank (recall-oriented)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== CHART 3: P-R scatter ======== -->
+    <div class="chart-block">
+      <div class="chart-title">Precision vs recall</div>
+      <div class="chart-subtitle">Triple-level micro-averaged — each dot is a system configuration</div>
+      <div class="chart-wrap">
+        <canvas id="chart-pr" width="660" height="380"></canvas>
+        <div class="chart-tooltip" id="tip-pr"></div>
+        <div class="chart-legend">
+          <div class="chart-legend-item"><div class="chart-legend-swatch" style="background: var(--s1);"></div> Clean labels</div>
+          <div class="chart-legend-item"><div class="chart-legend-swatch" style="background: var(--s1); opacity: 0.35;"></div> 15% label noise</div>
+          <div class="chart-legend-item"><div class="chart-legend-swatch" style="background: var(--s-ref);"></div> Lodgicl production (reported)</div>
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 2rem; margin-bottom: 0.6rem;">Effect of 15% label noise (assessor inconsistency)</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>System</th><th>Recall (clean)</th><th>Recall (noisy)</th><th>Delta</th></tr></thead>
+        <tbody>
+          <tr><td>kNN union vote</td><td>0.80</td><td>0.76</td><td>-0.04</td></tr>
+          <tr><td>Retrieve-then-rank</td><td>0.87</td><td>0.82</td><td>-0.05</td></tr>
+          <tr><td>Retrieve-rank (recall-oriented)</td><td>0.90</td><td>0.88</td><td>-0.02</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 2rem; margin-bottom: 0.6rem;">Per-job recall percentiles (triple-level)</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>System</th><th>P10</th><th>P50</th><th>P90</th></tr></thead>
+        <tbody>
+          <tr><td>kNN union vote</td><td>0.55</td><td>0.82</td><td>1.00</td></tr>
+          <tr><td>Retrieve-then-rank</td><td>0.67</td><td>0.91</td><td>1.00</td></tr>
+          <tr class="highlight"><td>Retrieve-rank (recall-oriented)</td><td>0.75</td><td>0.92</td><td>1.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>
+      The candidate pool contains <span class="metric good">99.7%</span> of correct triples. Retrieval is solved. The architectural question is how much of that pool a system recovers.
+    </p>
+    <p>
+      A kNN vote with no model reaches <span class="metric good">0.80</span> recall. The simplest learned verifier reaches <span class="metric good">0.90</span>. The production generate-from-context architecture yields <span class="metric bad">~0.50</span> recall on the same type of retrieved input.
+    </p>
+    <p>
+      The recall-oriented verifier has a P10 of <span class="metric good">0.75</span>. This means that even the worst-performing 10% of jobs recover at least three quarters of their items. Label noise costs 2–5 recall points. This confirms that part of any real-world recall gap is a measurement ceiling, not model error.
+    </p>
+  </section>
+
+  <!-- ============ 5. DOMAIN EVIDENCE ============ -->
+  <section class="section">
+    <span class="section-number">5</span>
+    <h2>Domain Evidence</h2>
+    <p>
+      The retrieve-then-verify pattern is the established solution in every analogous domain.
+    </p>
+    <p>
+      <strong>Medical coding (ICD).</strong> State-of-the-art systems use per-label attention. Each code asks "does the text support me?" LLM approaches that use binary verification outperform prompted generation by 100% to 6%.
+    </p>
+    <p>
+      <strong>Extreme multi-label classification.</strong> Amazon PECOS and AttentionXML use two stages. First, they shortlist candidates. Then, they score every (input, label) pair with a trained ranker.
+    </p>
+    <p>
+      <strong>Auto insurance estimation.</strong> CCC and Tractable use computer vision to classify damage. They then apply deterministic rules to assemble the operations list. No production system generates line items with free-form generation.
+    </p>
+  </section>
+
+  <!-- ============ 6. STRATEGIES ============ -->
+  <section class="section">
+    <span class="section-number">6</span>
+    <h2>Strategies</h2>
+    <p>These strategies are ranked by impact-to-effort ratio. They compose with each other.</p>
+
+    <ol class="strategies">
+      <li><strong>Enumerate and verify.</strong> Collect the candidate pool from retrieved assessments. Ask the LLM yes/no per candidate with one-line evidence. The recall ceiling becomes the pool ceiling (~0.997). Effort: days.</li>
+      <li><strong>Self-consistency union.</strong> Sample the generator 3–5 times at temperature&nbsp;>&nbsp;0. Union items that appear in 2 or more samples. This typically adds 10–20 recall points. Effort: days.</li>
+      <li><strong>ID-grounded selection.</strong> Output only IDs from the candidate list. Use structured output, not free text. Apply deterministic post-rules for catalog variants. Effort: days to weeks.</li>
+      <li><strong>Co-occurrence bundle expansion.</strong> Mine association rules from historical scopes. Apply them as deterministic expansion after the model's output. Effort: weeks.</li>
+      <li><strong>Situation classification with routed context.</strong> Classify the peril type first. Route to a scenario template that seeds the checklist. Effort: weeks.</li>
+      <li><strong>Trained verifier.</strong> Replace the LLM verifier with a cross-encoder. Train it on historical assessments with hard negatives. Our benchmark shows logistic regression already reaches 0.90. A cross-encoder on real data is the proven end state. Effort: months.</li>
+      <li><strong>Data levers (parallel).</strong> Enrich catalog items with assessor synonyms. Capture assessor rationale. Run a label-consistency audit. Score at three levels so near-misses are visible.</li>
+    </ol>
+  </section>
+
+  <!-- ============ 7. LIMITATIONS ============ -->
+  <section class="section">
+    <span class="section-number">7</span>
+    <h2>Limitations</h2>
+    <p>
+      This benchmark is synthetic. Descriptions come from scenario templates. Retrieval is easier than in production. Do not use absolute numbers as production forecasts. Use them as an architecture comparison.
+    </p>
+    <p>
+      The Lodgicl production number (~0.50 recall) is reported by their team on their data. It is included only for shape comparison. It was not measured on the same test set.
+    </p>
+  </section>
+
+  <!-- ============ 8. VALIDATION PLAN ============ -->
+  <section class="section">
+    <span class="section-number">8</span>
+    <h2>Validation Plan</h2>
+    <p>
+      <strong>Week 1.</strong> Re-run the oracle experiment with strategy S1 on Lodgicl's data. If recall increases from ~0.65 toward ~0.95, the diagnosis is confirmed. Then apply S1 on production retrieval, plus S2 and S3. Report at all three scoring levels.
+    </p>
+    <p>
+      <strong>Week 2.</strong> Mine co-occurrence rules (S4) from the historical corpus. Measure the marginal recall of bundle expansion. Run a label-consistency audit on a 50-claim sample (S7). Decision gate: if S1–S4 reach a plateau below target, scope S6 with their data volume.
+    </p>
+  </section>
+
+  <footer class="footnotes">
+    Based on the synthetic benchmark at <code>src/hmjp/</code> (19 rooms, 20 trades, 90 items, 10 peril scenarios, 2,000 generated jobs). Domain claims reference Liu et al. (TACL 2024), Boyle et al. (2023), NEJM AI (2024), and Xactimate/CCC/M3NHF documentation. Written per ASD-STE100 Simplified Technical English rules. All code and data are in the accompanying repository.
+  </footer>
+
+</article>
+
+<script>
+(function () {
+  function getCSS(prop) {
+    return getComputedStyle(document.documentElement).getPropertyValue(prop).trim();
+  }
+
+  function setupCanvas(id) {
+    const c = document.getElementById(id);
+    const dpr = window.devicePixelRatio || 1;
+    const rect = c.getBoundingClientRect();
+    c.width = rect.width * dpr;
+    c.height = rect.height * dpr;
+    const ctx = c.getContext('2d');
+    ctx.scale(dpr, dpr);
+    return { c, ctx, w: rect.width, h: rect.height, dpr };
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    r = Math.min(r, h / 2, w / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.arcTo(x + w, y, x + w, y + r, r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+    ctx.lineTo(x + r, y + h);
+    ctx.arcTo(x, y + h, x, y + h - r, r);
+    ctx.lineTo(x, y + r);
+    ctx.arcTo(x, y, x + r, y, r);
+    ctx.closePath();
+  }
+
+  // ========================== CHART 1: F1 BARS ==========================
+  function drawF1() {
+    const { c, ctx, w, h } = setupCanvas('chart-f1');
+    const s1 = getCSS('--s1');
+    const sRef = getCSS('--s-ref');
+    const ink = getCSS('--chart-ink');
+    const ink2 = getCSS('--chart-ink2');
+    const muted = getCSS('--chart-muted');
+    const grid = getCSS('--chart-grid');
+    const axis = getCSS('--chart-axis');
+    const surface = getCSS('--chart-surface');
+
+    const pad = { top: 28, right: 20, bottom: 55, left: 42 };
+    const pw = w - pad.left - pad.right;
+    const ph = h - pad.top - pad.bottom;
+
+    const systems = [
+      { label: 'Candidate\npool', clean: 0.51, noisy: 0.51 },
+      { label: 'kNN\nunion', clean: 0.70, noisy: 0.68 },
+      { label: 'Retrieve-\nthen-rank', clean: 0.74, noisy: 0.72 },
+      { label: 'Retrieve-rank\n(recall-oriented)', clean: 0.74, noisy: 0.72 },
+    ];
+
+    const maxVal = 0.85;
+    const groupW = pw / systems.length;
+    const barW = Math.min(22, groupW * 0.28);
+    const gap = 3;
+
+    // grid
+    ctx.strokeStyle = grid;
+    ctx.lineWidth = 1;
+    for (let v = 0; v <= maxVal; v += 0.1) {
+      const y = pad.top + ph * (1 - v / maxVal);
+      ctx.beginPath();
+      ctx.moveTo(pad.left, y);
+      ctx.lineTo(pad.left + pw, y);
+      ctx.stroke();
+    }
+
+    // axis
+    ctx.strokeStyle = axis;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, pad.top + ph);
+    ctx.lineTo(pad.left + pw, pad.top + ph);
+    ctx.stroke();
+
+    // y-axis ticks
+    ctx.fillStyle = muted;
+    ctx.font = '10px ' + getCSS('--mono');
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let v = 0; v <= maxVal; v += 0.1) {
+      const y = pad.top + ph * (1 - v / maxVal);
+      ctx.fillText(v.toFixed(1), pad.left - 6, y);
+    }
+
+    // reference line (Lodgicl)
+    const refY = pad.top + ph * (1 - 0.59 / maxVal);
+    ctx.setLineDash([4, 3]);
+    ctx.strokeStyle = sRef;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, refY);
+    ctx.lineTo(pad.left + pw, refY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    const hitTargets = [];
+
+    systems.forEach((sys, i) => {
+      const cx = pad.left + groupW * i + groupW / 2;
+
+      // clean bar
+      const bh1 = ph * (sys.clean / maxVal);
+      const x1 = cx - barW - gap / 2;
+      const y1 = pad.top + ph - bh1;
+      ctx.fillStyle = s1;
+      roundRect(ctx, x1, y1, barW, bh1, 4);
+      ctx.fill();
+
+      // 2px surface gap at baseline
+      ctx.fillStyle = surface;
+      ctx.fillRect(x1, pad.top + ph - 2, barW, 2);
+
+      // noisy bar
+      const bh2 = ph * (sys.noisy / maxVal);
+      const x2 = cx + gap / 2;
+      const y2 = pad.top + ph - bh2;
+      ctx.globalAlpha = 0.4;
+      ctx.fillStyle = s1;
+      roundRect(ctx, x2, y2, barW, bh2, 4);
+      ctx.fill();
+      ctx.globalAlpha = 1.0;
+
+      ctx.fillStyle = surface;
+      ctx.fillRect(x2, pad.top + ph - 2, barW, 2);
+
+      // direct labels
+      ctx.font = '600 10px ' + getCSS('--mono');
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillStyle = ink2;
+      ctx.fillText(sys.clean.toFixed(2), x1 + barW / 2, y1 - 4);
+      ctx.globalAlpha = 0.7;
+      ctx.fillText(sys.noisy.toFixed(2), x2 + barW / 2, y2 - 4);
+      ctx.globalAlpha = 1.0;
+
+      // x-axis labels
+      ctx.font = '10px ' + getCSS('--sans');
+      ctx.fillStyle = muted;
+      ctx.textBaseline = 'top';
+      const lines = sys.label.split('\n');
+      lines.forEach((line, li) => {
+        ctx.fillText(line, cx, pad.top + ph + 8 + li * 13);
+      });
+
+      hitTargets.push(
+        { x: x1, y: y1, w: barW, h: bh1, label: sys.label.replace('\n', ' '), val: sys.clean, cond: 'Clean' },
+        { x: x2, y: y2, w: barW, h: bh2, label: sys.label.replace('\n', ' '), val: sys.noisy, cond: '15% noise' },
+      );
+    });
+
+    // tooltip
+    const tip = document.getElementById('tip-f1');
+    c.addEventListener('mousemove', function(e) {
+      const rect = c.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      let found = null;
+      for (const t of hitTargets) {
+        if (mx >= t.x && mx <= t.x + t.w && my >= t.y && my <= t.y + t.h) { found = t; break; }
+      }
+      if (found) {
+        tip.innerHTML = `<strong>${found.label}</strong> (${found.cond})<br>F1: ${found.val.toFixed(2)}`;
+        tip.classList.add('visible');
+        let tx = e.clientX - rect.left + 12;
+        let ty = e.clientY - rect.top - 10;
+        if (tx + 150 > w) tx = mx - 160;
+        tip.style.left = tx + 'px';
+        tip.style.top = ty + 'px';
+      } else {
+        tip.classList.remove('visible');
+      }
+    });
+    c.addEventListener('mouseleave', () => tip.classList.remove('visible'));
+  }
+
+  // ========================== CHART 2: RECALL DISTRIBUTION ==========================
+  function drawRecall() {
+    const { c, ctx, w, h } = setupCanvas('chart-recall');
+    const s1 = getCSS('--s1');
+    const s2 = getCSS('--s2');
+    const s3 = getCSS('--s3');
+    const ink = getCSS('--chart-ink');
+    const ink2 = getCSS('--chart-ink2');
+    const muted = getCSS('--chart-muted');
+    const grid = getCSS('--chart-grid');
+    const axis = getCSS('--chart-axis');
+    const surface = getCSS('--chart-surface');
+
+    const pad = { top: 20, right: 60, bottom: 50, left: 42 };
+    const pw = w - pad.left - pad.right;
+    const ph = h - pad.top - pad.bottom;
+
+    const minVal = 0.4;
+    const maxVal = 1.05;
+    const range = maxVal - minVal;
+
+    const systems = [
+      { label: 'kNN union', color: s3, p10: 0.5455, p50: 0.8182, p90: 1.0, p10n: 0.5237, p50n: 0.7778, p90n: 1.0 },
+      { label: 'Retrieve-then-rank', color: s1, p10: 0.6667, p50: 0.9091, p90: 1.0, p10n: 0.60, p50n: 0.8333, p90n: 1.0 },
+      { label: 'Retrieve-rank (RO)', color: s2, p10: 0.75, p50: 0.9167, p90: 1.0, p10n: 0.7273, p50n: 0.90, p90n: 1.0 },
+    ];
+
+    const groupW = pw / systems.length;
+
+    // grid
+    ctx.strokeStyle = grid;
+    ctx.lineWidth = 1;
+    for (let v = 0.4; v <= 1.01; v += 0.1) {
+      const y = pad.top + ph * (1 - (v - minVal) / range);
+      ctx.beginPath();
+      ctx.moveTo(pad.left, y);
+      ctx.lineTo(pad.left + pw, y);
+      ctx.stroke();
+    }
+
+    // axis
+    ctx.strokeStyle = axis;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, pad.top + ph);
+    ctx.lineTo(pad.left + pw, pad.top + ph);
+    ctx.stroke();
+
+    // y-axis ticks
+    ctx.fillStyle = muted;
+    ctx.font = '10px ' + getCSS('--mono');
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let v = 0.4; v <= 1.01; v += 0.1) {
+      const y = pad.top + ph * (1 - (v - minVal) / range);
+      ctx.fillText(v.toFixed(1), pad.left - 6, y);
+    }
+
+    const hitTargets = [];
+    const stemW = 4;
+
+    systems.forEach((sys, i) => {
+      const cx = pad.left + groupW * i + groupW / 2;
+      const cleanX = cx - 10;
+      const noisyX = cx + 10;
+
+      // clean range
+      const y90 = pad.top + ph * (1 - (sys.p90 - minVal) / range);
+      const y50 = pad.top + ph * (1 - (sys.p50 - minVal) / range);
+      const y10 = pad.top + ph * (1 - (sys.p10 - minVal) / range);
+
+      // range bar (p10 to p90)
+      ctx.fillStyle = sys.color;
+      ctx.globalAlpha = 0.15;
+      roundRect(ctx, cleanX - stemW, y90, stemW * 2, y10 - y90, 3);
+      ctx.fill();
+      ctx.globalAlpha = 1.0;
+
+      // stem line
+      ctx.strokeStyle = sys.color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(cleanX, y90);
+      ctx.lineTo(cleanX, y10);
+      ctx.stroke();
+
+      // p10 cap
+      ctx.beginPath();
+      ctx.moveTo(cleanX - 5, y10);
+      ctx.lineTo(cleanX + 5, y10);
+      ctx.stroke();
+
+      // p90 cap
+      ctx.beginPath();
+      ctx.moveTo(cleanX - 5, y90);
+      ctx.lineTo(cleanX + 5, y90);
+      ctx.stroke();
+
+      // p50 dot
+      ctx.fillStyle = sys.color;
+      ctx.beginPath();
+      ctx.arc(cleanX, y50, 5, 0, Math.PI * 2);
+      ctx.fill();
+      // surface ring
+      ctx.strokeStyle = surface;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(cleanX, y50, 5, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // noisy range
+      const ny90 = pad.top + ph * (1 - (sys.p90n - minVal) / range);
+      const ny50 = pad.top + ph * (1 - (sys.p50n - minVal) / range);
+      const ny10 = pad.top + ph * (1 - (sys.p10n - minVal) / range);
+
+      ctx.fillStyle = sys.color;
+      ctx.globalAlpha = 0.07;
+      roundRect(ctx, noisyX - stemW, ny90, stemW * 2, ny10 - ny90, 3);
+      ctx.fill();
+      ctx.globalAlpha = 0.4;
+
+      ctx.strokeStyle = sys.color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(noisyX, ny90);
+      ctx.lineTo(noisyX, ny10);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(noisyX - 5, ny10);
+      ctx.lineTo(noisyX + 5, ny10);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(noisyX - 5, ny90);
+      ctx.lineTo(noisyX + 5, ny90);
+      ctx.stroke();
+
+      ctx.fillStyle = sys.color;
+      ctx.beginPath();
+      ctx.arc(noisyX, ny50, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1.0;
+
+      ctx.strokeStyle = surface;
+      ctx.lineWidth = 2;
+      ctx.globalAlpha = 0.4;
+      ctx.beginPath();
+      ctx.arc(noisyX, ny50, 4, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.globalAlpha = 1.0;
+
+      // direct labels (right side)
+      ctx.font = '600 9px ' + getCSS('--mono');
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = ink2;
+      if (i === systems.length - 1) {
+        ctx.fillText('P90: ' + sys.p90.toFixed(2), cleanX + 18, y90);
+        ctx.fillText('P50: ' + sys.p50.toFixed(2), cleanX + 18, y50);
+        ctx.fillText('P10: ' + sys.p10.toFixed(2), cleanX + 18, y10);
+      }
+
+      // x label
+      ctx.font = '10px ' + getCSS('--sans');
+      ctx.fillStyle = muted;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      const parts = sys.label.split(' (');
+      ctx.fillText(parts[0], cx, pad.top + ph + 8);
+      if (parts[1]) ctx.fillText('(' + parts[1], cx, pad.top + ph + 21);
+
+      hitTargets.push({
+        x: cx - groupW / 2, w: groupW,
+        label: sys.label,
+        cleanP10: sys.p10, cleanP50: sys.p50, cleanP90: sys.p90,
+        noisyP10: sys.p10n, noisyP50: sys.p50n, noisyP90: sys.p90n,
+      });
+    });
+
+    const tip = document.getElementById('tip-recall');
+    c.addEventListener('mousemove', function(e) {
+      const rect = c.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      let found = null;
+      for (const t of hitTargets) {
+        if (mx >= t.x && mx <= t.x + t.w && my >= pad.top && my <= pad.top + ph) { found = t; break; }
+      }
+      if (found) {
+        tip.innerHTML = `<strong>${found.label}</strong><br>` +
+          `Clean — P10: ${found.cleanP10.toFixed(2)} · P50: ${found.cleanP50.toFixed(2)} · P90: ${found.cleanP90.toFixed(2)}<br>` +
+          `Noisy — P10: ${found.noisyP10.toFixed(2)} · P50: ${found.noisyP50.toFixed(2)} · P90: ${found.noisyP90.toFixed(2)}`;
+        tip.classList.add('visible');
+        let tx = e.clientX - rect.left + 12;
+        let ty = e.clientY - rect.top - 10;
+        if (tx + 260 > w) tx = mx - 270;
+        tip.style.left = tx + 'px';
+        tip.style.top = ty + 'px';
+      } else {
+        tip.classList.remove('visible');
+      }
+    });
+    c.addEventListener('mouseleave', () => tip.classList.remove('visible'));
+  }
+
+  // ========================== CHART 3: P-R SCATTER ==========================
+  function drawPR() {
+    const { c, ctx, w, h } = setupCanvas('chart-pr');
+    const s1 = getCSS('--s1');
+    const sRef = getCSS('--s-ref');
+    const ink = getCSS('--chart-ink');
+    const ink2 = getCSS('--chart-ink2');
+    const muted = getCSS('--chart-muted');
+    const grid = getCSS('--chart-grid');
+    const axis = getCSS('--chart-axis');
+    const surface = getCSS('--chart-surface');
+
+    const pad = { top: 20, right: 30, bottom: 42, left: 48 };
+    const pw = w - pad.left - pad.right;
+    const ph = h - pad.top - pad.bottom;
+
+    const xMin = 0.3, xMax = 1.05;
+    const yMin = 0.25, yMax = 0.80;
+    const xRange = xMax - xMin;
+    const yRange = yMax - yMin;
+
+    function toX(r) { return pad.left + pw * (r - xMin) / xRange; }
+    function toY(p) { return pad.top + ph * (1 - (p - yMin) / yRange); }
+
+    // grid
+    ctx.strokeStyle = grid;
+    ctx.lineWidth = 1;
+    for (let v = 0.3; v <= 1.01; v += 0.1) {
+      const x = toX(v);
+      ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + ph); ctx.stroke();
+    }
+    for (let v = 0.3; v <= 0.81; v += 0.1) {
+      const y = toY(v);
+      ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + pw, y); ctx.stroke();
+    }
+
+    // axes
+    ctx.strokeStyle = axis;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, pad.top + ph);
+    ctx.lineTo(pad.left + pw, pad.top + ph);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(pad.left, pad.top);
+    ctx.lineTo(pad.left, pad.top + ph);
+    ctx.stroke();
+
+    // axis labels
+    ctx.fillStyle = muted;
+    ctx.font = '10px ' + getCSS('--mono');
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    for (let v = 0.3; v <= 1.01; v += 0.1) {
+      ctx.fillText(v.toFixed(1), toX(v), pad.top + ph + 6);
+    }
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let v = 0.3; v <= 0.81; v += 0.1) {
+      ctx.fillText(v.toFixed(1), pad.left - 6, toY(v));
+    }
+
+    // axis titles
+    ctx.font = '11px ' + getCSS('--sans');
+    ctx.fillStyle = ink2;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('Recall', pad.left + pw / 2, pad.top + ph + 24);
+
+    ctx.save();
+    ctx.translate(14, pad.top + ph / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Precision', 0, 0);
+    ctx.restore();
+
+    // F1 iso-lines
+    ctx.setLineDash([3, 4]);
+    ctx.strokeStyle = grid;
+    ctx.lineWidth = 1;
+    [0.5, 0.6, 0.7, 0.8].forEach(f1 => {
+      ctx.beginPath();
+      let started = false;
+      for (let r = xMin; r <= xMax; r += 0.005) {
+        const p = (f1 * r) / (2 * r - f1);
+        if (p < yMin || p > yMax || r < xMin || r > xMax) continue;
+        if (!started) { ctx.moveTo(toX(r), toY(p)); started = true; }
+        else ctx.lineTo(toX(r), toY(p));
+      }
+      ctx.stroke();
+      // label
+      const lr = Math.min(xMax - 0.02, f1 / (2 - f1) * (yMax / yMax));
+      const lp = (f1 * 0.98) / (2 * 0.98 - f1);
+      if (lp >= yMin && lp <= yMax) {
+        ctx.fillStyle = muted;
+        ctx.font = '9px ' + getCSS('--mono');
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText('F1=' + f1.toFixed(1), toX(0.98) + 3, toY(lp));
+      }
+    });
+    ctx.setLineDash([]);
+
+    const points = [
+      { label: 'Candidate pool', r: 0.997, p: 0.34, clean: true },
+      { label: 'kNN union', r: 0.80, p: 0.62, clean: true },
+      { label: 'Retrieve-rank', r: 0.87, p: 0.64, clean: true },
+      { label: 'Retrieve-rank (RO)', r: 0.90, p: 0.62, clean: true },
+      { label: 'Candidate pool', r: 0.996, p: 0.34, clean: false },
+      { label: 'kNN union', r: 0.76, p: 0.62, clean: false },
+      { label: 'Retrieve-rank', r: 0.82, p: 0.65, clean: false },
+      { label: 'Retrieve-rank (RO)', r: 0.88, p: 0.61, clean: false },
+      { label: 'Lodgicl production', r: 0.50, p: 0.72, ref: true },
+    ];
+
+    const hitTargets = [];
+
+    // draw connecting lines (clean → noisy pairs)
+    ctx.strokeStyle = s1;
+    ctx.globalAlpha = 0.15;
+    ctx.lineWidth = 1;
+    const cleanPts = points.filter(p => p.clean);
+    const noisyPts = points.filter(p => !p.ref && !p.clean);
+    cleanPts.forEach(cp => {
+      const np = noisyPts.find(n => n.label === cp.label);
+      if (np) {
+        ctx.beginPath();
+        ctx.moveTo(toX(cp.r), toY(cp.p));
+        ctx.lineTo(toX(np.r), toY(np.p));
+        ctx.stroke();
+      }
+    });
+    ctx.globalAlpha = 1.0;
+
+    points.forEach(pt => {
+      const x = toX(pt.r);
+      const y = toY(pt.p);
+      const radius = pt.ref ? 6 : 5;
+      const color = pt.ref ? sRef : s1;
+      const alpha = (pt.clean || pt.ref) ? 1.0 : 0.35;
+
+      // surface ring
+      ctx.strokeStyle = surface;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(x, y, radius + 1, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1.0;
+
+      // labels for clean points and ref
+      if (pt.clean || pt.ref) {
+        ctx.font = '10px ' + getCSS('--sans');
+        ctx.fillStyle = ink2;
+        ctx.textBaseline = 'middle';
+
+        let lx, ly, align;
+        if (pt.label === 'Candidate pool') {
+          lx = x - 10; ly = y - 14; align = 'right';
+        } else if (pt.label === 'Lodgicl production') {
+          lx = x + 10; ly = y - 2; align = 'left';
+        } else if (pt.label === 'kNN union') {
+          lx = x - 10; ly = y + 2; align = 'right';
+        } else if (pt.label === 'Retrieve-rank') {
+          lx = x + 10; ly = y - 12; align = 'left';
+        } else {
+          lx = x + 10; ly = y + 2; align = 'left';
+        }
+        ctx.textAlign = align;
+        ctx.fillText(pt.label, lx, ly);
+      }
+
+      hitTargets.push({ x, y, r: radius + 6, label: pt.label, prec: pt.p, rec: pt.r, cond: pt.ref ? 'Reported' : pt.clean ? 'Clean' : '15% noise' });
+    });
+
+    const tip = document.getElementById('tip-pr');
+    c.addEventListener('mousemove', function(e) {
+      const rect = c.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      let found = null;
+      for (const t of hitTargets) {
+        const d = Math.sqrt((mx - t.x) ** 2 + (my - t.y) ** 2);
+        if (d <= t.r) { found = t; break; }
+      }
+      if (found) {
+        tip.innerHTML = `<strong>${found.label}</strong> (${found.cond})<br>P: ${found.prec.toFixed(2)} · R: ${found.rec.toFixed(2)} · F1: ${(2 * found.prec * found.rec / (found.prec + found.rec)).toFixed(2)}`;
+        tip.classList.add('visible');
+        let tx = e.clientX - rect.left + 14;
+        let ty = e.clientY - rect.top - 10;
+        if (tx + 220 > w) tx = mx - 230;
+        tip.style.left = tx + 'px';
+        tip.style.top = ty + 'px';
+      } else {
+        tip.classList.remove('visible');
+      }
+    });
+    c.addEventListener('mouseleave', () => tip.classList.remove('visible'));
+  }
+
+  // ========================== INIT ==========================
+  function drawAll() {
+    drawF1();
+    drawRecall();
+    drawPR();
+  }
+
+  drawAll();
+
+  // re-draw on theme change
+  const obs = new MutationObserver(() => drawAll());
+  obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawAll);
+
+  // re-draw on resize
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(drawAll, 100);
+  });
+})();
+</script>

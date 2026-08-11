@@ -1,5 +1,0 @@
-title: "Verify, Don't Generate — Housing Repair Scope Prediction"
-date: "2026-08-12"
-description: "A retrieve-then-verify architecture recovers the recall that retrieve-then-generate drops — from ~0.50 to 0.90 on a synthetic insurance benchmark."
-tags: ["machine-learning", "insurance", "information-retrieval"]
-draft: true

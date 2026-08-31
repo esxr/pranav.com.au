@@ -6,15 +6,23 @@
 //
 // Encrypts the ENTIRE source document with the password using
 // PBKDF2(SHA-256, 210k) + AES-256-GCM, then emits a standalone gate page
-// that carries only the ciphertext. On correct entry the page decrypts in
-// the browser via the Web Crypto API and re-renders the original document
-// (document.write), so any inline scripts/styles in the post keep working.
+// that carries only the ciphertext. The password is supplied *in the link*
+// (?pass=... , or #pass=... to keep it out of referrers), not typed into a
+// form: the page reads it on load, decrypts via the Web Crypto API and
+// re-renders the original document (document.write), so any inline
+// scripts/styles in the post keep working. A visitor with the link sees the
+// post directly; without one they get a short locked notice and no input box.
 //
 // The content is NOT present in the gate's page source until unlocked, which
 // is what makes this meaningfully stronger than a hide/overlay. It is still a
 // *client-side* gate: the ciphertext + a correct password fully reveal the
 // content, so this deters casual access and keeps a post out of search — it is
 // not real access control for genuinely sensitive material.
+//
+// Link-borne passwords travel further than typed ones: they sit in browser
+// history and address bars, ride along in link previews, and are forwarded
+// verbatim whenever someone passes the link on. That is the intended trade —
+// one shareable link instead of a separate "here is the password" message.
 const fs = require("fs");
 const crypto = require("crypto");
 
@@ -79,53 +87,38 @@ body{
   display:flex;align-items:center;justify-content:center;padding:24px;
   -webkit-font-smoothing:antialiased;
 }
-.gate{width:100%;max-width:380px;text-align:center}
+[hidden]{display:none!important}
+.gate{width:100%;max-width:400px;text-align:center}
 .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--dimmer);margin-bottom:14px}
-h1{font-family:"Bodoni Moda",Didot,Georgia,serif;font-weight:400;font-size:30px;margin:0 0 8px}
-.sub{color:var(--dim);font-size:14px;margin:0 0 26px}
-form{display:flex;flex-direction:column;gap:12px}
-input[type=password]{
-  width:100%;padding:12px 14px;font-size:15px;
-  font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;
-  color:var(--bone);background:var(--panel);
-  border:1px solid var(--line);border-radius:8px;outline:none;
-  text-align:center;letter-spacing:.12em;
-}
-input[type=password]:focus{border-color:var(--brass)}
-button{
-  width:100%;padding:12px 14px;font-size:14px;cursor:pointer;
-  font-family:"IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase;
-  color:var(--ink);background:var(--brass);border:none;border-radius:8px;
-  transition:opacity .15s;
-}
-button:hover{opacity:.9}
-button:disabled{opacity:.5;cursor:default}
-.err{min-height:18px;color:var(--rust);font-size:12.5px;font-family:"IBM Plex Mono",monospace;margin-top:2px}
+h1{font-family:"Bodoni Moda",Didot,Georgia,serif;font-weight:400;font-size:30px;margin:0 0 10px}
+.sub{color:var(--dim);font-size:14px;margin:0}
 .foot{margin-top:26px;font-size:12px;color:var(--dimmer)}
 .foot a{color:var(--dim);text-decoration:none;border-bottom:1px solid var(--line)}
 .foot a:hover{color:var(--bone)}
 </style>
 </head>
 <body>
-<main class="gate">
+<main class="gate" id="gate" hidden>
   <div class="eyebrow">Protected post</div>
-  <h1>Locked</h1>
-  <p class="sub">This post is password&#8209;protected. Enter the password to continue.</p>
-  <form id="f" autocomplete="off">
-    <input id="pw" type="password" placeholder="Password" aria-label="Password" autofocus autocomplete="off" spellcheck="false">
-    <button id="go" type="submit">Unlock</button>
-    <div class="err" id="err" role="alert" aria-live="polite"></div>
-  </form>
+  <h1 id="head">Locked</h1>
+  <p class="sub" id="sub">This post opens from a shared link that carries its password. Ask whoever sent you here for that link.</p>
   <p class="foot"><a href="/">&larr; Back to home</a></p>
 </main>
 <script>
 const DATA = "${blob}";
 const ITER = ${ITERATIONS};
 const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
-const form = document.getElementById("f");
-const pwEl = document.getElementById("pw");
-const goEl = document.getElementById("go");
-const errEl = document.getElementById("err");
+
+/* The password rides in the link. ?pass= is the documented form; #pass= works
+   too and never leaves the browser (fragments are not sent to servers and do
+   not appear in referrers), so it is the quieter option for the same link. */
+function passFromLink(){
+  const q = new URLSearchParams(location.search).get("pass");
+  if (q) return q;
+  const h = location.hash.replace(/^#/, "");
+  const m = new URLSearchParams(h).get("pass");
+  return m || "";
+}
 
 async function unlock(password){
   const raw = b64(DATA);
@@ -142,22 +135,29 @@ async function unlock(password){
   return new TextDecoder().decode(buf);
 }
 
-form.addEventListener("submit", async e => {
-  e.preventDefault();
-  errEl.textContent = "";
-  goEl.disabled = true;
+/* Show the notice only once we know the link cannot open the post, so a
+   working link never flashes "Locked" on its way to the content. */
+function locked(head, sub){
+  document.getElementById("head").textContent = head;
+  document.getElementById("sub").textContent = sub;
+  document.getElementById("gate").hidden = false;
+}
+
+(async () => {
+  const password = passFromLink();
+  if (!password) {
+    locked("Locked", "This post opens from a shared link that carries its password. Ask whoever sent you here for that link.");
+    return;
+  }
   try {
-    const html = await unlock(pwEl.value);
+    const html = await unlock(password);
     document.open();
     document.write(html);
     document.close();
   } catch (_){
-    errEl.textContent = "Incorrect password.";
-    goEl.disabled = false;
-    pwEl.value = "";
-    pwEl.focus();
+    locked("That link did not open it", "The password in this link is not correct for this post. Ask whoever sent it for a current link.");
   }
-});
+})();
 </script>
 </body>
 </html>

@@ -60,6 +60,21 @@
   footer.doc{margin-top:3.4rem;padding-top:1.3rem;border-top:1px solid var(--hair-strong);
              font-size:.78rem;color:var(--faint);display:flex;flex-direction:column;gap:.45rem}
 
+  /* ---------- unverified placeholders (delete with the .draftnote block) ---------- */
+  :root{--tbc:#9a5b00;--tbc-wash:rgba(154,91,0,.09)}
+  @media (prefers-color-scheme:dark){:root{--tbc:#e0a458;--tbc-wash:rgba(224,164,88,.14)}}
+  :root[data-theme="dark"]{--tbc:#e0a458;--tbc-wash:rgba(224,164,88,.14)}
+  :root[data-theme="light"]{--tbc:#9a5b00;--tbc-wash:rgba(154,91,0,.09)}
+  mark.tbc{background:var(--tbc-wash);color:var(--tbc);border:1px dashed var(--tbc);
+           border-radius:2px;padding:.02em .3em;font-family:var(--mono);font-size:.84em;
+           font-weight:500}
+  .draftnote{border:1px dashed var(--tbc);border-left-width:3px;border-radius:2px;
+             background:var(--tbc-wash);padding:.9rem 1rem;margin-top:1.6rem;
+             display:flex;flex-direction:column;gap:.5rem;font-size:.9rem}
+  .draftnote .label{font-family:var(--mono);font-size:.63rem;letter-spacing:.15em;
+                    text-transform:uppercase;color:var(--tbc);font-weight:600}
+  .draftnote ol{font-size:.87rem;gap:.35rem}
+
   /* ---------- figure shell ---------- */
   .fig{margin:.5rem 0 .3rem;border:1px solid var(--hair);border-radius:3px;background:var(--surface);overflow:hidden}
   .fig-head{padding:.45rem .75rem;border-bottom:1px solid var(--hair);background:var(--surface-2);
@@ -177,10 +192,27 @@
   <p class="eyebrow">Proposal · Accelerated Understanding</p>
   <h1>A free quarter on your research loop</h1>
   <p class="byline">
-    <span>Prepared for Anima Anandkumar and Benedikt Jenik. Pranav Dhoolia, Sydney</span>
+    <span>Prepared for Anima Anandkumar and Benedikt Jenik. Pranav Dhoolia, <mark class="tbc">CITY</mark></span>
     <span>31 Aug 2026</span>
   </p>
 </header>
+
+<!-- ===== DELETE THIS BLOCK BEFORE SENDING (and the .tbc / .draftnote CSS above) ===== -->
+<div class="draftnote">
+  <p class="label">Draft · 4 unverified facts</p>
+  <p>LinkedIn blocks automated fetches, so these four could not be checked. Each is marked
+  <mark class="tbc">like this</mark> in the text below. Fix or cut all four before this goes to
+  anyone.</p>
+  <ol>
+    <li><strong>City</strong> in the byline. Inferred from UNSW / UTS / Antler.</li>
+    <li><strong>Years</strong> building harnesses, in the abstract. Inferred from post dates.</li>
+    <li><strong>Open-source contributions</strong> in the evidence table. A search result said
+    LangGraph and OpenGPT; name only what you can point at, or cut the row.</li>
+    <li><strong>The Antler sentence</strong> in section 7. It is load-bearing (it makes the unpaid
+    offer read as a choice rather than a fallback) but it does say you have a company. Keep, reword,
+    or cut. The funding figure was deliberately left out.</li>
+  </ol>
+</div>
 
 <div class="abstract">
   <p class="label">Abstract</p>
@@ -198,7 +230,7 @@
   <p>But I read your Self-Improvement section carefully, and it describes a shape I know well.
   Define a task, simulate, take a step in the improvement direction, repeat, with a check that a
   result satisfies the governing equation. <strong>That is a harness with a verifiable gate.</strong>
-  It is the thing I have spent two years building for software delivery, where the gate is a test
+  It is the thing I have spent <mark class="tbc">N</mark> years building for software delivery, where the gate is a test
   suite rather than a conservation law. Different domain. Same structure.</p>
 
   <p>So I would like to spend a quarter on the parts of your work that are systems problems rather
@@ -396,7 +428,7 @@
           <tr><td><a href="https://pranav.com.au/posts/from-agents-to-harnesses/">From Agents to Harnesses</a> and its sequel</td><td>The control-surface pattern I would apply to your improvement loop</td></tr>
           <tr><td><a href="https://pranav.com.au/posts/claude-sdlc-skill/">An SDLC harness</a> that carries a task from transcript to design to code</td><td>End-to-end automation of a loop that used to need a person at every step</td></tr>
           <tr><td><a href="https://pranav.com.au/posts/operantlabs-observe-learn-codify/">Operant</a>: observe traffic, learn the repeated task, codify it</td><td>Learning a repeated pattern from telemetry and gating it before it serves</td></tr>
-          <tr><td>Contributions to LangGraph and other open agent tooling</td><td>I work in public and my code survives other people reading it</td></tr>
+          <tr><td><mark class="tbc">Open-source contributions — name the real ones</mark></td><td>I work in public and my code survives other people reading it</td></tr>
         </tbody>
       </table>
     </div>
@@ -440,8 +472,8 @@
   <div class="qa">
     <h3><span class="n">7</span>Why I am offering to work for nothing, when I do have other options</h3>
     <p>I want to answer this before you wonder about it, because an offer like mine usually means
-    somebody has run out of alternatives. I am in Antler and raising for my own company. I could
-    spend the next year building it, and it would probably work well enough.</p>
+    somebody has run out of alternatives. <mark class="tbc">I am in Antler and raising for my own company. I could
+    spend the next year building it, and it would probably work well enough.</mark></p>
 
     <p>I would rather spend that year near this. Everything I have built so far is infrastructure for
     other people's intelligence, and it has been good work, and it is not the thing I actually want.

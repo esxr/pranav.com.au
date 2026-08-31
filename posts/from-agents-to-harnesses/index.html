@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Governing the Determinism Spectrum in Agent Harnesses</title>
+<title>From Agents to Harnesses</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -304,27 +304,30 @@
 
   <header class="masthead">
     <p class="kicker">A Position Piece &middot; Agentic Middleware</p>
-    <h1>Governing the<br>Determinism <em>Spectrum</em></h1>
-    <p class="standfirst">Agent harnesses are stochastic by design. Governance is the discipline of deciding, deliberately, which parts of them must not be.</p>
+    <h1>From Agents<br>to <em>Harnesses</em></h1>
+    <p class="standfirst">Agent harnesses are stochastic by design. Governance is the discipline that decides which parts of them must not be stochastic.</p>
   </header>
 
   <div class="abstract">
     <p class="tag">The pitch, in one breath</p>
-    <p>Modern agent harnesses generate, execute, and verify code with remarkable autonomy &mdash; and almost no guarantees. An agent can paraphrase a compliance check, skip a validation, or route around a safeguard, because today those controls live in the same operational space the agent is free to reinterpret.</p>
-    <p>We propose treating determinism as a <strong>spectrum we govern</strong> rather than a property we wish for. The standardization of skills, commands, plugins, and hooks gives us a set of control surfaces &mdash; each one a place to convert probabilistic behavior into a guarantee. The value of a surface is set by how far <strong>outside the agent's discretion</strong> it sits. We call the practice <strong>gradual determinism</strong>: keep the agent dynamic everywhere it earns its keep, and pin down only what must not vary.</p>
+    <p>Modern agent harnesses write, run, and check code with much autonomy. They give almost no guarantees. An agent can paraphrase a compliance check. It can skip a validation. It can go around a safeguard. Today those controls are in the same operational space that the agent can interpret again.</p>
+    <p>We propose that you govern determinism as a <strong>spectrum</strong>. Do not wish for it as a property. Skills, commands, plugins, and hooks are now standard, and they give us a set of control surfaces. At each surface you can change probabilistic behavior into a guarantee.</p>
+    <p>A surface has more value when it is farther <strong>outside the agent's discretion</strong>. We call the practice <strong>gradual determinism</strong>. Keep the agent dynamic where its dynamism has value. Make constant only the parts that must not change.</p>
   </div>
 
   <section id="problem">
     <p class="sec-no">01 / THE PREMISE</p>
     <h2>The controls are in the wrong room</h2>
-    <p>The power of a harness like an autonomous coding agent is precisely its freedom: it interprets intent, writes the code, runs it, and decides when it is done. That freedom is not a bug to be removed. But a control that the agent can rewrite is not a control &mdash; it is a suggestion.</p>
-    <p>A skill that says &ldquo;validate the license headers&rdquo; depends on the agent choosing to validate, choosing to do so correctly, and not quietly deciding the step was unnecessary this time. When the rule and the actor share a room, the actor always wins. The fix is not to constrain the agent's intelligence. It is to move the rules into a room the agent cannot enter &mdash; and to do so only where a guarantee is actually worth its cost.</p>
+    <p>The power of an autonomous coding agent is its freedom. The agent interprets intent, writes the code, runs it, and decides when the work is complete. That freedom is not a defect. But a control that the agent can rewrite is not a control. It is a suggestion.</p>
+    <p>A skill says &ldquo;validate the license headers.&rdquo; That skill depends on three decisions by the agent. The agent must decide to validate. It must decide to validate correctly. It must not decide that the step is unnecessary this time. When the rule and the actor are in the same room, the actor always wins.</p>
+    <p>The correct fix is not a limit on the intelligence of the agent. Move the rules into a room that the agent cannot enter. Do this only where a guarantee is worth its cost.</p>
   </section>
 
   <section id="spectrum">
     <p class="sec-no">02 / THE FRAME</p>
     <h2>Five surfaces, one axis</h2>
-    <p>The mechanisms we already have line up along the <em class="term">anatomy of the agent loop</em>. Commands govern its <b>entry</b>. Scripts govern <b>execution</b>. Hooks govern the <b>exit</b>. Loops govern <b>continuation</b>. Wrappers own the <b>whole loop</b>. Read left to right, that ordering also tracks two things at once: how much is guaranteed, and how far the control sits outside the agent's reach.</p>
+    <p>The mechanisms that we have align with the <em class="term">anatomy of the agent loop</em>. Commands control its <b>entry</b>. Scripts control <b>execution</b>. Hooks control the <b>exit</b>. Loops control <b>continuation</b>. Wrappers own the <b>whole loop</b>.</p>
+    <p>From left to right, that order shows two things. It shows how much the surface guarantees. It also shows how far the control is outside the reach of the agent.</p>
 
     <div class="spectrum">
       <svg viewBox="0 0 700 220" role="img" aria-label="A spectrum from agent discretion to operator guarantee with five control surfaces">
@@ -377,7 +380,7 @@
       </div>
     </div>
 
-    <p>It is, strictly, two dimensions: the <em class="term">breadth of the guarantee</em> and its <em class="term">tamper-resistance</em>. A skill is fully in-band &mdash; the agent can paraphrase or skip it. A hook is enforced by the harness runtime whether or not the agent cooperates. That gap is what separates a pattern from a control.</p>
+    <p>There are two dimensions: the <em class="term">breadth of the guarantee</em> and its <em class="term">tamper-resistance</em>. A skill is fully in-band. The agent can paraphrase the skill or skip it. The harness runtime enforces a hook, even if the agent does not cooperate. That difference separates a pattern from a control.</p>
   </section>
 
   <section id="surfaces">
@@ -391,9 +394,10 @@
         <h3>Routing determinism</h3>
         <span class="governs">governs <b>entry</b></span>
       </div>
-      <p class="vignette">For three sprints, the &ldquo;run the compliance gate&rdquo; skill simply never fired. The agent kept deciding, in good faith, that it had already covered the spirit of the rule. Nobody could point to the run that proved it. We exposed the gate as <code class="inl">/comply</code> &mdash; a command the reviewer types &mdash; and the question &ldquo;did the gate run?&rdquo; became answerable for the first time.</p>
-      <p>Skill selection belongs to the agent; the user cannot compel a skill to fire. Commands invert that. A command is operator-invoked, so it is a routing guarantee: a named, auditable entry point into a known procedure. You cannot force the agent to <em class="term">choose</em> the right path, but you can hand the operator a path the agent cannot decline to take.</p>
-      <div class="guarantee"><b>Guarantee</b>This procedure ran, because a human invoked it &mdash; not because the model judged it relevant.</div>
+      <p class="vignette">For three sprints, the &ldquo;run the compliance gate&rdquo; skill never fired. Each time, the agent decided in good faith that it satisfied the intent of the rule. No person could point to the run that proved it. We made the gate available as <code class="inl">/comply</code>, a command that the reviewer types. Then we could answer the question &ldquo;did the gate run?&rdquo; for the first time.</p>
+      <p>The agent selects the skills. The user cannot make a skill fire. Commands reverse this. The operator invokes a command, so a command is a routing guarantee. It is a named entry point into a known procedure, and you can audit it.</p>
+      <p>You cannot make the agent <em class="term">choose</em> the correct path. But you can give the operator a path that the agent cannot refuse.</p>
+      <div class="guarantee"><b>Guarantee</b>This procedure ran because a person invoked it. It did not run because the model found it relevant.</div>
     </div>
 
     <!-- 2 -->
@@ -403,9 +407,9 @@
         <h3>Computational determinism</h3>
         <span class="governs">governs <b>execution</b></span>
       </div>
-      <p class="vignette">The settlement-rounding step came out a cent different across runs &mdash; never wrong enough to fail a test, never right enough to trust. The skill had described the calculation in prose and left the agent to re-derive it each time. We froze the reviewed implementation into a script and reduced the skill phase to &ldquo;invoke it.&rdquo; The cent stopped moving.</p>
-      <p>A skill phase written in natural language leaves interpretation &mdash; and code generation &mdash; to the agent at runtime. That is the right default for novel work. But once a phase has been generated, reviewed, curated, and approved, the same code can be packaged as a script and the phase description reduced to an instruction to adapt or invoke it. The non-determinism of regeneration collapses into the determinism of a frozen, version-controlled artifact.</p>
-      <div class="guarantee"><b>Guarantee</b>This step computes the same way every time, from code a human approved &mdash; not freshly improvised prose.</div>
+      <p class="vignette">The settlement-rounding step gave a result that changed by one cent between runs. The error was too small to fail a check, and too large to trust. The skill gave the calculation in prose and let the agent derive it again each time. We put the approved implementation into a script. We reduced the skill phase to one instruction: invoke the script. The cent did not move again.</p>
+      <p>A skill phase in natural language lets the agent interpret the phase and write the code at run time. That is the correct default for new work. But you can make a phase, review it, curate it, and approve it. Then you can package the same code as a script. You can reduce the phase description to an instruction that adapts or invokes that script. The non-determinism of regeneration becomes the determinism of a constant artifact under version control.</p>
+      <div class="guarantee"><b>Guarantee</b>This step computes the same way each time. It uses code that a person approved, not new prose.</div>
     </div>
 
     <!-- 3 -->
@@ -415,8 +419,9 @@
         <h3>Verification determinism</h3>
         <span class="governs">governs <b>exit</b></span>
       </div>
-      <p class="vignette">&ldquo;Done&rdquo; meant whatever the agent felt was done &mdash; sometimes with a failing test suite and a missing license header in the diff. We put a gate at the end of the turn. Now &ldquo;done&rdquo; has to survive a checker that does not negotiate.</p>
-      <p>At a hook point &mdash; the stop-hook fires when the agent tries to end its turn &mdash; deterministic code inspects the output for structural and semantic properties. And the loop <em>can</em> be re-driven from here: a stop-hook that returns a block decision with a reason prevents the agent from stopping and feeds that reason back as its next instruction. The hook becomes a hard exit gate. One guardrail is mandatory &mdash; the harness passes a <code class="inl">stop_hook_active</code> flag, true when the agent is already in a forced continuation, and the hook must honor it or it will loop forever.</p>
+      <p class="vignette">&ldquo;Done&rdquo; was what the agent thought was done. Sometimes the test suite failed and the diff had no license header. We put a gate at the end of the turn. Now &ldquo;done&rdquo; must satisfy a checker that does not negotiate.</p>
+      <p>The stop-hook fires when the agent tries to end its turn. At that hook point, deterministic code examines the output for structural and semantic properties. You <em>can</em> also drive the loop again from here. A stop-hook can return a block decision with a reason. The block prevents the agent from stopping, and the reason becomes its next instruction. The hook is a hard exit gate.</p>
+      <p>One guardrail is necessary. The harness sends a <code class="inl">stop_hook_active</code> flag. The flag is true when the agent is already in a forced continuation. The hook must obey the flag. If it does not, the hook loops forever.</p>
 <pre><span class="c">#!/usr/bin/env python3</span>
 <span class="c">"""Stop-hook gate: refuse to end the turn until the build is verifiably clean.</span>
 <span class="c"></span>
@@ -439,8 +444,8 @@ checks = subprocess.run([<span class="s">"make"</span>, <span class="s">"verify"
         <span class="s">"reason"</span>: <span class="s">f"Verification failed; fix before finishing:\n{checks.stdout}"</span>,
     }))
 sys.exit(0)</pre>
-      <p>Where the property needs judgment rather than an exit code &mdash; &ldquo;is this actually complete?&rdquo; &mdash; a prompt- or agent-type hook runs a cheap evaluator in the same slot. The shape is identical; only the oracle changes.</p>
-      <div class="guarantee"><b>Guarantee</b>The turn cannot end until the output passes a check the agent does not control &mdash; and failure re-drives the work.</div>
+      <p>Some properties need judgement, not an exit code. An example is the question &ldquo;is this complete?&rdquo; For these, a prompt-type or agent-type hook runs a low-cost evaluator in the same slot. The structure is the same. Only the oracle is different.</p>
+      <div class="guarantee"><b>Guarantee</b>The turn cannot end until the output passes a check that the agent does not control. A failure starts the work again.</div>
     </div>
 
     <!-- 4 -->
@@ -450,9 +455,10 @@ sys.exit(0)</pre>
         <h3>Conditional continuation</h3>
         <span class="governs">governs <b>iteration</b></span>
       </div>
-      <p class="vignette">The migration guide needed four passes before the style linter went quiet. Doing those passes by hand &mdash; re-prompting, re-reading the report &mdash; was the least deterministic part of an otherwise tidy pipeline. A <code class="inl">/loop</code> turned &ldquo;keep going until it's clean&rdquo; from a habit into a construct.</p>
-      <p>A <code class="inl">/loop</code>-style construct runs a task repeatedly until a satisfactory outcome is reached. This is not deterministic on its own &mdash; but it raises the floor of what we can expect. The honest caveat: a loop is only as deterministic as its verifier. A loop without an oracle just burns turns. Which is why loops and hooks compose naturally &mdash; the hook is the oracle, the loop is the driver &mdash; and the pair converges toward a property you can actually name.</p>
-      <div class="guarantee"><b>Guarantee</b>The harness keeps working until a stated condition holds &mdash; as trustworthy as the condition you can verify.</div>
+      <p class="vignette">The migration guide needed four passes before the style linter was quiet. We did those passes by hand. Each time we wrote the prompt again and read the report again. This was the least deterministic part of a pipeline that was otherwise clean. A <code class="inl">/loop</code> changed &ldquo;continue until it is clean&rdquo; from a habit into a construct.</p>
+      <p>A <code class="inl">/loop</code> construct runs a task again and again until the outcome is satisfactory. The loop is not deterministic on its own. But it increases the minimum result that we can expect. A loop is only as deterministic as its verifier. A loop with no oracle only uses turns.</p>
+      <p>So loops and hooks go together well. The hook is the oracle and the loop is the driver. Together they move toward a property that you can name.</p>
+      <div class="guarantee"><b>Guarantee</b>The harness continues until a stated condition is true. The guarantee is only as good as the condition that you can verify.</div>
     </div>
 
     <!-- 5 -->
@@ -462,8 +468,9 @@ sys.exit(0)</pre>
         <h3>Orchestration determinism</h3>
         <span class="governs">governs the <b>whole loop</b></span>
       </div>
-      <p class="vignette">The overnight batch was fine right up until the morning it wasn't &mdash; an agent applied a plan no one had seen. We did not want it slower; we wanted a hard gate between <em>plan</em> and <em>apply</em>, owned by something that was not the agent. So we wrote the gate ourselves and called the harness from inside it.</p>
-      <p>A custom wrapper drives the harness through its API or CLI &mdash; a more bespoke, more deterministic relative of <code class="inl">/loop</code>. And the multi-turn question resolves cleanly: a first headless call returns a session id, and subsequent calls resume that same session, preserving full context across invocations &mdash; exactly the thread-id pattern familiar from graph-based orchestration SDKs. The control flow now lives in code the operator owns. The agent supplies capability; the wrapper supplies the guarantee that nothing is applied unreviewed.</p>
+      <p class="vignette">The overnight batch was correct until one morning. On that morning, an agent applied a plan that no person had seen. We did not want a slower batch. We wanted a hard gate between <em>plan</em> and <em>apply</em>, owned by something that was not the agent. So we wrote the gate, and we called the harness from inside it.</p>
+      <p>A custom wrapper drives the harness through its API or its CLI. The wrapper is a more specific and more deterministic relative of <code class="inl">/loop</code>. The multi-turn question also has a clean answer. The first headless call returns a session id. Later calls resume the same session and keep the full context. This is the same thread-id pattern that graph-based orchestration SDKs use.</p>
+      <p>The control flow is now in code that the operator owns. The agent gives capability. The wrapper gives the guarantee that a person reviews each change before the harness applies it.</p>
 <pre><span class="c">"""Deterministic envelope around an agent harness.</span>
 <span class="c"></span>
 <span class="c">The orchestrator &mdash; not the agent &mdash; owns the control flow: it opens a</span>
@@ -489,29 +496,31 @@ sid = plan[<span class="s">"session_id"</span>]
 
 <span class="k">if</span> input(<span class="s">"Approve this plan? [y/N] "</span>).strip().lower() == <span class="s">"y"</span>:
     run(<span class="s">"Apply the approved plan exactly as described."</span>, session=sid)</pre>
-      <div class="guarantee"><b>Guarantee</b>The entire control flow &mdash; gates, approvals, retries &mdash; lives in code the operator owns; the agent is a callable primitive inside it.</div>
+      <div class="guarantee"><b>Guarantee</b>The full control flow is in code that the operator owns. This includes the gates, the approvals, and the retries. The agent is a primitive that this code calls.</div>
     </div>
   </section>
 
   <section id="compose">
     <p class="sec-no">04 / COMPOSITION</p>
     <h2>Deterministic skeleton, stochastic muscle</h2>
-    <p>These surfaces are not alternatives. They stack. A mature harness uses a <em class="term">command</em> to route into a known procedure, a <em class="term">script</em> to perform the step that must compute identically, a <em class="term">hook</em> to verify the result and re-drive on failure, and a <em class="term">wrapper</em> to own the approvals around the whole exchange. The agent keeps its dynamism in the gaps between &mdash; which is exactly where dynamism is worth having.</p>
-    <p class="pull">We are not making the agent deterministic. We are deciding, surface by surface, which invariants the agent is no longer permitted to violate.</p>
-    <p>It is worth being precise about what this buys. Generation remains stochastic; the model still improvises. What we gain is <em class="term">guaranteed invariants at chosen checkpoints</em> &mdash; islands of determinism around a probabilistic core. That is a more honest claim than &ldquo;deterministic agents,&rdquo; and a more useful one.</p>
+    <p>These surfaces are not alternatives. They stack. A mature harness uses all of them. A <em class="term">command</em> routes into a known procedure. A <em class="term">script</em> does the step that must compute identically. A <em class="term">hook</em> verifies the result and starts the work again after a failure.</p>
+    <p>A <em class="term">wrapper</em> owns the approvals around the full exchange. The agent keeps its dynamism in the spaces between these surfaces. That is where dynamism has value.</p>
+    <p class="pull">We do not make the agent deterministic. Surface by surface, we decide which invariants the agent can no longer violate.</p>
+    <p>Be precise about the result. Generation is still stochastic. The model still improvises. We get <em class="term">guaranteed invariants at selected checkpoints</em>. These are islands of determinism around a probabilistic core. That claim is more honest than &ldquo;deterministic agents,&rdquo; and it is more useful.</p>
   </section>
 
   <section id="why">
     <p class="sec-no">05 / WHY IT MATTERS</p>
     <h2>The control surface is the audit surface</h2>
-    <p>Compliance, security, and governance do not ask for cleverness. They ask: can you show, after the fact, that the rule held? Every surface on this spectrum is code &mdash; a command definition, a frozen script, a hook, an orchestration wrapper. Code is versionable, reviewable, signable, and attestable. The same move that makes a control tamper-resistant against the agent also makes it legible to an auditor.</p>
-    <p>That is the quiet payoff of pushing controls out-of-band. We stop hoping the agent behaved and start being able to <em class="term">demonstrate</em> the envelope it ran inside. For any setting where an autonomous system touches regulated work, that shift &mdash; from trust to evidence &mdash; is the whole game. Gradual determinism is how we get there without giving up the autonomy that made the harness worth adopting in the first place.</p>
+    <p>Compliance, security, and governance do not ask for cleverness. They ask one question. Can you show, after the event, that the rule held? Each surface on this spectrum is code: a command definition, a constant script, a hook, or an orchestration wrapper.</p>
+    <p>You can put code under version control. You can review it, sign it, and attest to it. The same change that makes a control resistant to the agent also makes it clear to an auditor.</p>
+    <p>That is the quiet result when you move controls out-of-band. We no longer hope that the agent behaved correctly. We can <em class="term">show</em> the envelope that contained it. An autonomous system that touches regulated work needs this change from trust to evidence. Gradual determinism gives us that change, and we keep the autonomy that made the harness worth its adoption.</p>
   </section>
 
   <footer>
-    <p>A working position on governing autonomy in agent harnesses. Shared for discussion and refinement.</p>
+    <p>A working position on the governance of autonomy in agent harnesses. We share it for discussion and refinement.</p>
     <div class="refs">
-      <p>Mechanism details verified against the Claude Code <em>Hooks reference</em> (stop-hook block/continue semantics, <code style="font-family:inherit">stop_hook_active</code>) and the <em>Headless mode</em> documentation (<code style="font-family:inherit">--output-format json</code>, <code style="font-family:inherit">session_id</code>, <code style="font-family:inherit">--resume</code>, <code style="font-family:inherit">--max-turns</code>).</p>
+      <p>We verified the mechanism details against two documents. The first is the Claude Code <em>Hooks reference</em> (stop-hook block and continue semantics, <code style="font-family:inherit">stop_hook_active</code>). The second is the <em>Headless mode</em> documentation (<code style="font-family:inherit">--output-format json</code>, <code style="font-family:inherit">session_id</code>, <code style="font-family:inherit">--resume</code>, <code style="font-family:inherit">--max-turns</code>).</p>
     </div>
   </footer>
 

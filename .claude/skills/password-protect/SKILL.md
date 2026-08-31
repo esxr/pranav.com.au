@@ -71,6 +71,8 @@ node .claude/skills/password-protect/scripts/verify-gate.js \
 
 This uses Node's Web Crypto (the same API the browser runs) to confirm: the correct password decrypts to the byte-identical original, a wrong password is rejected, and no sampled plaintext leaked into the gate source. Expect `ALL CHECKS PASSED`.
 
+One expected exception: if you passed the post's real title as the optional `[title]` argument, the leak check reports it as leaked — the gate's `<title>` genuinely is public. That is a deliberate choice, not a bug. Confirm the leaked tokens are *only* the title before accepting the failure, and prefer the default neutral "Protected" whenever the title itself gives away something the URL does not.
+
 It does **not** exercise the link-reading path, so also load the page in a browser (serve the repo with `python3 -m http.server` and drive it with the headless-browser MCP). Check all four cases:
 
 | URL | Expected |

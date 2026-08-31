@@ -7,6 +7,7 @@
   unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
 
   :root {
+    font-size:21px;
     --ground:#fff; --surface:#fff; --surface-2:#f4f4f2; --surface-3:#eceae7;
     --hair:#dcdcd8; --hair-strong:#b8b8b2;
     --ink:#1c1c1a; --dim:#56564f; --faint:#7d7d75;
@@ -30,22 +31,22 @@
 
   *{box-sizing:border-box}
   body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
-       font-size:16px;line-height:1.68;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:720px;margin:0 auto;padding:4rem 1.5rem 6rem}
+       font-size:1rem;line-height:1.58;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:720px;margin:0 auto;padding:64px 24px 96px}
   .stack{display:flex;flex-direction:column}
-  h1{font-family:var(--serif);font-weight:600;font-size:clamp(1.85rem,4.2vw,2.35rem);
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(1.75rem,4.2vw,2.15rem);
      line-height:1.15;margin:0;text-wrap:balance;letter-spacing:-.01em}
   h2{font-family:var(--serif);font-weight:600;font-size:1.32rem;line-height:1.25;margin:0;text-wrap:balance}
-  h3{font-size:1rem;font-weight:700;margin:0;line-height:1.35}
+  h3{font-size:1.05rem;font-weight:700;margin:0;line-height:1.35}
   h3 .n{font-family:var(--mono);font-size:.8rem;color:var(--faint);font-weight:500;margin-right:.5rem}
   p{margin:0} a{color:var(--accent)}
   .eyebrow{font-family:var(--mono);font-size:.67rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin:0}
   header.doc{border-bottom:1px solid var(--hair-strong);padding-bottom:1.5rem;gap:.6rem}
   .byline{font-family:var(--mono);font-size:.7rem;color:var(--faint);display:flex;flex-wrap:wrap;gap:.3rem 1.2rem;margin-top:.45rem}
   .abstract{border:1px solid var(--hair);border-radius:2px;background:var(--surface-2);
-            padding:1.15rem 1.25rem;margin-top:2.2rem;display:flex;flex-direction:column;gap:.7rem;font-size:.95rem}
+            padding:1rem 1.1rem;margin-top:1.9rem;display:flex;flex-direction:column;gap:.7rem;font-size:.95rem}
   .abstract .label,.note .label{font-family:var(--mono);font-size:.63rem;letter-spacing:.15em;text-transform:uppercase;color:var(--faint)}
-  section{gap:.8rem;margin-top:2.9rem}
+  section{gap:.8rem;margin-top:2.5rem}
   .qa{display:flex;flex-direction:column;gap:.7rem;border-top:1px solid var(--hair);padding-top:1rem;margin-top:1.6rem}
   .note{border:1px solid var(--hair);border-radius:2px;padding:.9rem 1rem;font-size:.93rem;
         display:flex;flex-direction:column;gap:.45rem;background:var(--surface-2)}
@@ -94,9 +95,9 @@
   @keyframes tint{0%,26%{background:var(--surface-2)}38%,80%{background:var(--accent-wash)}92%,100%{background:var(--surface-2)}}
 
   /* 1 — the bill */
-  .bill{display:flex;height:40px;border:1px solid var(--hair-strong);border-radius:2px;overflow:hidden}
+  .bill{display:flex;height:46px;border:1px solid var(--hair-strong);border-radius:2px;overflow:hidden}
   .bill span{display:flex;align-items:center;justify-content:center;font-family:var(--mono);
-             font-size:.6rem;color:#fff;background:var(--accent);overflow:hidden;white-space:nowrap;flex-grow:0}
+             font-size:.62rem;color:#fff;background:var(--accent);overflow:hidden;white-space:nowrap;flex-grow:0}
   .bill .pay{background:var(--cost);color:var(--ink);flex-grow:100}
   .bill .c1{animation:cut1 9s infinite}.bill .c2{animation:cut2 9s infinite}.bill .c3{animation:cut3 9s infinite}
   .bill .pay{animation:payg 9s infinite}
@@ -110,7 +111,7 @@
 
   /* 2 — breakpoints */
   .bp{height:0;opacity:0;overflow:hidden;border-top:1px dashed var(--accent);
-      font-family:var(--mono);font-size:.6rem;color:var(--accent);margin:0 .45rem;animation:bpin 9s infinite}
+      font-family:var(--mono);font-size:.62rem;color:var(--accent);margin:0 .45rem;animation:bpin 9s infinite}
   @keyframes bpin{0%,30%{height:0;opacity:0}42%,80%{height:15px;opacity:1}92%,100%{height:0;opacity:0}}
 
   /* 3 — masking */
@@ -130,7 +131,7 @@
   .cbox{position:absolute;border:1px dashed var(--hair-strong);border-radius:3px;opacity:0;animation:cbox 9s infinite}
   @keyframes cbox{0%,42%{opacity:0}56%,80%{opacity:1}92%,100%{opacity:0}}
   .cbox b{position:absolute;top:-8px;left:6px;background:var(--surface);font-family:var(--mono);
-          font-size:.57rem;font-weight:500;color:var(--faint);padding:0 4px}
+          font-size:.62rem;font-weight:500;color:var(--faint);padding:0 4px}
   .pill{position:absolute;left:0;bottom:0;font-family:var(--mono);font-size:.64rem;color:var(--accent);
         border:1px solid var(--accent);background:var(--accent-wash);border-radius:2px;
         padding:.18rem .45rem;opacity:0;animation:pill 9s infinite}
@@ -157,7 +158,7 @@
   .fun .wide b{animation:cheap 9s infinite}
   @keyframes cheap{0%,26%{background:var(--cost)}44%,80%{background:var(--accent)}96%,100%{background:var(--cost)}}
   .funlab{display:flex;gap:10px;margin-top:.4rem}
-  .funlab span{flex:1;font-family:var(--mono);font-size:.6rem;color:var(--faint);line-height:1.35}
+  .funlab span{flex:1;font-family:var(--mono);font-size:.62rem;color:var(--faint);line-height:1.35}
 
   /* 7 — per-key ledger */
   .led .row i{font-style:normal;opacity:0;animation:led 9s infinite}
@@ -171,7 +172,7 @@
   .qtr{display:flex;flex-direction:column;gap:.5rem}
   .qbar{height:22px;border:1px solid var(--hair-strong);border-radius:2px;display:flex;overflow:hidden}
   .qbar span{display:flex;align-items:center;justify-content:center;font-family:var(--mono);
-             font-size:.58rem;white-space:nowrap;overflow:hidden}
+             font-size:.62rem;white-space:nowrap;overflow:hidden}
   .qbar .plumb{background:var(--cost);color:var(--ink);flex-grow:100;animation:plumb 9s infinite}
   .qbar .prod{background:var(--accent);color:#fff;flex-grow:0;animation:prod 9s infinite}
   @keyframes plumb{0%,26%{flex-grow:100}46%,80%{flex-grow:8}96%,100%{flex-grow:100}}
@@ -179,34 +180,46 @@
   .qlab{font-family:var(--mono);font-size:.62rem;color:var(--faint)}
 
 
+  /* ---------- desktop: prose keeps its measure, figures break out wider ----------
+     The three prototypes sit inside the abstract panel, so the panel widens with
+     them and its own paragraphs stay pinned to the reading measure. */
+  @media (min-width:900px){
+    .bleed{position:relative;left:50%;transform:translateX(-50%)}
+    .proto-scroll{width:100%}
+    .abstract{width:min(1088px,calc(100vw - 3rem));padding:1.6rem 24px}
+    .abstract>p,.abstract>.label{max-width:720px;width:100%;margin-left:auto;margin-right:auto}
+    .fig{width:min(880px,calc(100vw - 3rem))}
+  }
+
   @media (max-width:760px){
-    body{font-size:15.5px;line-height:1.62}
-    .wrap{padding:2.25rem 1.1rem 4rem}
+    :root{font-size:19px}
+    body{line-height:1.6}
+    .wrap{padding:40px 20px 72px}
     h1{font-size:clamp(1.55rem,6.4vw,2rem)}
     h2{font-size:1.18rem}
     .abstract{padding:1rem .95rem}
     .qa{padding-top:.85rem;margin-top:1.3rem}
     .proto{width:660px}
-    .proto-scroll{margin:1.1rem -1.1rem;padding:0 1.1rem}
+    .proto-scroll{margin:1.1rem -20px;padding:0 20px}
     .life{flex-wrap:wrap}
     .life div{flex:1 1 calc(50% - 3px)}
-    .row{font-size:.66rem;padding:.3rem .4rem;gap:.4rem}
-    .tot{font-size:.68rem}
-    .bill{height:34px}
-    .bill span{font-size:.54rem}
-    .key,.funlab span,.qlab{font-size:.6rem}
-    .fig-head{font-size:.6rem;letter-spacing:.1em}
-    .fig figcaption{font-size:.6rem}
+    .row{font-size:.7rem;padding:.3rem .4rem;gap:.4rem}
+    .tot{font-size:.72rem}
+    .bill{height:38px}
+    .bill span{font-size:.68rem}
+    .key,.funlab span,.qlab{font-size:.68rem}
+    .fig-head{font-size:.68rem;letter-spacing:.1em}
+    .fig figcaption{font-size:.68rem}
     .cstage{height:auto;aspect-ratio:300/150;min-height:150px}
     table{font-size:.8rem}
     th,td{padding:.5rem .6rem .5rem 0}
     ol.steps .sub{font-size:.84rem}
   }
   @media (max-width:400px){
-    .wrap{padding-left:.85rem;padding-right:.85rem}
-    .proto-scroll{margin-left:-.85rem;margin-right:-.85rem;padding:0 .85rem}
+    .wrap{padding-left:16px;padding-right:16px}
+    .proto-scroll{margin-left:-16px;margin-right:-16px;padding:0 16px}
     .bill span{font-size:0}
-    .row{font-size:.62rem}
+    .row{font-size:.66rem}
   }
   @media (prefers-reduced-motion:reduce){
     .fig *,.fig *::before,.fig *::after{animation:none!important}
@@ -222,6 +235,8 @@
           --hair-strong:#888;--ink:#000;--dim:#333;--faint:#555;--accent:#000;
           --accent-wash:#f0f0f0;--cost:#bbb}
     body{font-size:10.5pt}.wrap{padding:0;max-width:none}
+    .bleed{position:static;left:auto;transform:none;width:auto}
+    .abstract{padding:.9rem 1rem}
     .note,.abstract,section,tr,ol.steps>li,.fig,.qa{break-inside:avoid}
     .fig *{animation:none!important}
   }
@@ -238,7 +253,7 @@
   </p>
 </header>
 
-<div class="abstract">
+<div class="abstract bleed">
   <p class="label">Abstract</p>
 
   <p>You built Fastlane so your customers can focus on their product while their content brings in
@@ -288,7 +303,7 @@
     So does each script you write and each revision you make after a post. So your gross margin
     moves with your model bill, and a new customer adds cost on every loop they run.</p>
 
-    <figure class="fig">
+    <figure class="fig bleed">
       <div class="fig-head">What one loop costs you</div>
       <div class="fig-stage">
         <div class="bill">
@@ -318,7 +333,7 @@
     part of the call. A provider bills a re-used prefix at about one tenth of the price, but only
     when the call marks where the prefix ends. Most agents do not mark it.</p>
 
-    <figure class="fig">
+    <figure class="fig bleed">
       <div class="fig-head">One call, turn 7</div>
       <div class="fig-stage">
         <div class="row tint"><span>brand pack + tool schemas</span>
@@ -350,7 +365,7 @@
     output that the model already used. You pay full price to send it again on every turn after
     that.</p>
 
-    <figure class="fig">
+    <figure class="fig bleed">
       <div class="fig-head">One call, turn 9</div>
       <div class="fig-stage">
         <div class="row"><span>system and tools</span><span>5,800 tok</span></div>
@@ -392,7 +407,7 @@
     <p>Each step is a separate goal that repeats across every account. A frontier model serves all
     of them, including the narrow ones a smaller model could do.</p>
 
-    <figure class="fig">
+    <figure class="fig bleed">
       <div class="fig-head">50,000 runs, grouped by goal</div>
       <div class="fig-stage">
         <div class="cstage">
@@ -427,7 +442,7 @@
     <p>A model swap that degrades a hook or a script costs you more than it saves. You cannot accept
     a change you have not seen evidence for.</p>
 
-    <figure class="fig">
+    <figure class="fig bleed">
       <div class="fig-head">The lifecycle of one learned rule</div>
       <div class="fig-stage">
         <div class="life">
@@ -461,7 +476,7 @@
     fast. Free users run the same pipeline as paid users. They read the same websites and they make
     the same scripts. So each free signup carries a real model cost and returns no revenue.</p>
 
-    <figure class="fig">
+    <figure class="fig bleed">
       <div class="fig-head">Two ways to fix a free plan that costs money</div>
       <div class="fig-stage">
         <div class="fun">
@@ -488,7 +503,7 @@
     bill for one customer, one brand, or one post. Provider dashboards report by API key and by day.
     They do not report by conversation.</p>
 
-    <figure class="fig">
+    <figure class="fig bleed">
       <div class="fig-head">Cost to serve, for each key</div>
       <div class="fig-stage">
         <div class="led">
@@ -519,7 +534,7 @@
     team needs about one quarter to build this well. You are about to hire one founding engineer,
     and that person will be the most valuable engineering hour in the company for the next year.</p>
 
-    <figure class="fig">
+    <figure class="fig bleed">
       <div class="fig-head">Your founding engineer's first quarter</div>
       <div class="fig-stage">
         <div class="qtr">
@@ -1584,6 +1599,9 @@ function ProtoPatterns(props) {
       width: 26,
       height: 34,
       zIndex: 7,
+      /* when the mobile crop hides the sidebar, hide the cursor while it is
+         out there rather than let it fly off the visible canvas */
+      opacity: props.clipX && cur[0] < props.clipX ? 0 : 1,
       transform: 'scale(' + (1 - 0.14 * press) + ')',
       transformOrigin: '2px 2px'
     }
@@ -2370,6 +2388,9 @@ function ProtoSkill(props) {
       width: 26,
       height: 34,
       zIndex: 7,
+      /* when the mobile crop hides the sidebar, hide the cursor while it is
+         out there rather than let it fly off the visible canvas */
+      opacity: props.clipX && cur[0] < props.clipX ? 0 : 1,
       transform: 'scale(' + (1 - 0.14 * press) + ')',
       transformOrigin: '2px 2px'
     }
@@ -2911,14 +2932,40 @@ window.ProtoIntegrate = ProtoIntegrate;
 (() => {
   const React = window.React, ReactDOM = window.ReactDOM;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Every prototype is drawn into a fixed 1540x1120 world and uniformly scaled
+     to fit. On a phone that lands the whole world in a 660px scroller, which
+     puts nav labels around 11px. The window chrome — the 54px titlebar and the
+     252px sidebar — carries no argument, so on small screens we crop it out and
+     spend the reclaimed width on the content column instead. ProtoIntegrate is
+     three free-floating windows with no chrome to shed, so it is left whole. */
+  const PW = 1540, PH = 1120;
+  const CROP = { ProtoPatterns: [252, 54], ProtoSkill: [252, 54] };
+  /* crop wherever the figure cannot be widened, i.e. below the bleed breakpoint */
+  const small = matchMedia('(max-width: 899px)');
+
   document.querySelectorAll('.proto').forEach(el => {
     const Comp = window[el.dataset.c];
     if (!Comp || !ReactDOM || !ReactDOM.createRoot) return;
     const root = ReactDOM.createRoot(el);
     let lastT = 0;
-    const draw = (t) => { lastT = t; root.render(React.createElement(Comp, {
-      open: 1, t, x: 0, y: 0, w: el.clientWidth, h: el.clientHeight })); };
+    const draw = (t) => {
+      lastT = t;
+      const c = small.matches ? CROP[el.dataset.c] : null;
+      if (c) {
+        const cw = PW - c[0], ch = PH - c[1];
+        el.style.aspectRatio = cw + '/' + ch;
+        const s = el.clientWidth / cw;
+        root.render(React.createElement(Comp, { open: 1, t, clipX: c[0],
+          x: -c[0] * s, y: -c[1] * s, w: PW * s, h: PH * s }));
+      } else {
+        el.style.aspectRatio = '';
+        root.render(React.createElement(Comp, {
+          open: 1, t, x: 0, y: 0, w: el.clientWidth, h: el.clientHeight }));
+      }
+    };
     if (window.ResizeObserver) new ResizeObserver(() => draw(lastT)).observe(el);
+    small.addEventListener('change', () => draw(lastT));
     if (reduce) { draw(0); return; }
     let live = false, raf = 0, t0 = 0, last = -1;
     const frame = (ts) => {

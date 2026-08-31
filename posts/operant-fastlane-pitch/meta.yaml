@@ -1,0 +1,4 @@
+title: "Operant — A cheaper reasoning layer for Fastlane"
+date: "2026-08-31"
+description: "A proposal for Fastlane: cut what each agent loop costs to serve instead of giving free users less — kv-cache shaping, compression, and learned routing, with one week in look-only mode to measure the prize."
+tags: ["operant", "fastlane", "ai-agents", "inference-cost", "proposal"]

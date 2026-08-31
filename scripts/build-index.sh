@@ -162,9 +162,9 @@ index_html = f'''<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pranav Dhoolia</title>
-  <meta name="description" content="Pranav Dhoolia — AI systems, evals, and fine-tuning">
+  <meta name="description" content="Pranav Dhoolia — I like Engineering">
   <meta property="og:title" content="Pranav Dhoolia">
-  <meta property="og:description" content="AI systems, evals, and fine-tuning">
+  <meta property="og:description" content="I like Engineering">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://pranav.com.au/">
   <link rel="canonical" href="https://pranav.com.au/">
@@ -174,11 +174,11 @@ index_html = f'''<!DOCTYPE html>
   <header>
     <nav>
       <a href="./" class="active">Home</a>
-      <a href="about.html">About</a>
+      <a href="https://linkedin.com/in/pranavdhoolia" target="_blank" rel="noopener noreferrer">About</a>
     </nav>
     <div class="hero">
       <h1>Pranav Dhoolia</h1>
-      <p>AI systems, evals, and fine-tuning</p>
+      <p>I like Engineering</p>
     </div>
   </header>
   <main>

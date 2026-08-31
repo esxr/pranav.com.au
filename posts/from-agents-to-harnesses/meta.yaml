@@ -1,5 +1,5 @@
-title: "From Agents to Harnesses — Domain-Specific Harnessing of the LLM OS"
-date: "2026-06-11"
-description: "How domain-specific harnesses transform raw LLM agents into governed, deterministic systems"
-tags: ["operant", "ai-agents", "harnesses", "llm-os"]
+title: "From Agents to Harnesses"
+date: "2026-06-09"
+description: "How five control surfaces — commands, scripts, hooks, gates, and a state machine — pin down every phase boundary an autonomous agent is no longer permitted to cross"
+tags: ["operant", "ai-agents", "determinism", "governance"]
 draft: false

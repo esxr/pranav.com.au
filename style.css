@@ -120,16 +120,19 @@ nav a.active {
   margin: 0;
 }
 
-.post-card,
-.post-card:visited,
-.post-card:hover,
-.post-card:active {
+.post-card {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s ease;
+}
+
+.post-card a,
+.post-card a:visited,
+.post-card a:hover,
+.post-card a:active {
   display: block;
   padding: 1.25rem 0;
-  border-bottom: 1px solid var(--border);
   text-decoration: none;
   color: inherit;
-  transition: background 0.15s ease;
 }
 
 .post-card:hover {
